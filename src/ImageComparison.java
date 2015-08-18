@@ -60,7 +60,7 @@ public class ImageComparison {
 		
 		for (int x = 0; x<imagewidth; x++) {
 			for(int y = 0;y<imageheight; y++) {
-				if (img1.getRGB(x, y) != img2.getRGB(x, y)) {
+				if (calculatePixelRgbDiff(x, y, img1, img2) > threshold) {
 //					outImgGraphics.drawRect(x * pixelPerBlockX, y * pixelPerBlockY,
 //							pixelPerBlockX - 1, pixelPerBlockY - 1);
 					equal = false;
@@ -68,6 +68,10 @@ public class ImageComparison {
 			}
 		}
 		
+		if (!equal) {
+			if(pathOut != null && !pathOut.isEmpty())
+				saveImage(imgOut,pathOut);
+		}
 		return equal;
 	}
 
@@ -95,8 +99,10 @@ public class ImageComparison {
 				}
 			}
 		}
-		if(pathOut != null && !pathOut.isEmpty())
-			saveImage(imgOut,pathOut);
+		if (!exactlyEqual) {
+			if(pathOut != null && !pathOut.isEmpty())
+				saveImage(imgOut,pathOut);
+		}
 		
 		return exactlyEqual;
 	}
@@ -105,8 +111,14 @@ public class ImageComparison {
 		/*Method for the regular fuzzy comparison*/
 		
 		boolean fuzzyEqual = true;
-		if ((pixelPerBlockX == 1) && (pixelPerBlockY == 1) && (threshold == 0.00)) {
-			return exactlyEqual(img1, img2, pathOut);
+		if ((pixelPerBlockX == 1) && (pixelPerBlockY == 1)) {
+			if (threshold == 0.00) {
+				return exactlyEqual(img1, img2, pathOut);
+			}
+			else {
+				return pixelFuzzyEqual(img1, img2, pathOut);
+			}
+			
 		}
 		if ((img1.getWidth() != img2.getWidth()) || (img1.getHeight() != img2.getHeight())) {
 			img2 = adaptImageSize(img1,img2);
@@ -127,33 +139,30 @@ public class ImageComparison {
 				/ (float) pixelPerBlockX);
 		int blocksy = (int) Math.ceil((float) imageheight
 				/ (float) pixelPerBlockY);
-
-		for (int y = 0; y < blocksy; y++) {
-//			debug = "";
-			for (int x = 0; x < blocksx; x++) {
+		
+		for (int y = 0; y < blocksx; y++) {
+			for (int x = 0; x < blocksy; x++) {
 				subImageWidth=calcPixSpan(pixelPerBlockX,x,imagewidth);
 				subImageHeight=calcPixSpan(pixelPerBlockY,y,imageheight);
-				//System.out.println(" Real Width:" +img1.getWidth() + " Real Height:" +img1.getHeight() + " X-Start:"+ x * pixelPerBlockX + " Y-Start:" +y * pixelPerBlockY + " sub width:" +subImageWidth + " sub height:" + subImageHeight);
-				//System.out.println(" Real Width:" +img2.getWidth() + " Real Height:" +img2.getHeight() + " X-Start:"+ x * pixelPerBlockX + " Y-Start:" +y * pixelPerBlockY + " sub width:" +subImageWidth + " sub height:" + subImageHeight);
 				HashMap<String, Integer> avgRgb1 = getAverageRgb(img1
 						.getSubimage(x * pixelPerBlockX, y * pixelPerBlockY,
 								subImageWidth, subImageHeight));
 				HashMap<String, Integer> avgRgb2 = getAverageRgb(img2
 						.getSubimage(x * pixelPerBlockX, y * pixelPerBlockY,
 								subImageWidth, subImageHeight));
-//				debug = debug
-//						+ String.format(Locale.ENGLISH, "%1.2f",
-//								calculateRgbDiff(avgRgb1, avgRgb2)) + " | ";
 				if (calculateRgbDiff(avgRgb1, avgRgb2) > threshold) {
 					outImgGraphics.drawRect(x * pixelPerBlockX, y * pixelPerBlockY,
 							pixelPerBlockX - 1, pixelPerBlockY - 1);
 					fuzzyEqual = false;
 				}
 			}
-			//System.out.println(debug);
 		}
-		if(pathOut != null && !pathOut.isEmpty())
-			saveImage(imgOut,pathOut);
+
+		if (!fuzzyEqual) {
+			if(pathOut != null && !pathOut.isEmpty())
+				saveImage(imgOut,pathOut);
+		}
+		
 		return fuzzyEqual;
 	}
 
@@ -187,8 +196,7 @@ public class ImageComparison {
 	
 	private double calculatePixelRgbDiff(int x, int y, BufferedImage img1, BufferedImage img2) {
 		double maxDifference = 255 * 255 * 255;
-		double difference = Math.abs(img1.getRGB(x, y)) - img2.getRGB(x, y);
-		
+		double difference = Math.abs(img1.getRGB(x, y) - img2.getRGB(x, y));
 		return difference/maxDifference;
 	}
 	
@@ -201,8 +209,7 @@ public class ImageComparison {
 
 		return difference / maxDifference;
 	}
-
-
+	
 	private HashMap<String, Integer> getAverageRgb(BufferedImage img) {
 		Raster currentRaster = img.getData();
 		HashMap<String, Integer> averageRgb = new HashMap<String, Integer>();
@@ -242,7 +249,7 @@ public class ImageComparison {
 		BufferedImage bi = imageToBufferedImage(img);
 		File f = new File(filename);
 		try {
-			ImageIO.write(bi,"jpg", f);
+			ImageIO.write(bi,"png", f);
 		}
 		catch (IOException io) {
 		}
