@@ -27,8 +27,7 @@ public class ColorTest {
        
         red = new Color(redImg.getRGB(2, 2));
         System.out.println("RGB: " + redImg.getRGB(2,2));
-        System.out.println("Red: " + red.getRed());
-       
+        System.out.println("Red: " + red.getRed());  
     }
    
     public static BufferedImage setAlpha(BufferedImage img) {
