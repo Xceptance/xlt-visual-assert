@@ -1,5 +1,3 @@
-
-
 import java.io.*;
 import java.util.HashMap;
 import java.awt.*;
@@ -77,6 +75,7 @@ public class ImageComparison {
 
 	public boolean exactlyEqual (BufferedImage img1, BufferedImage img2, String pathOut) throws IOException {
 		/*Method for the exact comparison of two images*/
+		//img1: reference Image, img2: screenshot
 		boolean exactlyEqual = true;
 		if ((img1.getWidth() != img2.getWidth()) || (img1.getHeight() != img2.getHeight())) {
 			img2 = adaptImageSize(img1,img2);
@@ -84,18 +83,18 @@ public class ImageComparison {
 		
 		
 		imgOut = imageToBufferedImage(img2);
-		Graphics2D outImgGraphics = imgOut.createGraphics();
-		outImgGraphics.setColor(Color.RED);
+//		Graphics2D outImgGraphics = imgOut.createGraphics();
+//		outImgGraphics.setColor(Color.RED);
 		
 		int imagewidth = img1.getWidth();
 		int imageheight = img1.getHeight();
 		
 		for (int x = 0; x<imagewidth; x++) {
 			for(int y = 0;y<imageheight; y++) {
-				if (img1.getRGB(x, y) != img2.getRGB(x, y)) {
-//					outImgGraphics.drawRect(x * pixelPerBlockX, y * pixelPerBlockY,
-//							pixelPerBlockX - 1, pixelPerBlockY - 1);
-					exactlyEqual = false;
+					if (img1.getRGB(x, y) != img2.getRGB(x, y)) {
+						exactlyEqual = false;
+//						outImgGraphics.drawRect(x * pixelPerBlockX, y * pixelPerBlockY,
+//								pixelPerBlockX - 1, pixelPerBlockY - 1);
 				}
 			}
 		}
