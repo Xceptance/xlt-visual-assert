@@ -6,11 +6,11 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
-import org.openqa.selenium.Capabilities;
+// import org.openqa.selenium.Capabilities; 	Incompatible with Xlt
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.remote.RemoteWebDriver;
+// import org.openqa.selenium.remote.RemoteWebDriver;	Incompatible with Xlt
 
 import com.xceptance.xlt.api.engine.Session;
 import com.xceptance.xlt.api.engine.scripting.WebDriverCustomModule;
@@ -27,8 +27,14 @@ public class CompareScreenshots implements WebDriverCustomModule
     public void execute(WebDriver webDriver, String... parameters)
     {
         String currentActionName = Session.getCurrent().getWebDriverActionName();
-    	String browserName = getBrowserName(webDriver);
-    	String referencePath = "./" + browserName + "/" + currentActionName;  
+        String browserName = "Firefox";
+        String referencePath;
+        if (parameters[0] == null) {
+        	referencePath = "/home/daniel/workspace/" + browserName + "/" + currentActionName;
+        }
+        else { 
+        	referencePath = parameters[0];  			//May mean there is no separate Folder for other browsers
+        }
         File referenceFile = new File(referencePath + ".png");
         if (!referenceFile.isFile()) {
             try
@@ -40,6 +46,7 @@ public class CompareScreenshots implements WebDriverCustomModule
                 // TODO:
             }
         	System.out.println("Set new reference Screenshot");
+  //  		System.out.println("referenceFile absolute path: " + referenceFile.getAbsolutePath()); 	//Debug
         }
         else {
         	File screenshotFile = new File(referencePath + "-new-screenshot" + ".png");
@@ -47,15 +54,16 @@ public class CompareScreenshots implements WebDriverCustomModule
             {
                 takeScreenshot(webDriver, screenshotFile);
                 System.out.println("Found reference screenshot");
+  //      		System.out.println("sceenshotFile absolute path: " + screenshotFile.getAbsolutePath());	//Debug
             }
             catch (IOException e)
             {
                 // TODO:
             }
-            //Convert fuzzyness Parameters from String to integer/ double
-            int pixelPerBlockX = Integer.parseInt(parameters[0]);
-            int pixelPerBlockY = Integer.parseInt(parameters[1]);
-            double threshold = Double.parseDouble(parameters[2]);   
+            //Convert fuzzyness Parameters from String to integer/double
+            int pixelPerBlockX = Integer.parseInt(parameters[1]);
+            int pixelPerBlockY = Integer.parseInt(parameters[2]);
+            double threshold = Double.parseDouble(parameters[3]);   
             try {
             	BufferedImage screenshot = ImageIO.read(screenshotFile);
             	BufferedImage reference = ImageIO.read(referenceFile);
@@ -69,6 +77,7 @@ public class CompareScreenshots implements WebDriverCustomModule
             		//print marked Image
             		File fileMarkedImage = new File(referencePath + "marked" + ".png");
             		openFile(fileMarkedImage);
+ //           		System.out.println("fileMarkedImage absolute path: " + fileMarkedImage.getAbsolutePath());	//Debug
             		System.out.println("Layout did change");
             	}
             }
@@ -128,11 +137,11 @@ public class CompareScreenshots implements WebDriverCustomModule
 		}
 		return reference;
 	}
-	private String getBrowserName(WebDriver webdriver) {				//New
-		Capabilities capabilities = ((RemoteWebDriver) webdriver).getCapabilities();
-		String browserName = capabilities.getBrowserName();
-		return browserName;
-	}
+//	private String getBrowserName(WebDriver webdriver) {				Incombatability with Xceptance?
+//		Capabilities capabilities = ((RemoteWebDriver) webdriver).getCapabilities();
+//		String browserName = capabilities.getBrowserName();
+//		return browserName;
+//	}		
 }
 
 
