@@ -6,9 +6,11 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.remote.RemoteWebDriver;
 
 import com.xceptance.xlt.api.engine.Session;
 import com.xceptance.xlt.api.engine.scripting.WebDriverCustomModule;
@@ -25,7 +27,9 @@ public class CompareScreenshots implements WebDriverCustomModule
     public void execute(WebDriver webDriver, String... parameters)
     {
         String currentActionName = Session.getCurrent().getWebDriverActionName();
-        File referenceFile = new File(currentActionName + ".png");
+    	String browserName = getBrowserName(webDriver);
+    	String referencePath = "./" + browserName + "/" + currentActionName;  
+        File referenceFile = new File(referencePath + ".png");
         if (!referenceFile.isFile()) {
             try
             {
@@ -38,7 +42,7 @@ public class CompareScreenshots implements WebDriverCustomModule
         	System.out.println("Set new reference Screenshot");
         }
         else {
-        	File screenshotFile = new File(currentActionName + "-new-screenshot" + ".png");
+        	File screenshotFile = new File(referencePath + "-new-screenshot" + ".png");
             try
             {
                 takeScreenshot(webDriver, screenshotFile);
@@ -58,12 +62,12 @@ public class CompareScreenshots implements WebDriverCustomModule
             	reference = overwriteTransparentPixels(reference, screenshot);
             	//The following is rudimentary, the ImageComparison class should be integrated
             	ImageComparison imagecomparison = new ImageComparison(pixelPerBlockX, pixelPerBlockY, threshold);
-            	if (imagecomparison.fuzzyEqual(reference, screenshot, currentActionName + "marked" + ".png")) {						
+            	if (imagecomparison.fuzzyEqual(reference, screenshot, referencePath + "marked" + ".png")) {						
             		System.out.println("Layout didn't change");
             	}
             	else {
             		//print marked Image
-            		File fileMarkedImage = new File(currentActionName + "marked" + ".png");
+            		File fileMarkedImage = new File(referencePath + "marked" + ".png");
             		openFile(fileMarkedImage);
             		System.out.println("Layout did change");
             	}
@@ -123,6 +127,11 @@ public class CompareScreenshots implements WebDriverCustomModule
 			}
 		}
 		return reference;
+	}
+	private String getBrowserName(WebDriver webdriver) {				//New
+		Capabilities capabilities = ((RemoteWebDriver) webdriver).getCapabilities();
+		String browserName = capabilities.getBrowserName();
+		return browserName;
 	}
 }
 
