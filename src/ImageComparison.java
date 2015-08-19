@@ -134,17 +134,19 @@ public class ImageComparison {
 		int blocksy = (int) Math.ceil((float) imageheight
 				/ (float) pixelPerBlockY);
 		
-		for (int y = 0; y < blocksx; y++) {
-			for (int x = 0; x < blocksy; x++) {
+		for (int y = 0; y < blocksy; y++) {
+			for (int x = 0; x < blocksx; x++) {
 				subImageWidth=calcPixSpan(pixelPerBlockX,x,imagewidth);
 				subImageHeight=calcPixSpan(pixelPerBlockY,y,imageheight);
-				HashMap<String, Integer> avgRgb1 = getAverageRgb(img1
-						.getSubimage(x * pixelPerBlockX, y * pixelPerBlockY,
-								subImageWidth, subImageHeight));
-				HashMap<String, Integer> avgRgb2 = getAverageRgb(img2
-						.getSubimage(x * pixelPerBlockX, y * pixelPerBlockY,
-								subImageWidth, subImageHeight));
-				if (calculateRgbDiff(avgRgb1, avgRgb2) > threshold) {
+
+				BufferedImage sub1 = img1.getSubimage(x * pixelPerBlockX, y * pixelPerBlockY,
+									subImageWidth, subImageHeight);
+				BufferedImage sub2 =  img2.getSubimage(x * pixelPerBlockX, y * pixelPerBlockY,
+						subImageWidth, subImageHeight);
+				double[] avgRgb1 = calculateAverageRgb(sub1);
+				double[] avgRgb2 = calculateAverageRgb(sub2);
+				
+				if (getRgbDifference(avgRgb1, avgRgb2) > threshold) {
 					outImgGraphics.drawRect(x * pixelPerBlockX, y * pixelPerBlockY,
 							pixelPerBlockX - 1, pixelPerBlockY - 1);
 					fuzzyEqual = false;
@@ -189,47 +191,49 @@ public class ImageComparison {
 	}
 	
 	private double calculatePixelRgbDiff(int x, int y, BufferedImage img1, BufferedImage img2) {
-		double maxDifference = 255 * 255 * 255;
-		double difference = Math.abs(img1.getRGB(x, y) - img2.getRGB(x, y));
+		double maxDifference = 3 * 255;
+		Color color1 = new Color(img1.getRGB(x, y));
+		Color color2 = new Color(img2.getRGB(x, y));
+		double difference = Math.abs(color1.getBlue() - color2.getBlue())
+							+ Math.abs(color1.getRed() - color2.getRed())
+							+ Math.abs(color1.getGreen() - color2.getGreen());
+		
+//		double difference = Math.abs(img1.getRGB(x, y) - img2.getRGB(x, y));
 		return difference/maxDifference;
 	}
 	
-	private double calculateRgbDiff(HashMap<String, Integer> avgRgb1,
-			HashMap<String, Integer> avgRgb2) {
-		double maxDifference = 255 * 3;
-		double difference = Math.abs(avgRgb1.get("r") - avgRgb2.get("r"))
-				+ Math.abs(avgRgb1.get("g") - avgRgb2.get("g"))
-				+ Math.abs(avgRgb1.get("b") - avgRgb2.get("b"));
-
-		return difference / maxDifference;
-	}
-	
-	private HashMap<String, Integer> getAverageRgb(BufferedImage img) {
-		Raster currentRaster = img.getData();
-		HashMap<String, Integer> averageRgb = new HashMap<String, Integer>();
-		averageRgb.put("r", 0);
-		averageRgb.put("g", 0);
-		averageRgb.put("b", 0);
-
-		for (int y = 0; y < img.getHeight(); y++) {
-			for (int x = 0; x < img.getWidth(); x++) {
-				averageRgb.put("r", averageRgb.get("r") + currentRaster.getSample(x, y, 0));
-				averageRgb.put("g", averageRgb.get("g") + currentRaster.getSample(x, y, 1));
-				averageRgb.put("b", averageRgb.get("b") + currentRaster.getSample(x, y, 2));
-
+	private double[] calculateAverageRgb (BufferedImage img) {
+		double[] averageRgb = {0, 0, 0};
+		int imageHeight = img.getHeight();
+		int imageWidth = img.getWidth();
+		
+		for (int y = 0; y<imageHeight; y++) {
+			for (int x = 0; x<imageWidth; x++) {
+				Color color = new Color (img.getRGB(x, y));
+				averageRgb[0] = averageRgb[0] + (double) color.getRed();
+				averageRgb[1] = averageRgb[1] + (double) color.getGreen();
+				averageRgb[2] = averageRgb[2] + (double) color.getBlue();
 			}
 		}
-
-		averageRgb.put("r",
-				averageRgb.get("r") / (img.getHeight() * img.getWidth()));
-		averageRgb.put("g",
-				averageRgb.get("g") / (img.getHeight() * img.getWidth()));
-		averageRgb.put("b",
-				averageRgb.get("b") / (img.getHeight() * img.getWidth()));
-
+		
+		double pixels = imageWidth * imageHeight;
+		averageRgb[0] = averageRgb[0] / pixels;
+		averageRgb[1] = averageRgb[1] / pixels;
+		averageRgb[2] = averageRgb[2] / pixels;
+		
+		
 		return averageRgb;
 	}
-
+	
+	private double getRgbDifference(double [] Rgb1, double [] Rgb2) {
+		double maxDiff = 3 * 255;
+		double diff = Math.abs(Rgb1[0] - Rgb2[0]) +
+					Math.abs(Rgb1[1] - Rgb2[1]) +
+					Math.abs(Rgb1[2] - Rgb2[2]);
+		
+		return diff/maxDiff;
+	}
+	
 	private BufferedImage imageToBufferedImage(Image img) {
 		BufferedImage bi = new BufferedImage(img.getWidth(null),
 				img.getHeight(null), BufferedImage.TYPE_INT_RGB);
