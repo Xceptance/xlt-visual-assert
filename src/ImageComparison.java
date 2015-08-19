@@ -50,17 +50,15 @@ public class ImageComparison {
 		}
 		
 		imgOut = imageToBufferedImage(img2);
-		Graphics2D outImgGraphics = imgOut.createGraphics();
-		outImgGraphics.setColor(Color.RED);
+
 		
 		int imagewidth = img1.getWidth();
 		int imageheight = img1.getHeight();
-		
+		int rgbRed = (255 << 24) | (255 << 16) | (0 << 8) | 0; 						//
 		for (int x = 0; x<imagewidth; x++) {
 			for(int y = 0;y<imageheight; y++) {
 				if (calculatePixelRgbDiff(x, y, img1, img2) > threshold) {
-//					outImgGraphics.drawRect(x * pixelPerBlockX, y * pixelPerBlockY,
-//							pixelPerBlockX - 1, pixelPerBlockY - 1);
+					imgOut.setRGB(x, y, rgbRed);									//Paint it red
 					equal = false;
 				}
 			}
@@ -83,18 +81,15 @@ public class ImageComparison {
 		
 		
 		imgOut = imageToBufferedImage(img2);
-//		Graphics2D outImgGraphics = imgOut.createGraphics();
-//		outImgGraphics.setColor(Color.RED);
-		
+	
 		int imagewidth = img1.getWidth();
 		int imageheight = img1.getHeight();
-		
-		for (int x = 0; x<imagewidth; x++) {
+		int rgbRed = (255 << 24) | (255 << 16) | (0 << 8) | 0; 			
+		for (int x = 0; x<imagewidth; x++) {							
 			for(int y = 0;y<imageheight; y++) {
 					if (img1.getRGB(x, y) != img2.getRGB(x, y)) {
-						exactlyEqual = false;
-//						outImgGraphics.drawRect(x * pixelPerBlockX, y * pixelPerBlockY,
-//								pixelPerBlockX - 1, pixelPerBlockY - 1);
+						exactlyEqual = false;														
+						imgOut.setRGB(x, y, rgbRed);					
 				}
 			}
 		}
@@ -123,7 +118,7 @@ public class ImageComparison {
 			img2 = adaptImageSize(img1,img2);
 		}
 
-		imgOut = imageToBufferedImage(img2);
+		imgOut = img2;
 		Graphics2D outImgGraphics = imgOut.createGraphics();
 		outImgGraphics.setColor(Color.RED);
 		

@@ -16,22 +16,42 @@ public class Bildvergleichstest {
 		BufferedImage img1 = ImageIO.read(first);
 		BufferedImage img2 = ImageIO.read(second);
 		
-		ImageComparison imageComparison = new ImageComparison(50,50,0.05);
+		img1 = overwriteTransparentPixels(img1, img2);
+		ImageComparison imageComparison = new ImageComparison(30,30,0.05);
 		
-/**		if (imageComparison.pixelFuzzyEqual(img1, img2, imgOutputDifferences)) 
+		if (imageComparison.pixelFuzzyEqual(img1, img2, imgOutputDifferences)) 
 			System.out.println("Die Bilder sind gleich");
 		else 
 			System.out.println("Die Bilder sind nicht gleich");
-*/		
-		if(imageComparison.exactlyEqual(img1, img2, imgOutputDifferences))
-			System.out.println("Die Bilder sind gleich");
-		else 
-			System.out.println("Die Bilder sind nicht gleich");
+		
+//		if(imageComparison.exactlyEqual(img1, img2, imgOutputDifferences))
+//			System.out.println("Die Bilder sind gleich");
+//		else 
+//			System.out.println("Die Bilder sind nicht gleich");
 		
 	
-/**		if(imageComparison.fuzzyEqual(first,second,imgOutputDifferences))
-			System.out.println("Images are fuzzy-equal.");
-		else
-			System.out.println("Images are not fuzzy-equal."); 
-*/	}
+//		if(imageComparison.fuzzyEqual(img1, img2,imgOutputDifferences))
+//			System.out.println("Images are fuzzy-equal.");
+//		else
+//			System.out.println("Images are not fuzzy-equal."); 
+	}
+	
+    /**
+     * Overwrites all transparent pixels in the reference image with corresponding pixels of the screenshot image.
+     * Pseudotransparency
+     * 
+     * @throws IOException
+     */
+	private static BufferedImage overwriteTransparentPixels(BufferedImage reference, BufferedImage screenshot) {
+		for (int w=0; w<reference.getWidth(); w++) {
+			for (int h=0; h<reference.getHeight(); h++) {
+				int alpha = (reference.getRGB(w, h) >> 24) & 0xFF;
+				if (alpha == 0) {
+					int rgb = screenshot.getRGB(w, h);
+					reference.setRGB(w, h, rgb);
+				}
+			}
+		}
+		return reference;
+	}
 }
