@@ -108,8 +108,6 @@ public class ImageComparison {
         }
 
         imgOut = img2;
-        Graphics2D outImgGraphics = imgOut.createGraphics();
-        outImgGraphics.setColor(Color.RED);
        
         int subImageHeight;
         int subImageWidth;
@@ -158,8 +156,7 @@ public class ImageComparison {
                     if (getRgbDifference(avgRgbSubMaskImage, avgRgbBlack) > threshold) {       
                        
 //                        mark the current block and set fuzzyEqual false
-                        outImgGraphics.drawRect(x * pixelPerBlockX, y * pixelPerBlockY,
-                        pixelPerBlockX - 1, pixelPerBlockY - 1);
+                    	drawBorders(imgOut, pixelPerBlockX, pixelPerBlockY, x, y);
                        
 //                        If trainingMode is on, the user can view the Image and choose to set the marked area transparent.
 //                        It's pseudo-transparency; the maskImage will be set Black
@@ -271,39 +268,39 @@ public class ImageComparison {
     	
     }
 
-//    private void drawBorders (BufferedImage img, int pixelPerBlockX, int pixelPerBlockY, int currentX, int currentY) {
-//    	for (int a = currentX * pixelPerBlockX; a < (currentX + 1) * pixelPerBlockX; a++) {
-//    		int rgb = img.getRGB(a, currentY * pixelPerBlockY);
-//    		Color currentColor = new Color (rgb);
-//    		int [] newValues = getComplementary(currentColor);
-//    		Color newColor = new Color (newValues[0], newValues[1], newValues[2]);
-//    		int newRgb = newColor.getRGB();
-//    		img.setRGB(a, currentY * pixelPerBlockY, newRgb);
-//    		
-//    		rgb = img.getRGB(a, ((currentY + 1) * pixelPerBlockY) - 1);
-//    		currentColor = new Color (rgb);
-//    		newValues = getComplementary(currentColor);
-//    		newColor = new Color (newValues[0], newValues[1], newValues[2]);
-//    		newRgb = newColor.getRGB();
-//    		img.setRGB(a, ((currentY + 1) * pixelPerBlockY) - 1, newRgb);
-//    	}
-//    	
-//    	for (int b = currentY * pixelPerBlockY; b < (currentY + 1) * pixelPerBlockY; b++) {
-//    		int rgb = img.getRGB(currentX * pixelPerBlockX, b);
-//    		Color currentColor = new Color (rgb);
-//    		int [] newValues = getComplementary(currentColor);
-//    		Color newColor = new Color (newValues[0], newValues[1], newValues[2]);
-//    		int newRgb = newColor.getRGB();
-//    		img.setRGB(currentX * pixelPerBlockX, b, newRgb);
-//    		
-//    		rgb = img.getRGB(((currentX + 1) * pixelPerBlockX) - 1, b);
-//    		currentColor = new Color (rgb);
-//    		newValues = getComplementary(currentColor);
-//    		newColor = new Color (newValues[0], newValues[1], newValues[2]);
-//    		newRgb = newColor.getRGB();
-//    		img.setRGB(((currentX + 1) * pixelPerBlockX) - 1, b, newRgb);
-//    	}
-//    }
+    private void drawBorders (BufferedImage img, int pixelPerBlockX, int pixelPerBlockY, int currentX, int currentY) {
+    	for (int a = currentX * pixelPerBlockX; a < (currentX + 1) * pixelPerBlockX; a++) {
+    		int rgb = img.getRGB(a, currentY * pixelPerBlockY);
+    		Color currentColor = new Color (rgb);
+    		int [] newValues = getComplementary(currentColor);
+    		Color newColor = new Color (newValues[0], newValues[1], newValues[2]);
+    		int newRgb = newColor.getRGB();
+    		img.setRGB(a, currentY * pixelPerBlockY, newRgb);
+    		
+    		rgb = img.getRGB(a, ((currentY + 1) * pixelPerBlockY) - 1);
+    		currentColor = new Color (rgb);
+    		newValues = getComplementary(currentColor);
+    		newColor = new Color (newValues[0], newValues[1], newValues[2]);
+    		newRgb = newColor.getRGB();
+    		img.setRGB(a, ((currentY + 1) * pixelPerBlockY) - 1, newRgb);
+    	}
+    	
+    	for (int b = currentY * pixelPerBlockY; b < (currentY + 1) * pixelPerBlockY; b++) {
+    		int rgb = img.getRGB(currentX * pixelPerBlockX, b);
+    		Color currentColor = new Color (rgb);
+    		int [] newValues = getComplementary(currentColor);
+    		Color newColor = new Color (newValues[0], newValues[1], newValues[2]);
+    		int newRgb = newColor.getRGB();
+    		img.setRGB(currentX * pixelPerBlockX, b, newRgb);
+    		
+    		rgb = img.getRGB(((currentX + 1) * pixelPerBlockX) - 1, b);
+    		currentColor = new Color (rgb);
+    		newValues = getComplementary(currentColor);
+    		newColor = new Color (newValues[0], newValues[1], newValues[2]);
+    		newRgb = newColor.getRGB();
+    		img.setRGB(((currentX + 1) * pixelPerBlockX) - 1, b, newRgb);
+    	}
+    }
 
    
     private BufferedImage imageToBufferedImage(Image img) {
