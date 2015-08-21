@@ -262,6 +262,7 @@ public class ImageComparison {
     }
     
     private int [] getComplementary (Color currentColor) {
+//    	calculates the complement to a given color
     	int [] values = {255 - currentColor.getRed(), 255 - currentColor.getGreen(), 
     						255 - currentColor.getBlue()};		
     	return values;
@@ -269,6 +270,8 @@ public class ImageComparison {
     }
 
     private void drawBorders (BufferedImage img, int pixelPerBlockX, int pixelPerBlockY, int currentX, int currentY) {
+//    	this method draws a frame around a specific block using the complementary
+//    	color of each pixel for better visibility
     	for (int a = currentX * pixelPerBlockX; a < (currentX + 1) * pixelPerBlockX; a++) {
     		int rgb = img.getRGB(a, currentY * pixelPerBlockY);
     		Color currentColor = new Color (rgb);
