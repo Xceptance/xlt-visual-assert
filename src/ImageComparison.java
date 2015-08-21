@@ -261,11 +261,26 @@ public class ImageComparison {
         return diff/maxDiff;
     }
     
-    private int [] getComplementary (Color currentColor) {
+    private Color getComplementary (Color currentColor) {
 //    	calculates the complement to a given color
-    	int [] values = {255 - currentColor.getRed(), 255 - currentColor.getGreen(), 
-    						255 - currentColor.getBlue()};		
-    	return values;
+    	Color newColor = Color.WHITE;
+    	int red = currentColor.getRed();
+    	int green = currentColor.getGreen();
+    	int blue = currentColor.getBlue();
+    	int biggest = Math.max(red, green);
+    	biggest = Math.max(biggest, blue);
+    	
+    	if (biggest == blue) {
+    		newColor = Color.ORANGE;
+    	}
+    	if (biggest == red){
+    		newColor = Color.GREEN;
+    	}
+    	if (biggest == green) {
+    		newColor = Color.RED;
+    	}
+		
+    	return newColor;
     	
     }
 
@@ -275,15 +290,13 @@ public class ImageComparison {
     	for (int a = currentX * pixelPerBlockX; a < (currentX + 1) * pixelPerBlockX; a++) {
     		int rgb = img.getRGB(a, currentY * pixelPerBlockY);
     		Color currentColor = new Color (rgb);
-    		int [] newValues = getComplementary(currentColor);
-    		Color newColor = new Color (newValues[0], newValues[1], newValues[2]);
+    		Color newColor = getComplementary(currentColor);
     		int newRgb = newColor.getRGB();
     		img.setRGB(a, currentY * pixelPerBlockY, newRgb);
     		
     		rgb = img.getRGB(a, ((currentY + 1) * pixelPerBlockY) - 1);
     		currentColor = new Color (rgb);
-    		newValues = getComplementary(currentColor);
-    		newColor = new Color (newValues[0], newValues[1], newValues[2]);
+    		newColor = getComplementary(currentColor);
     		newRgb = newColor.getRGB();
     		img.setRGB(a, ((currentY + 1) * pixelPerBlockY) - 1, newRgb);
     	}
@@ -291,15 +304,13 @@ public class ImageComparison {
     	for (int b = currentY * pixelPerBlockY; b < (currentY + 1) * pixelPerBlockY; b++) {
     		int rgb = img.getRGB(currentX * pixelPerBlockX, b);
     		Color currentColor = new Color (rgb);
-    		int [] newValues = getComplementary(currentColor);
-    		Color newColor = new Color (newValues[0], newValues[1], newValues[2]);
+    		Color newColor = getComplementary(currentColor);
     		int newRgb = newColor.getRGB();
     		img.setRGB(currentX * pixelPerBlockX, b, newRgb);
     		
     		rgb = img.getRGB(((currentX + 1) * pixelPerBlockX) - 1, b);
     		currentColor = new Color (rgb);
-    		newValues = getComplementary(currentColor);
-    		newColor = new Color (newValues[0], newValues[1], newValues[2]);
+    		newColor = getComplementary(currentColor);
     		newRgb = newColor.getRGB();
     		img.setRGB(((currentX + 1) * pixelPerBlockX) - 1, b, newRgb);
     	}
