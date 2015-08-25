@@ -251,8 +251,6 @@ public class ImageComparison {
     }
     
     private Color getComplementary (Color currentColor) {
-//    	int [] values = {255 - currentColor.getRed(), 255 - currentColor.getGreen(), 
-//    						255 - currentColor.getBlue()};
     	int red = currentColor.getRed();
     	int green = currentColor.getGreen();
     	int blue = currentColor.getBlue();
@@ -264,9 +262,9 @@ public class ImageComparison {
     		newColor = Color.GREEN;
     	}
     	if (biggest == blue) {
-    		newColor = Color.ORANGE;
+    		newColor = Color.RED;
     	}
-    	if (biggest == green) {
+    	if ((biggest - green) < 30) {
     		newColor = Color.RED;
     	}
     	
@@ -289,7 +287,7 @@ public class ImageComparison {
     		img.setRGB((currentX * pixelPerBlockX) + a, (currentY * pixelPerBlockY) + subImageHeight - 1, newRgb);
     	}
     	
-    	for (int b = 0; b < subImageHeight; b++) {
+    	for (int b = 1; b < subImageHeight - 1; b++) {
     		int rgb = img.getRGB(currentX * pixelPerBlockX, (currentY * pixelPerBlockY) + b);
     		Color currentColor = new Color (rgb);
     		Color newColor = getComplementary(currentColor);
