@@ -152,7 +152,7 @@ public class ImageComparison {
                     if (getRgbDifference(avgRgbSubMaskImage, avgRgbBlack) > threshold) {       
                        
 //                        mark the current block. Set fuzzyEqual false ONLY IF trainingMode is false
-                    	drawBorders(imgOut, pixelPerBlockX, pixelPerBlockY, x, y);
+                    	drawBorders(imgOut, subImageWidth, subImageHeight, x, y);
                        
 //						If trainingMode is on, all marked areas will be set black in the maskImage
 //						The markedImage will still be saved
