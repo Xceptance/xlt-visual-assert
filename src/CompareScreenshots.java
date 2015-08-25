@@ -1,4 +1,3 @@
-import java.awt.Desktop;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -6,11 +5,13 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
-// import org.openqa.selenium.Capabilities; 	Incompatible with Xlt
+import org.eclipse.jetty.io.RuntimeIOException;
+import org.junit.Assert;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
-// import org.openqa.selenium.remote.RemoteWebDriver;	Incompatible with Xlt
+import org.openqa.selenium.remote.RemoteWebDriver;	
 
 import com.xceptance.xlt.api.engine.Session;
 import com.xceptance.xlt.api.engine.scripting.WebDriverCustomModule;
@@ -26,13 +27,16 @@ public class CompareScreenshots implements WebDriverCustomModule
      */
 
 	@Override
-    public void execute(WebDriver webDriver, String... args)
+	public void execute(WebDriver webDriver, String... args) 
     {
 		XltProperties x = XltProperties.getInstance();
 		
 		//Get browsername for the name of the image
         String currentActionName = Session.getCurrent().getWebDriverActionName();
-        String browserName = "Firefox";
+        String browserName = getBrowserName(webDriver);
+        
+		//Get browsername for the name of the image
+        String currentTestCaseName = Session.getCurrent().getUserID();
         
         //Get index for name of he image
     	String indexS = x.getProperty("com.xceptance.xlt.loadtests.TestCaseCP.index");
@@ -40,13 +44,14 @@ public class CompareScreenshots implements WebDriverCustomModule
     	
     	//Get path to the directory
         String directory = x.getProperty("com.xceptance.xlt.loadtests.TestCaseCP.directoryToScreenshots");
-        String referencePath = directory + "/" + browserName + "/" + currentActionName + indexS;
+        directory = directory + "/" + currentTestCaseName + "/" + browserName;
+        
+        //Set name of the referenceImage
+        String screenshotName = currentActionName + "-" + indexS;
+        String referencePath = directory + "/" + screenshotName;
+        
         File referenceFile = new File(referencePath + ".png");
-        
-        //Count up index and save it
-        indexI++;
-        indexS = Integer.toString(indexI);
-        
+             
         //If there's no other screenshot, just save the new one
         if (!referenceFile.isFile()) {
             try
@@ -55,50 +60,70 @@ public class CompareScreenshots implements WebDriverCustomModule
             }
             catch (IOException e)
             {
-                e.printStackTrace();
+                throw new RuntimeIOException();
             }
         	System.out.println("Set new reference Screenshot");
-  //  		System.out.println("referenceFile absolute path: " + referenceFile.getAbsolutePath()); 	//Debug
         }
         
         //If there is another screenshot ...
         else {
-        	File screenshotFile = new File(referencePath + "-new-screenshot" + ".png");
+        	//Create temporary file for the new screenshot
+        	File screenshotFile = new File(directory + "new-screenshot" + screenshotName + ".png");
+        	screenshotFile.deleteOnExit(); 			
             try
             {
                 takeScreenshot(webDriver, screenshotFile);
                 System.out.println("Found reference screenshot");
-  //      		System.out.println("sceenshotFile absolute path: " + screenshotFile.getAbsolutePath());	//Debug
             }
             catch (IOException e)
             {
-                e.printStackTrace();
+            	throw new RuntimeIOException();
             }
-            //Get fuzzyness properties and convert them from String to integer/double
             
+       
+            
+            //Get fuzzyness properties and convert them from String to integer/double
             int pixelPerBlockX = Integer.parseInt(x.getProperty("com.xceptance.xlt.loadtests.TestCaseCP.pixelPerBlockX"));
             int pixelPerBlockY = Integer.parseInt(x.getProperty("com.xceptance.xlt.loadtests.TestCaseCP.pixelPerBlockY"));
             double threshold = Double.parseDouble(x.getProperty("com.xceptance.xlt.loadtests.TestCaseCP.threshold"));   
-            //Compare screenshots, core algorithm
+            
             try {
+            	//Initialize referenceImage, screenshotImage 
             	BufferedImage screenshot = ImageIO.read(screenshotFile);
             	BufferedImage reference = ImageIO.read(referenceFile);
             	reference = overwriteTransparentPixels(reference, screenshot);
-            	ImageComparison imagecomparison = new ImageComparison(pixelPerBlockX, pixelPerBlockY, threshold);
-            	if (imagecomparison.fuzzyEqual(reference, screenshot, referencePath + "marked" + ".png")) {						
+            	
+            	//Initialize markedImageFile and maskImageFile
+            	new File(directory + "/marked/").mkdirs();
+            	String markedImagePath = directory + "/marked/" + screenshotName + "-marked" + ".png"; 
+            	File markedImageFile = new File(markedImagePath);
+            	
+            	String maskImagePath = referencePath + "-mask" + ".png"; 
+            	File maskImageFile = new File(maskImagePath);
+            	
+            	//Initializes boolean variable for training mode
+            	Boolean trainingMode = false;
+            	
+            	ImageComparison imagecomparison = new ImageComparison(pixelPerBlockX, pixelPerBlockY, threshold, trainingMode);
+            	if (imagecomparison.fuzzyEqual(reference, screenshot, maskImageFile, markedImageFile)) {						
             		System.out.println("Layout didn't change");
             	}
+            	
             	else {
-            		//print marked Image
-  //          		File fileMarkedImage = new File(referencePath + "marked" + ".png");							//Debug
- //           		System.out.println("fileMarkedImage absolute path: " + fileMarkedImage.getAbsolutePath());	//Debug
+//            		Give an assertion. The marked Image was saved in the fuzzyEqual method
+            		String assertMessage = "Layout changed" + currentActionName + "-i" + indexS;
+            		Assert.assertTrue(assertMessage, false);			
             		System.out.println("Layout did change");
             	}
             }
-            catch (Exception e) {
-				e.printStackTrace();
-			}
+            catch (IOException e) {
+            	throw new RuntimeIOException();
+            	}
         }
+        //Count up index and save it
+        indexI++;
+        indexS = Integer.toString(indexI);
+        x.setProperty("com.xceptance.xlt.loadtests.TestCaseCP.index", indexS);
     }
 
     /**
@@ -120,20 +145,6 @@ public class CompareScreenshots implements WebDriverCustomModule
     }    
     
     /**
-     * Opens a File if he Desktop API is supported. Isn't used at the moment
-     * 
-     * @throws IOException
-     */
-//	private  void openFile(File file) throws IOException {
-//		if (Desktop.isDesktopSupported()) {
-//			Desktop desktop = Desktop.getDesktop();
-//			if (desktop.isSupported(Desktop.Action.OPEN)); {
-//				desktop.open(file);
-//			}
-//		}
-//	}
-//	
-    /**
      * Overwrites all transparent pixels in the reference image with corresponding pixels of the screenshot image.
      * Pseudotransparency
      * 
@@ -152,11 +163,18 @@ public class CompareScreenshots implements WebDriverCustomModule
 		return reference;
 	}
 	
-//	private String getBrowserName(WebDriver webdriver) {				Incombatability with Xceptance?
-//		Capabilities capabilities = ((RemoteWebDriver) webdriver).getCapabilities();
-//		String browserName = capabilities.getBrowserName();
-//		return browserName;
-//	}		
+	/**
+	 * Gets and returns the browsername using Selenium methods 
+	 * 
+	 * 
+	 * @param webdriver
+	 * @return
+	 */
+	private String getBrowserName(WebDriver webdriver) {			
+		Capabilities capabilities = ((RemoteWebDriver) webdriver).getCapabilities();
+		String browserName = capabilities.getBrowserName();
+		return browserName;
+	}		
 }
 
 
