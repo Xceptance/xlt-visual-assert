@@ -56,7 +56,7 @@ public class ImageComparison {
         }
        
         if (!equal) {
-            saveImage(imgOut,fileOut);
+            ImageIO.write(imgOut, "PNG", fileOut);
         }
         return equal;
     }
@@ -92,7 +92,7 @@ public class ImageComparison {
             }
         }
         if (!exactlyEqual) {
-                saveImage(imgOut,fileOut);
+                ImageIO.write(imgOut, "PNG", fileOut);
         }
        
         return exactlyEqual;
@@ -192,7 +192,7 @@ public class ImageComparison {
         }
         ImageIO.write(maskImage, "PNG", fileMask);                       
         if (!fuzzyEqual) {
-                saveImage(imgOut,fileOut);
+                ImageIO.write(imgOut, "PNG", fileOut);
         }
        
         return fuzzyEqual;
@@ -314,15 +314,7 @@ public class ImageComparison {
         g2.drawImage(img, null, null);
         return bi;
     }
-
-    private void saveImage(BufferedImage img, File file) {
-        try {
-            ImageIO.write(img,"png", file);
-        }
-        catch (IOException io) {
-        }
-    }
-   
+  
     private BufferedImage initializeMaskImage(BufferedImage img, File file) throws IOException {
     	//read and return mask Image if it already exists and has the same size 
     	if (file.exists()) {

@@ -73,15 +73,12 @@ public class CompareScreenshots implements WebDriverCustomModule
             try
             {
                 takeScreenshot(webDriver, screenshotFile);
-                System.out.println("Found reference screenshot");
             }
             catch (IOException e)
             {
             	throw new RuntimeIOException();
             }
-            
-       
-            
+           
             //Get fuzzyness properties and convert them from String to integer/double
             int pixelPerBlockX = Integer.parseInt(x.getProperty("com.xceptance.xlt.loadtests.TestCaseCP.pixelPerBlockX"));
             int pixelPerBlockY = Integer.parseInt(x.getProperty("com.xceptance.xlt.loadtests.TestCaseCP.pixelPerBlockY"));
@@ -91,34 +88,32 @@ public class CompareScreenshots implements WebDriverCustomModule
             	//Initialize referenceImage, screenshotImage 
             	BufferedImage screenshot = ImageIO.read(screenshotFile);
             	BufferedImage reference = ImageIO.read(referenceFile);
-            	reference = overwriteTransparentPixels(reference, screenshot);
             	
             	//Initialize markedImageFile and maskImageFile
             	new File(directory + "/marked/").mkdirs();
             	String markedImagePath = directory + "/marked/" + screenshotName + "-marked" + ".png"; 
             	File markedImageFile = new File(markedImagePath);
             	
-            	String maskImagePath = referencePath + "-mask" + ".png"; 
+              	new File(directory + "/mask/").mkdirs();
+            	String maskImagePath = directory + "/mask/" + screenshotName + "-mask" + ".png"; 
             	File maskImageFile = new File(maskImagePath);
             	
             	//Initializes boolean variable for training mode
-            	Boolean trainingMode = false;
+            	String trainingModeString = x.getProperty("com.xceptance.xlt.loadtests.TestCaseCP.trainingMode");
+            	Boolean trainingMode = Boolean.parseBoolean(trainingModeString);
             	
+
             	ImageComparison imagecomparison = new ImageComparison(pixelPerBlockX, pixelPerBlockY, threshold, trainingMode);
-            	if (imagecomparison.fuzzyEqual(reference, screenshot, maskImageFile, markedImageFile)) {						
-            		System.out.println("Layout didn't change");
-            	}
-            	
-            	else {
+            	if (!imagecomparison.fuzzyEqual(reference, screenshot, maskImageFile, markedImageFile)) {
+            		
 //            		Give an assertion. The marked Image was saved in the fuzzyEqual method
             		String assertMessage = "Layout changed" + currentActionName + "-i" + indexS;
             		Assert.assertTrue(assertMessage, false);			
-            		System.out.println("Layout did change");
             	}
             }
             catch (IOException e) {
             	throw new RuntimeIOException();
-            	}
+            }
         }
         //Count up index and save it
         indexI++;
@@ -144,25 +139,6 @@ public class CompareScreenshots implements WebDriverCustomModule
         }
     }    
     
-    /**
-     * Overwrites all transparent pixels in the reference image with corresponding pixels of the screenshot image.
-     * Pseudotransparency
-     * 
-     * @throws IOException
-     */
-	private BufferedImage overwriteTransparentPixels(BufferedImage reference, BufferedImage screenshot) {
-		for (int w=0; w<reference.getWidth(); w++) {
-			for (int h=0; h<reference.getHeight(); h++) {
-				int alpha = (reference.getRGB(w, h) >> 24) & 0xFF;
-				if (alpha == 0) {
-					int rgb = screenshot.getRGB(w, h);
-					reference.setRGB(w, h, rgb);
-				}
-			}
-		}
-		return reference;
-	}
-	
 	/**
 	 * Gets and returns the browsername using Selenium methods 
 	 * 
@@ -176,12 +152,3 @@ public class CompareScreenshots implements WebDriverCustomModule
 		return browserName;
 	}		
 }
-
-
-
-
-
-
-
-
-
