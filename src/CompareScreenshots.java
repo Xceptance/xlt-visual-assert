@@ -31,23 +31,37 @@ public class CompareScreenshots implements WebDriverCustomModule
     {
 		XltProperties x = XltProperties.getInstance();
 		
-		//Get browsername for the name of the image
+		//Checks if this is a new testcase. If yes, (re)sets index. If not. increments index
+		if ( (x.getProperty("com.xceptance.xlt.loadtests.TestCaseCP.currentID") == Session.getCurrent().getID()) ) {
+			String indexString = x.getProperty("com.xceptance.xlt.loadtests.TestCaseCP.index");
+			int indexInt = Integer.parseInt(indexString);
+			indexInt++;
+			indexString = String.valueOf(indexInt);
+			x.setProperty("com.xceptance.xlt.loadtests.TestCaseCP.index", indexString);
+		}
+		
+		else { 
+			String currentID = Session.getCurrent().getID(); 
+			x.setProperty("com.xceptance.xlt.loadtests.TestCaseCP.currentID", currentID);
+			x.setProperty("com.xceptance.xlt.loadtests.TestCaseCP.index", "1");
+		}
+		
+		
+		//Get testcasename for the correct folder
+		String currentTestCaseName = Session.getCurrent().getUserID();
+		
+		//Get browsername for the correct subfolder
         String currentActionName = Session.getCurrent().getWebDriverActionName();
         String browserName = getBrowserName(webDriver);
-        
-		//Get browsername for the name of the image
-        String currentTestCaseName = Session.getCurrent().getUserID();
-        
-        //Get index for name of he image
-    	String indexS = x.getProperty("com.xceptance.xlt.loadtests.TestCaseCP.index");
-    	int    indexI = Integer.parseInt(indexS);
-    	
+                	
     	//Get path to the directory
         String directory = x.getProperty("com.xceptance.xlt.loadtests.TestCaseCP.directoryToScreenshots");
         directory = directory + "/" + currentTestCaseName + "/" + browserName;
         
-        //Set name of the referenceImage
-        String screenshotName = currentActionName + "-" + indexS;
+
+		//Set name of the referenceImage       
+        String indexS = x.getProperty("com.xceptance.xlt.loadtests.TestCaseCP.index");
+        String screenshotName = indexS + "-" + currentActionName;
         String referencePath = directory + "/" + screenshotName;
         
         File referenceFile = new File(referencePath + ".png");
@@ -62,7 +76,6 @@ public class CompareScreenshots implements WebDriverCustomModule
             {
                 throw new RuntimeIOException();
             }
-        	System.out.println("Set new reference Screenshot");
         }
         
         //If there is another screenshot ...
@@ -115,10 +128,6 @@ public class CompareScreenshots implements WebDriverCustomModule
             	throw new RuntimeIOException();
             }
         }
-        //Count up index and save it
-        indexI++;
-        indexS = Integer.toString(indexI);
-        x.setProperty("com.xceptance.xlt.loadtests.TestCaseCP.index", indexS);
     }
 
     /**
@@ -135,7 +144,7 @@ public class CompareScreenshots implements WebDriverCustomModule
         }
         else
         {
-        	System.out.println("Webdriver isn't an instance of TakesScreenshot");
+        	throw new RuntimeIOException();
         }
     }    
     
