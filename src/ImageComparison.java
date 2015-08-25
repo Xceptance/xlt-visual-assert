@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import net.coobird.thumbnailator.Thumbnails;
 
 public class ImageComparison {
     private BufferedImage imgOut = null;
@@ -28,10 +27,17 @@ public class ImageComparison {
         /*Method for pixel-based fuzzy comparison*/
        
         boolean equal = true;
-//        adapts size of image 2 if necessary
-        if ((img1.getWidth() != img2.getWidth()) || (img1.getHeight() != img2.getHeight())) {
-            img2 = adaptImageSize(img1,img2);
-        }
+        
+//      Checks if one image is smaller then the other and if yes which. Increases the images Width and Height until they are equal
+//      The original Images will be in the top left corner
+		while ( (img1.getWidth() != img2.getWidth()) || (img1.getHeight() != img2.getHeight()) ) {
+			if ( (img1.getWidth() > img2.getWidth()) || (img1.getHeight() > img2.getHeight()) ) {
+				img2 = adaptImageSize(img1, img2);
+			}
+			if ( (img1.getWidth() < img2.getWidth()) || (img1.getHeight() < img2.getHeight()) ) {
+				img1 = adaptImageSize(img2, img1);
+			}
+		}
        
         imgOut = imageToBufferedImage(img2);
 
@@ -59,11 +65,17 @@ public class ImageComparison {
         /*Method for the exact comparison of two images*/
         //img1: reference Image, img2: screenshot
         boolean exactlyEqual = true;
-//        adapts size of image 2 if necessary
-        if ((img1.getWidth() != img2.getWidth()) || (img1.getHeight() != img2.getHeight())) {
-            img2 = adaptImageSize(img1,img2);
-        }
-       
+
+//      Checks if one image is smaller then the other and if yes which. Increases the images Width and Height until they are equal
+//      The original Images will be in the top left corner
+		while ( (img1.getWidth() != img2.getWidth()) || (img1.getHeight() != img2.getHeight()) ) {
+			if ( (img1.getWidth() > img2.getWidth()) || (img1.getHeight() > img2.getHeight()) ) {
+				img2 = adaptImageSize(img1, img2);
+			}
+			if ( (img1.getWidth() < img2.getWidth()) || (img1.getHeight() < img2.getHeight()) ) {
+				img1 = adaptImageSize(img2, img1);
+			}
+		}       
        
         imgOut = imageToBufferedImage(img2);
    
@@ -99,10 +111,17 @@ public class ImageComparison {
                 return pixelFuzzyEqual(img1, img2, fileOut);
             }
         }
-//        adapts size of image 2 if necessary
-        if ((img1.getWidth() != img2.getWidth()) || (img1.getHeight() != img2.getHeight())) {
-            img2 = adaptImageSize(img1,img2);
-        }
+        
+//      Checks if one image is smaller then the other and if yes which. Increases the images Width and Height until they are equal
+//      The original Images will be in the top left corner
+		while ( (img1.getWidth() != img2.getWidth()) || (img1.getHeight() != img2.getHeight()) ) {
+			if ( (img1.getWidth() > img2.getWidth()) || (img1.getHeight() > img2.getHeight()) ) {
+				img2 = adaptImageSize(img1, img2);
+			}
+			if ( (img1.getWidth() < img2.getWidth()) || (img1.getHeight() < img2.getHeight()) ) {
+				img1 = adaptImageSize(img2, img1);
+			}
+		}
 
         imgOut = img2;
        
@@ -185,22 +204,7 @@ public class ImageComparison {
         else
             return pixelPerBlock;
     }
-   
-    private BufferedImage adaptImageSize(BufferedImage img1, BufferedImage img2) throws IOException {
-//        Method for the scaling of the new screenshot in case its size differs from the reference
-        int scalePixelWidth;
-        int scalePixelHeight;       
-
-        if(((float)img2.getWidth()/(float)img1.getWidth()) < ((float)img2.getHeight()/(float)img1.getHeight())){
-            scalePixelWidth = img1.getWidth();
-            scalePixelHeight = (int) (img2.getHeight() * Math.ceil((float)img1.getWidth()/(float)img2.getWidth()));
-        }else {
-            scalePixelHeight = img1.getHeight();
-            scalePixelWidth = (int) (img2.getWidth() * Math.ceil((float)img1.getHeight()/(float)img2.getHeight()));
-        }
-        return Thumbnails.of(img2).size(scalePixelWidth, scalePixelHeight).asBufferedImage();
-    }
-   
+    
     private double calculatePixelRgbDiff(int x, int y, BufferedImage img1, BufferedImage img2) {
 //        Method calculates the RGB difference of two pixels in comparison to the
 //        maximum possible difference
@@ -336,6 +340,36 @@ public class ImageComparison {
         g.fillRect(0, 0, width, height);
         return mask;
     }
+    
+ // Increases the size of the second Image to the size of the first Image
+    private BufferedImage adaptImageSize(BufferedImage img1, BufferedImage imgToIncrease) {
+    	int maxWidth = imgToIncrease.getWidth();
+    	int maxHeight = imgToIncrease.getHeight();
+		
+		if (img1.getWidth() > maxWidth) {
+			maxWidth = img1.getWidth();
+			imgToIncrease = increaseImageSize(imgToIncrease, maxWidth, maxHeight);
+		}
+		
+		if (img1.getHeight() > maxHeight) {
+			maxHeight = img1.getHeight();
+			imgToIncrease = increaseImageSize(imgToIncrease, maxWidth, maxHeight);
+		}
+		return imgToIncrease;
+    }
+    
+//Increases an images width and height, the original image will be in the top left corner    
+	private BufferedImage increaseImageSize(BufferedImage img1, int width, int height) {
+		BufferedImage newImg1 = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
+		int rgb;
+		for (int w=0; w<img1.getWidth(); w++) {
+			for (int h=0; h<img1.getHeight(); h++) {
+				rgb = img1.getRGB(w, h);
+				newImg1.setRGB(w, h, rgb);
+			}
+		}
+		return newImg1;
+	}
 }
 
 
