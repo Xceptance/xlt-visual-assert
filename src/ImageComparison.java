@@ -322,19 +322,22 @@ public class ImageComparison {
     }
    
     private BufferedImage initializeMaskImage(BufferedImage img, File file) throws IOException {
-        if (file.exists()) {
-            BufferedImage mask = ImageIO.read(file);
-            return mask;
+    	//read and return mask Image if it already exists and has the same size 
+    	if (file.exists()) {
+            BufferedImage mask = ImageIO.read(file); 
+            if ( (mask.getWidth() == img.getWidth()) && (mask.getHeight() == img.getHeight()) ) {
+            	return mask;
+            }
         }
-        else {
-            int width = img.getWidth();
-            int height = img.getHeight();
-            BufferedImage mask = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
-            Graphics g = mask.getGraphics();
-            g.setColor(Color.WHITE);
-            g.fillRect(0, 0, width, height);
-            return mask;
-        }
+    	
+    	int width = img.getWidth();
+        int height = img.getHeight();
+        BufferedImage mask = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
+        Graphics g = mask.getGraphics();
+        g.setColor(Color.WHITE);
+        g.fillRect(0, 0, width, height);
+        return mask;
     }
 }
+
 
