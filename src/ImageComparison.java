@@ -1,13 +1,10 @@
-
 import java.awt.Color;
-import java.awt.Desktop;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 import net.coobird.thumbnailator.Thumbnails;
@@ -121,9 +118,8 @@ public class ImageComparison {
         int blocksy = (int) Math.ceil((float) imageheight
                 / (float) pixelPerBlockY);
        
-//        Initializes a Scanner for training mode       
+//        Initializes maskImage
         BufferedImage maskImage = initializeMaskImage(img1, fileMask);
-        Scanner scanner = new Scanner(System.in);
        
         for (int y = 0; y < blocksy; y++) {
             for (int x = 0; x < blocksx; x++) {
@@ -146,42 +142,35 @@ public class ImageComparison {
                 double[] avgRgb2 = calculateAverageRgb(sub2);
                 double[] avgRgbSubMaskImage = calculateAverageRgb(subMaskImage);
                
-//                initialize the RGB values for Black, for comparison with the MaskImage using getRgbDifference
+//             initialize the RGB values for Black, for comparison with the MaskImage using getRgbDifference
                 double[] avgRgbBlack = {Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue()};
 
-//                if the difference between the subImages is above the threshold
+//              if the difference between the subImages is above the threshold
                 if  (getRgbDifference(avgRgb1, avgRgb2) > threshold) {
                    
 //                    and if the difference between the maskImage and Black is above the threshold               
                     if (getRgbDifference(avgRgbSubMaskImage, avgRgbBlack) > threshold) {       
                        
-//                        mark the current block and set fuzzyEqual false
+//                        mark the current block. Set fuzzyEqual false ONLY IF trainingMode is false
                     	drawBorders(imgOut, pixelPerBlockX, pixelPerBlockY, x, y);
                        
-//                        If trainingMode is on, the user can view the Image and choose to set the marked area transparent.
-//                        It's pseudo-transparency; the maskImage will be set Black
+//						If trainingMode is on, all marked areas will be set black in the maskImage
+//						The markedImage will still be saved
                         if (trainingMode) {
-//                                saveImage(imgOut, fileOut);
-//                                openFile(fileOut);
-//                                System.out.println("Difference found. Ignore differences at that point? (Y/n)");
-//                                String input = scanner.next();
-//                                scanner.nextLine();
                                 Graphics gMask  = maskImage.getGraphics();
                                 gMask.setColor(Color.BLACK);
-                                String input = "Y";                            //for demonstration
-                                if (input=="Y") {
-                                        gMask.fillRect(x * pixelPerBlockX, y * pixelPerBlockY,
-                                                subImageWidth, subImageHeight);
-                                }
+                                gMask.fillRect(x * pixelPerBlockX, y * pixelPerBlockY,
+                                subImageWidth, subImageHeight);
+                                
                         }             //training Mode
-                       
-                        fuzzyEqual = false;
+                        else {
+                        	fuzzyEqual = false;
+                        }
                     }    // if the maskImage not black
                    
                 }        // if the difference between the Images is above the treshold
             }
         }
-        scanner.close();
         ImageIO.write(maskImage, "PNG", fileMask);                       
         if (!fuzzyEqual) {
                 saveImage(imgOut,fileOut);
@@ -319,15 +308,6 @@ public class ImageComparison {
         }
     }
    
-    private  void openFile(File file) throws IOException {
-        if (Desktop.isDesktopSupported()) {
-            Desktop desktop = Desktop.getDesktop();
-            if (desktop.isSupported(Desktop.Action.OPEN)); {
-                desktop.open(file);
-            }
-        }
-    }
-   
     private BufferedImage initializeMaskImage(BufferedImage img, File file) throws IOException {
         if (file.exists()) {
             BufferedImage mask = ImageIO.read(file);
@@ -340,7 +320,7 @@ public class ImageComparison {
             Graphics g = mask.getGraphics();
             g.setColor(Color.WHITE);
             g.fillRect(0, 0, width, height);
-            return img;
+            return mask;
         }
     }
 }
