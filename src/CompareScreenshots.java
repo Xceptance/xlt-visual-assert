@@ -82,7 +82,6 @@ public class CompareScreenshots implements WebDriverCustomModule
         else {
         	//Create temporary file for the new screenshot
         	File screenshotFile = new File(directory + "new-screenshot" + screenshotName + ".png");
-        	screenshotFile.deleteOnExit(); 			
             try
             {
                 takeScreenshot(webDriver, screenshotFile);
@@ -98,9 +97,10 @@ public class CompareScreenshots implements WebDriverCustomModule
             double threshold = Double.parseDouble(x.getProperty("com.xceptance.xlt.loadtests.TestCaseCP.threshold"));   
             
             try {
-            	//Initialize referenceImage, screenshotImage 
+            	//Initialize referenceImage, screenshotImage, delete screenshotImageFile
             	BufferedImage screenshot = ImageIO.read(screenshotFile);
             	BufferedImage reference = ImageIO.read(referenceFile);
+            	screenshotFile.delete();
             	
             	//Initialize markedImageFile and maskImageFile
             	new File(directory + "/marked/").mkdirs();
