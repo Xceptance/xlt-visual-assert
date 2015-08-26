@@ -180,6 +180,7 @@ public class ImageComparison {
                                 gMask.setColor(Color.BLACK);
                                 gMask.fillRect(x * pixelPerBlockX, y * pixelPerBlockY,
                                 subImageWidth, subImageHeight);
+                                gMask.dispose();
                                 
                         }             //training Mode
                         else {
@@ -312,6 +313,7 @@ public class ImageComparison {
                 img.getHeight(null), BufferedImage.TYPE_INT_RGB);
         Graphics2D g2 = bi.createGraphics();
         g2.drawImage(img, null, null);
+        g2.dispose();
         return bi;
     }
   
@@ -326,10 +328,11 @@ public class ImageComparison {
     	
     	int width = img.getWidth();
         int height = img.getHeight();
-        BufferedImage mask = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
+        BufferedImage mask = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics g = mask.getGraphics();
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, width, height);
+        g.dispose();
         return mask;
     }
     
@@ -350,18 +353,14 @@ public class ImageComparison {
 		return imgToIncrease;
     }
     
-//Increases an images width and height, the original image will be in the top left corner    
-	private BufferedImage increaseImageSize(BufferedImage img1, int width, int height) {
-		BufferedImage newImg1 = new BufferedImage(width, height, BufferedImage.TYPE_4BYTE_ABGR);
-		int rgb;
-		for (int w=0; w<img1.getWidth(); w++) {
-			for (int h=0; h<img1.getHeight(); h++) {
-				rgb = img1.getRGB(w, h);
-				newImg1.setRGB(w, h, rgb);
-			}
-		}
-		return newImg1;
-	}
+  //Increases an images width and height, the original image will be in the top left corner    
+  	private BufferedImage increaseImageSize(BufferedImage img, int width, int height) {
+  		BufferedImage newImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+  		Graphics g = newImg.getGraphics();
+  		g.drawImage(img, 0, 0, null);
+  		g.dispose();
+  		return newImg;
+  	}
 }
 
 
