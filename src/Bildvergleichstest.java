@@ -16,31 +16,39 @@ public class Bildvergleichstest {
 	public static void main(String[] args) throws IOException {
 		
 		BufferedImage img = new BufferedImage(2, 2, BufferedImage.TYPE_INT_ARGB);
-		Bildvergleichstest b = new Bildvergleichstest();
-//		img = b.increaseImageSize(img, 10, 10);
-//		
-//		int[][] array = new int[5][5];
+		int rgbRed = Color.RED.getRGB();
+		for (int w=0; w<img.getWidth(); w++) {
+			for (int h=0; h<img.getHeight(); h++) {
+				img.setRGB(w, h, rgbRed);
+			}
+		}
+		System.out.println("Alpha red: " + Color.RED.getAlpha());
+		img = increaseImageSize(img, 10, 20);
+		
+
+		//		int[][] array = new int[5][5];
 //		Arrays.fill(array[2], 0);
 //		
 //		System.out.println(Arrays.toString(array[2]));
-		
-		img.setRGB(1, 1, 0);
-		System.out.println(img.getRGB(1, 1));
-		Color c = new Color(0, true);
-		System.out.println(c.getAlpha());
-		c = Color.BLACK;
-		System.out.println(c.getAlpha());
-		
-		
-		
+
+		for (int w=0; w<img.getWidth(); w++)
+			for (int h=0; h<img.getHeight(); h++) {
+				System.out.println("w: " + w + "| h: " + h  + isTransparent(img, w, h));
+				Color c = new Color(img.getRGB(w, h), true);
+				System.out.println(c.getAlpha());
+			}
 	}
 
 	private static BufferedImage increaseImageSize(BufferedImage img, int width, int height) {
-  		BufferedImage newImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+  		BufferedImage newImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+//  	fills the new parts of the image with transparent black, ie rgb = 0
+  		for (int w=img.getWidth(); w<width; w++) {
+  			for (int h=img.getHeight(); h<height; h++) {
+  				newImg.setRGB(w, h, 0);
+  			}
+  		}
   		Graphics g = newImg.createGraphics();
-  		g.drawImage(newImg, 0, 0, null);
-  		int alpha = newImg.getRGB(5, 5) >> 24;
-//  		System.out.println(alpha);
+  		g.drawImage(img, 0, 0, null);
   		g.dispose();
   		return newImg;
   	}

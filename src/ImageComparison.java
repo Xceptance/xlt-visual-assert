@@ -38,8 +38,10 @@ public class ImageComparison {
         int rgbRed = (255 << 24) | (255 << 16) | (0 << 8) | 0;                        
         for (int x = 0; x<imagewidth; x++) {
             for(int y = 0;y<imageheight; y++) {
-//                calculates difference and marks them red if above threshold ...
-                if (calculatePixelRgbDiff(x, y, img1, img2) > threshold) {
+            	boolean isTransparent = isTransparent(img1, x, y) || isTransparent(img2, x, y);
+
+//                calculates difference and marks them red if above threshold or transparent...
+                if ( (calculatePixelRgbDiff(x, y, img1, img2) > threshold) || isTransparent ) {
                 	
 //                  and if the maskImage is not Black ...                	
                 	if ( maskImage.getRGB(x, y) != Color.BLACK.getRGB() ) {   
@@ -173,7 +175,7 @@ public class ImageComparison {
                 double[] avgRgbSubMaskImage = calculateAverageRgb(subMaskImage);
                
 //             initialize the RGB values for Black, for comparison with the MaskImage using getRgbDifference
-                double[] avgRgbBlack = {Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue()};
+                double[] avgRgbBlack = {Color.BLACK.getRed(), Color.BLACK.getGreen(), Color.BLACK.getBlue(), Color.BLACK.getAlpha()};
 
 //              if the difference between the subImages is above the threshold
                 if  (getRgbDifference(avgRgb1, avgRgb2) > threshold) {
@@ -200,7 +202,7 @@ public class ImageComparison {
                         }
                     }    // if the maskImage not black
                    
-                }        // if the difference between the Images is above the treshold
+                }        // if the difference between the Images is above the threshold
             }
         }
         ImageIO.write(maskImage, "PNG", fileMask);                       
@@ -221,16 +223,17 @@ public class ImageComparison {
     private double calculatePixelRgbDiff(int x, int y, BufferedImage img1, BufferedImage img2) {
 //        Method calculates the RGB difference of two pixels in comparison to the
 //        maximum possible difference
-//    	  If alpha is 0, color.getRed(), getGreen() and getBlue() will also return 0!
-//    	  Therefore, the ImageComparison class cannot be used for images with fully transparent parts! 
+//    	  If one of the pixels is transparent, presumably throught the resizeImage method, it will return the maxDifference
     	
         double maxDifference = 3 * 255;
+        
         if (isTransparent(img1 ,x ,y)) {
         	return maxDifference;
         }
         if (isTransparent(img2 ,x ,y)) {
         	return maxDifference;
         }
+        
         Color color1 = new Color(img1.getRGB(x, y));
         Color color2 = new Color(img2.getRGB(x, y));
         double difference = Math.abs(color1.getBlue() - color2.getBlue())
@@ -241,18 +244,19 @@ public class ImageComparison {
     }
    
     private double[] calculateAverageRgb (BufferedImage img) {
-//        Method calculates average Red, Green and Blue values of a picture and returns them as array
-        double[] averageRgb = {0, 0, 0};
+//        Method calculates average Red, Green, Blue and Alpha values of a picture and returns them as array
+        double[] averageRgb = {0, 0, 0, 0};
         int imageHeight = img.getHeight();
         int imageWidth = img.getWidth();
        
 //        sum the respective values of each pixel and divide it by the number of pixels
         for (int y = 0; y<imageHeight; y++) {
             for (int x = 0; x<imageWidth; x++) {
-                Color color = new Color (img.getRGB(x, y));
+                Color color = new Color (img.getRGB(x, y), true);
                 averageRgb[0] = averageRgb[0] + (double) color.getRed();
                 averageRgb[1] = averageRgb[1] + (double) color.getGreen();
                 averageRgb[2] = averageRgb[2] + (double) color.getBlue();
+                averageRgb[3] = averageRgb[3] + (double) color.getAlpha();
             }
         }
        
@@ -260,20 +264,24 @@ public class ImageComparison {
         averageRgb[0] = averageRgb[0] / pixels;
         averageRgb[1] = averageRgb[1] / pixels;
         averageRgb[2] = averageRgb[2] / pixels;
-       
-       
+        averageRgb[3] = averageRgb[3] / pixels;
         return averageRgb;
     }
    
     private double getRgbDifference(double [] Rgb1, double [] Rgb2) {
-//        Method calculates the difference between to pictures with their given average Red, Green and Blue values
+//        Method calculates the difference between to pictures with their given average Red, Green, Blue and Alpha values
 //    	  based on the maximum RGB difference
+//    	  The maximum RGB difference does not include alpha values, the actual difference does (alpha values come from resizing)
+//    	  Therefore, differences in transparency will be more influential
+    	
         double maxDiff = Math.max(Rgb1[0], 255 - Rgb1[0]) +
         				Math.max(Rgb1[1], 255 - Rgb1[1]) +
-        				Math.max(Rgb1[2], 255 - Rgb1[2]);
+        				Math.max(Rgb1[2], 255 - Rgb1[2]); 
         double diff = Math.abs(Rgb1[0] - Rgb2[0]) +
                     Math.abs(Rgb1[1] - Rgb2[1]) +
-                    Math.abs(Rgb1[2] - Rgb2[2]);
+                    Math.abs(Rgb1[2] - Rgb2[2]) +
+                    Math.abs(Rgb1[3] - Rgb2[3]);
+
        
         return diff/maxDiff;
     }
@@ -378,10 +386,15 @@ public class ImageComparison {
 		return imgToIncrease;
     }
     
-  //Increases an images width and height, the original image will be in the top left corner    
-  	private BufferedImage increaseImageSize(BufferedImage img, int width, int height) {
-  		BufferedImage newImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-  		Graphics g = newImg.getGraphics();
+//  Increases an images width and height, the new image will be in the top left corner; the rest will be transparent black 
+	private static BufferedImage increaseImageSize(BufferedImage img, int width, int height) {
+  		BufferedImage newImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+  		for (int w=img.getWidth(); w<width; w++) {
+  			for (int h=img.getHeight(); h<height; h++) {
+  				newImg.setRGB(w, h, 0);
+  			}
+  		}
+  		Graphics g = newImg.createGraphics();
   		g.drawImage(img, 0, 0, null);
   		g.dispose();
   		return newImg;
