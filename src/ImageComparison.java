@@ -267,7 +267,10 @@ public class ImageComparison {
    
     private double getRgbDifference(double [] Rgb1, double [] Rgb2) {
 //        Method calculates the difference between to pictures with their given average Red, Green and Blue values
-        double maxDiff = 3 * 255;
+//    	  based on the maximum RGB difference
+        double maxDiff = Math.max(Rgb1[0], 255 - Rgb1[0]) +
+        				Math.max(Rgb1[1], 255 - Rgb1[1]) +
+        				Math.max(Rgb1[2], 255 - Rgb1[2]);
         double diff = Math.abs(Rgb1[0] - Rgb2[0]) +
                     Math.abs(Rgb1[1] - Rgb2[1]) +
                     Math.abs(Rgb1[2] - Rgb2[2]);
