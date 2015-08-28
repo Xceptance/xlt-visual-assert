@@ -271,8 +271,8 @@ public class ImageComparison {
     private double getRgbDifference(double [] Rgb1, double [] Rgb2) {
 //        Method calculates the difference between to pictures with their given average Red, Green, Blue and Alpha values
 //    	  based on the maximum RGB difference
-//    	  The maximum RGB difference does not include alpha values, the actual difference does (alpha values come from resizing)
-//    	  Therefore, differences in transparency will be more influential
+//		  Alpha values are more influential, because they indicate pixels that were not existent before
+//    	  The way it is implemented now, a difference of 255 in alpha and 0 in red, green and black matches a threshold of 1
     	
         double maxDiff = Math.max(Rgb1[0], 255 - Rgb1[0]) +
         				Math.max(Rgb1[1], 255 - Rgb1[1]) +
@@ -280,7 +280,7 @@ public class ImageComparison {
         double diff = Math.abs(Rgb1[0] - Rgb2[0]) +
                     Math.abs(Rgb1[1] - Rgb2[1]) +
                     Math.abs(Rgb1[2] - Rgb2[2]) +
-                    Math.abs(Rgb1[3] - Rgb2[3]);
+                    Math.abs( (Rgb1[3] - Rgb2[3])*3 );
 
        
         return diff/maxDiff;
