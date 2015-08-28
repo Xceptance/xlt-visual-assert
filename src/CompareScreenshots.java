@@ -1,6 +1,7 @@
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
@@ -29,6 +30,13 @@ public class CompareScreenshots implements WebDriverCustomModule
 	@Override
 	public void execute(WebDriver webDriver, String... args) 
     {
+        //Wait 100 miliseconds so the website is fully loaded
+        try {
+			TimeUnit.MILLISECONDS.sleep(100);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+		
 		XltProperties x = XltProperties.getInstance();
 		
 		//Checks if this is a new testcase. If yes, (re)sets index. If not. increments index
@@ -65,7 +73,7 @@ public class CompareScreenshots implements WebDriverCustomModule
         String referencePath = directory + "/" + screenshotName;
         
         File referenceFile = new File(referencePath + ".png");
-             
+               
         //If there's no other screenshot, just save the new one
         if (!referenceFile.isFile()) {
             try
@@ -120,7 +128,7 @@ public class CompareScreenshots implements WebDriverCustomModule
             	if (!imagecomparison.fuzzyEqual(reference, screenshot, maskImageFile, markedImageFile)) {
             		
 //            		Give an assertion. The marked Image was saved in the fuzzyEqual method
-            		String assertMessage = "Layout changed" + currentActionName + "-i" + indexS;
+            		String assertMessage = "Website does not match the reference screenshot: " + currentActionName;
             		Assert.assertTrue(assertMessage, false);			
             	}
             }
