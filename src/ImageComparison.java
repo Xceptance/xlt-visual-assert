@@ -225,20 +225,30 @@ public class ImageComparison {
 //        maximum possible difference
 //    	  If one of the pixels is transparent, presumably throught the resizeImage method, it will return the maxDifference
     	
-        double maxDifference = 3 * 255;
+    	Color color1 = new Color(img1.getRGB(x, y));
+        Color color2 = new Color(img2.getRGB(x, y));
         
+        int red1 = color1.getRed();
+        int red2 = color2.getRed();
+        int green1 = color1.getGreen();
+        int green2 = color2.getGreen();
+        int blue1 = color1.getBlue();
+        int blue2 = color2.getBlue();
+    	
+        double maxDifference = Math.max(red1, 255 - red1)
+        						+ Math.max(green1, 255 - green1)
+        						+ Math.max(blue1, 255 - blue1);
+              
         if (isTransparent(img1 ,x ,y)) {
-        	return maxDifference;
+        	return 1.00;
         }
         if (isTransparent(img2 ,x ,y)) {
-        	return maxDifference;
+        	return 1.00;
         }
-        
-        Color color1 = new Color(img1.getRGB(x, y));
-        Color color2 = new Color(img2.getRGB(x, y));
-        double difference = Math.abs(color1.getBlue() - color2.getBlue())
-                            + Math.abs(color1.getRed() - color2.getRed())
-                            + Math.abs(color1.getGreen() - color2.getGreen());
+
+        double difference = Math.abs(blue1 - blue2)
+                            + Math.abs(red1 - red2)
+                            + Math.abs(green1 - green2);
        
         return difference/maxDifference;
     }
@@ -311,33 +321,36 @@ public class ImageComparison {
     }
 
     private void drawBorders (BufferedImage img, int subImageWidth, int subImageHeight, int currentX, int currentY) {
+    	int x, y;
+    	
     	for (int a = 0; a < subImageWidth; a++) {
-    		int rgb = img.getRGB((currentX * pixelPerBlockX) + a, currentY * pixelPerBlockY);
-    		Color currentColor = new Color (rgb);
-    		Color newColor = getComplementary(currentColor);
-    		int newRgb = newColor.getRGB();
-    		img.setRGB((currentX * pixelPerBlockX) + a, currentY * pixelPerBlockY, newRgb);
-    		
-    		rgb = img.getRGB((currentX * pixelPerBlockX) + a, (currentY * pixelPerBlockY) + subImageHeight - 1);
-    		currentColor = new Color (rgb);
-    		newColor = getComplementary(currentColor);
-    		newRgb = newColor.getRGB();
-    		img.setRGB((currentX * pixelPerBlockX) + a, (currentY * pixelPerBlockY) + subImageHeight - 1, newRgb);
+    		x = currentX * pixelPerBlockX + a;
+    		y = currentY * pixelPerBlockY;
+    		colorPixel(img, x, y);
+
+    		y = currentY * pixelPerBlockY + subImageHeight - 1;
+    	    colorPixel(img, x, y);
     	}
     	
     	for (int b = 1; b < subImageHeight - 1; b++) {
-    		int rgb = img.getRGB(currentX * pixelPerBlockX, (currentY * pixelPerBlockY) + b);
-    		Color currentColor = new Color (rgb);
-    		Color newColor = getComplementary(currentColor);
-    		int newRgb = newColor.getRGB();
-    		img.setRGB(currentX * pixelPerBlockX, (currentY * pixelPerBlockY) + b, newRgb);
+    		x = currentX * pixelPerBlockX;
+    		y = currentY * pixelPerBlockY + b;
+    		colorPixel(img, x, y);
     		
-    		rgb = img.getRGB((currentX * pixelPerBlockX) + subImageWidth - 1, (currentY * pixelPerBlockY) + b);
-    		currentColor = new Color (rgb);
-    		newColor = getComplementary(currentColor);
-    		newRgb = newColor.getRGB();
-    		img.setRGB((currentX * pixelPerBlockX) + subImageWidth - 1, (currentY * pixelPerBlockY) + b, newRgb);
+    		x = currentX * pixelPerBlockX + subImageWidth - 1;
+    		colorPixel(img, x, y);
     	}
+    }
+    
+    private void colorPixel(BufferedImage img, int x, int y) {
+    	int rgb, newRgb;
+    	Color currentColor, newColor;
+    	
+    	rgb = img.getRGB(x, y);
+		currentColor = new Color (rgb);
+		newColor = getComplementary(currentColor);
+		newRgb = newColor.getRGB();
+		img.setRGB(x, y, newRgb);
     }
 
    
