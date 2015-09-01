@@ -9,6 +9,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import VisualComparison.ImageComparison;
+
 
 public class ImageComparisonUnitTest {
 	BufferedImage reference, newImage;
@@ -21,7 +23,7 @@ public class ImageComparisonUnitTest {
 	public void setup() {
 //		sets up a new reference image for each test
 		reference = new BufferedImage(8, 10, BufferedImage.TYPE_INT_ARGB);
-		paintBlack(reference);
+		paintWhite(reference);
 	}
 
 	@Test
@@ -31,8 +33,11 @@ public class ImageComparisonUnitTest {
 		outPutfile = new File("test"+x+".png");
 		maskFile = new File("mask"+x+".png");
 		newImage = new BufferedImage (6, 10, BufferedImage.TYPE_INT_ARGB);
+		paintWhite(newImage);
+		Assert.assertFalse(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
 		paintBlack(newImage);
-		Assert.assertTrue(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
+		paintBlack(reference);
+		Assert.assertFalse(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
 	}
 	
 	@Test
@@ -42,8 +47,11 @@ public class ImageComparisonUnitTest {
 		outPutfile = new File("test"+x+".png");
 		maskFile = new File("mask"+x+".png");
 		newImage = new BufferedImage (10, 10, BufferedImage.TYPE_INT_ARGB);
+		paintWhite(newImage);
+		Assert.assertFalse(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
 		paintBlack(newImage);
-		Assert.assertTrue(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
+		paintBlack(reference);
+		Assert.assertFalse(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
 	}
 	
 	@Test
@@ -53,8 +61,11 @@ public class ImageComparisonUnitTest {
 		outPutfile = new File("test"+x+".png");
 		maskFile = new File("mask"+x+".png");
 		newImage = new BufferedImage (8, 8, BufferedImage.TYPE_INT_ARGB);
+		paintWhite(newImage);
+		Assert.assertFalse(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
 		paintBlack(newImage);
-		Assert.assertTrue(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
+		paintBlack(reference);
+		Assert.assertFalse(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
 	}
 	
 	@Test
@@ -64,8 +75,11 @@ public class ImageComparisonUnitTest {
 		outPutfile = new File("test"+x+".png");
 		maskFile = new File("mask"+x+".png");
 		newImage = new BufferedImage (8, 12, BufferedImage.TYPE_INT_ARGB);
+		paintWhite(newImage);
+		Assert.assertFalse(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
 		paintBlack(newImage);
-		Assert.assertTrue(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
+		paintBlack(reference);
+		Assert.assertFalse(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
 	}
 	
 	@Test
@@ -75,8 +89,11 @@ public class ImageComparisonUnitTest {
 		outPutfile = new File("test"+x+".png");
 		maskFile = new File("mask"+x+".png");
 		newImage = new BufferedImage (6, 8, BufferedImage.TYPE_INT_ARGB);
+		paintWhite(newImage);
+		Assert.assertFalse(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
 		paintBlack(newImage);
-		Assert.assertTrue(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
+		paintBlack(reference);
+		Assert.assertFalse(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
 	}
 	
 	@Test 
@@ -86,8 +103,11 @@ public class ImageComparisonUnitTest {
 		outPutfile = new File("test"+x+".png");
 		maskFile = new File("mask"+x+".png");
 		newImage = new BufferedImage (10, 12, BufferedImage.TYPE_INT_ARGB);
+		paintWhite(newImage);
+		Assert.assertFalse(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
 		paintBlack(newImage);
-		Assert.assertTrue(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
+		paintBlack(reference);
+		Assert.assertFalse(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
 	}
 	
 	@Test
@@ -97,24 +117,29 @@ public class ImageComparisonUnitTest {
 		outPutfile = new File("test"+x+".png");
 		maskFile = new File("mask"+x+".png");
 		newImage = new BufferedImage (10, 8, BufferedImage.TYPE_INT_ARGB);
+		paintWhite(newImage);
+		Assert.assertFalse(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
 		paintBlack(newImage);
-		Assert.assertTrue(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
+		paintBlack(reference);
+		Assert.assertFalse(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
 	}
-
+	
 	public void paintBlack (BufferedImage img) {
 //		method for painting the images black
+		int rgb = Color.BLACK.getRGB();
 		for (int x = 0; x<img.getWidth(); x++) {
 			for (int y = 0; y<img.getHeight(); y++) {
-				img.setRGB(x, y, 0);
+				img.setRGB(x, y, rgb);
 			}
 		}
 	}
 	
 	public void paintWhite (BufferedImage img) {
 //		method for painting the images white
+		int rgb = Color.WHITE.getRGB();
 		for (int x = 0; x<img.getWidth(); x++) {
 			for (int y = 0; y<img.getHeight(); y++) {
-				img.setRGB(x, y, Color.WHITE.getRGB());
+				img.setRGB(x, y, rgb);
 			}
 		}
 	}
