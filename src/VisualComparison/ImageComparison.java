@@ -426,9 +426,9 @@ public class ImageComparison {
   		BufferedImage newImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
   		int[] newImgArray = ((DataBufferInt) newImg.getRaster().getDataBuffer()).getData();
   		int index;
-  		for (int w=img.getWidth(); w<width; w++) {
-  			for (int h=img.getHeight(); h<height; h++) {
-  				index = h * newImg.getWidth() + w;
+  		for (int w=img.getWidth(); w<=width; w++) {
+  			for (int h=img.getHeight(); h<=height; h++) {
+  				index = (h-1) * newImg.getWidth() + w -1;
   				newImgArray[index] = 0;
   			}
   		}

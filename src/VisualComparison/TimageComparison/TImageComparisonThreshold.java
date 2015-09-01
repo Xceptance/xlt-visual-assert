@@ -1,8 +1,5 @@
 package VisualComparison.TimageComparison;
 
-
-
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +13,7 @@ import VisualComparison.ImageComparison;
 
 public class TImageComparisonThreshold {
 //	Tests if the threshold is working as expected. 
-//	Calculation: Reference Image with rgb of red, green and blue = 255 -_> maxDifference =  765 
+//	Calculation: Reference Image with rgb of red, green and blue = 255 results in a maxDifference of 765 
 //  Threshold of 0.2 = 20% -> Difference of 153
 	
 //	The Test initializes reference and screenshot image, then runs test methods with a threshold of exactly 0.2, just above 0.2
@@ -38,6 +35,7 @@ public class TImageComparisonThreshold {
 		int green = 255;
 		int blue = 255;
 		int rgb = (red << 16) | (green << 8) | blue;
+		
 		for (int w=0; w<reference.getWidth(); w++) { 
 			for (int h=0; h<reference.getHeight(); h++) {
 				reference.setRGB(w, h, rgb);
@@ -50,6 +48,7 @@ public class TImageComparisonThreshold {
 		green = 255;
 		blue = 102;
 		rgb = (red << 16) | (green << 8) | blue;
+		
 		for (int w=0; w<screenshot.getWidth(); w++) { 
 			for (int h=0; h<screenshot.getHeight(); h++) {
 				screenshot.setRGB(w, h, rgb);
@@ -58,6 +57,8 @@ public class TImageComparisonThreshold {
 		this.screenshot = screenshot;
 	}
 	
+	
+//	 	The following three methods test the normal fuzzyEqual function
 	
 	@Test	
 	public void exactlyTenPercent() throws IOException {	

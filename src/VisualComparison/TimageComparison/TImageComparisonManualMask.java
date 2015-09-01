@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -57,7 +58,11 @@ public class TImageComparisonManualMask {
 		}
 		else {
 			System.out.println("Images arn't equal");
-		}
-			
+		}			
+	}
+	
+	@After
+	public void deleteFile() {
+		fileMask.delete();
 	}
 }

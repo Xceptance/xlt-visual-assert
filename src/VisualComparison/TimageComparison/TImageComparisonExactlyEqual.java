@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +22,7 @@ public class TImageComparisonExactlyEqual {
 	private File fileMask = new File(pathHome + "/maskImage.png");
 	private File fileOut = new File(pathHome + "/output.png");
 	
-// initializes two images, the only difference is that the rgb value of the top left pixel is smaller by one
+// initializes the two images, the only difference is that the rgb value of the top left pixel is smaller by one
 	@Before
 	public void initializeImages() {
 		BufferedImage reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
@@ -51,5 +52,11 @@ public class TImageComparisonExactlyEqual {
 		if (imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut)) {
 			Assert.assertTrue("The images arn't quite equal,  he apparently missed something - almostEqualButNotQuite", false);
 		}
+	}
+	
+	@After
+	public void deleteFile() {
+		fileMask.delete();
+		fileOut.delete();
 	}
 }

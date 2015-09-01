@@ -10,6 +10,7 @@ import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,11 +56,11 @@ public class TimageComparisonResizeImage {
 		BufferedImage img = ImageIO.read(fileOut);
 		
 		if (!(img.getWidth() == 300)) {
-			System.out.println("Output image does not have the correct width");
+			Assert.assertTrue("Marked image does not have the correct width", false);
 		}
 		
 		if (!(img.getHeight() == 300)) {
-			System.out.println("Output image does not have the correct height");
+			Assert.assertTrue("Marked image does not have the correct height", false);
 		}
 	}
 	
@@ -142,5 +143,11 @@ public class TimageComparisonResizeImage {
 		if (!(img.getRGB(50, 50)==rgbMarked)) {
 			Assert.assertTrue("The resized parts were not marked", false);
 		}
+	}
+	
+	@After
+	public void deleteFile() {
+		fileMask.delete();
+		fileOut.delete();
 	}
 }

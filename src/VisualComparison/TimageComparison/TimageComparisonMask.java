@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -156,5 +157,11 @@ public class TimageComparisonMask {
 					Assert.assertEquals(rgbMarked, output.getRGB(w, h));
 				}
 			}
+		}
+		
+		@After
+		public void deleteFile() {
+			fileMask.delete();
+			fileOut.delete();
 		}
 }

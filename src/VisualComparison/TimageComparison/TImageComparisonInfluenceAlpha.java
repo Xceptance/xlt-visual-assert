@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -84,5 +85,11 @@ public class TImageComparisonInfluenceAlpha {
 		if (imagecomparison.fuzzyEqual(transparentImg, notTransparentImg, fileMask, fileOut)) {
 			Assert.assertTrue("A transparent reference Image went undetected - influenceAlphaExactlyEqual", false);
 		}
+	}
+	
+	@After
+	public void deleteFile() {
+		fileMask.delete();
+		fileOut.delete();
 	}
 }

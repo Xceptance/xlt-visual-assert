@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -84,7 +85,13 @@ public class TimageComparisonResizedImageColor {
 		if (!imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut)) {
 			Assert.assertTrue("Failure, a threshold of one should return true - testFuzzyEqualThresholdOfOne", false);
 		}
-	}	
+	}
+	
+	@After
+	public void deleteFile() {
+		fileMask.delete();
+		fileOut.delete();
+	}
 }
 
 
