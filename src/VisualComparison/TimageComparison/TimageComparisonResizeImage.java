@@ -22,8 +22,8 @@ public class TimageComparisonResizeImage {
 //	This class tests whether the ResizeImage method is working as expected. Two Images are created, 
 //	both are white, but with different sizes
 	
-//	The tests test whether the resulting image has the correct size and whether or not the break off between marked black from resizing
-//	and unmarked white is at the correct place
+//	The tests test whether the resulting image has the correct size and whether or not the break off between marked black 
+//	from resizing and unmarked white is at the correct place
 	
 //	Includes separate methods for exactlyEqual and pixelFuzzyEqual
 	
@@ -34,6 +34,7 @@ public class TimageComparisonResizeImage {
 	private File fileMask = new File(pathHome + "/maskImage.png");
 	private File fileOut = new File(pathHome + "/output.png");
 	
+//	Initializes reference and screenshot images. 
 	@Before
 	public void initializeImages() {
 		BufferedImage reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
@@ -49,6 +50,8 @@ public class TimageComparisonResizeImage {
 		this.screenshot = screenshot;
 	}
 	
+//	Tests if the resulting marked image has the correct size (the same size as the big reference image)
+//	Tests the normal fuzzyEqual method
 	@Test
 	public void correctSize() throws IOException {
 		ImageComparison imagecomparison = new ImageComparison(2, 1, 0.01, false);
@@ -64,6 +67,8 @@ public class TimageComparisonResizeImage {
 		}
 	}
 	
+//	Tests if the smaller image correctly preserved during the resizing and if the resized parts are marked
+//	Tests the normal fuzzyEqual method
 	@Test
 	public void correctBreakPoint() throws IOException {
 		ImageComparison imagecomparison = new ImageComparison(2, 2, 0.01, false);
@@ -81,6 +86,8 @@ public class TimageComparisonResizeImage {
 		}
 	}
 	
+//	Tests if the resulting marked image has the correct size (the same size as the big reference image)
+//	Tests the normal exactlyEqual method	
 	@Test
 	public void correctSizeExactlyEqual() throws IOException {
 		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.00, false);
@@ -96,6 +103,8 @@ public class TimageComparisonResizeImage {
 		}
 	}
 	
+//	Tests if the smaller image correctly preserved during the resizing and if the resized parts are marked
+//	Tests the normal exactlyEqual method		
 	@Test
 	public void correctBreakPointExactlyEqual() throws IOException {
 		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.00, false);
@@ -113,6 +122,8 @@ public class TimageComparisonResizeImage {
 		}
 	}
 	
+//	Tests if the resulting marked image has the correct size (the same size as the big reference image)
+//	Tests the normal pixelFuzzyEqual method	
 	@Test
 	public void correctSizePixelFuzzyEqual() throws IOException {
 		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.01, false);
@@ -128,6 +139,8 @@ public class TimageComparisonResizeImage {
 		}
 	}
 	
+//	Tests if the smaller image correctly preserved during the resizing and if the resized parts are marked
+//	Tests the normal pixelFuzzyEqual method	
 	@Test
 	public void correctBreakPointPixelFuzzyEqual() throws IOException {
 		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.01, false);
