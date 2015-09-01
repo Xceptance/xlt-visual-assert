@@ -45,9 +45,7 @@ public class TImageComparisonTraining {
 		newImage = new BufferedImage(200, 200, BufferedImage.TYPE_INT_ARGB);
 		paintWhite(newImage);
 		paintArea(newImage, 0, 0, 10, 10);
-		Assert.assertFalse(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
-		Assert.assertTrue(training.fuzzyEqual(reference, newImage, maskFile, outPutfile));
-		Assert.assertTrue(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
+		assertBlock();
 	}
 	
 	@Test
@@ -59,9 +57,7 @@ public class TImageComparisonTraining {
 		paintWhite(newImage);
 		paintArea(newImage, 50, 30, 23, 27);
 		paintArea(newImage, 78, 83, 10, 45);
-		Assert.assertFalse(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
-		Assert.assertTrue(training.fuzzyEqual(reference, newImage, maskFile, outPutfile));
-		Assert.assertTrue(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
+		assertBlock();
 	}
 	
 	@Test
@@ -72,13 +68,9 @@ public class TImageComparisonTraining {
 		newImage = new BufferedImage(200, 200, BufferedImage.TYPE_INT_ARGB);
 		paintWhite(newImage);
 		paintArea(newImage, 0, 0, 10, 10);
-		Assert.assertFalse(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
-		Assert.assertTrue(training.fuzzyEqual(reference, newImage, maskFile, outPutfile));
-		Assert.assertTrue(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
+		assertBlock();
 		paintArea(newImage, 50, 50, 25, 25);
-		Assert.assertFalse(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
-		Assert.assertTrue(training.fuzzyEqual(reference, newImage, maskFile, outPutfile));
-		Assert.assertTrue(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
+		assertBlock();
 	}
 	
 	@Test
@@ -139,6 +131,12 @@ public class TImageComparisonTraining {
 				img.setRGB(x + a, y + b, rgb);
 			}
 		}
+	}
+	
+	public void assertBlock () throws IOException {
+		Assert.assertFalse(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertTrue(training.fuzzyEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertTrue(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
 	}
 
 }
