@@ -1,7 +1,5 @@
 package VisualComparison.TimageComparison;
 
-import static org.junit.Assert.*;
-
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -81,6 +79,37 @@ public class TImageComparisonTraining {
 		Assert.assertFalse(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
 		Assert.assertTrue(training.fuzzyEqual(reference, newImage, maskFile, outPutfile));
 		Assert.assertTrue(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
+	}
+	
+	@Test
+	public void trainExactlyEqual() throws IOException {
+		x = 4;
+		outPutfile = new File("test"+x+".png");
+		maskFile = new File("mask"+x+".png");
+		newImage = new BufferedImage(200, 200, BufferedImage.TYPE_INT_ARGB);
+		paintWhite(newImage);
+		paintArea(newImage, 80, 80, 1, 1);
+		Assert.assertFalse(imgCompare.exactlyEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertTrue(training.exactlyEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertTrue(imgCompare.exactlyEqual(reference, newImage, maskFile, outPutfile));
+		paintArea(newImage, 74, 154, 7, 1);
+		Assert.assertFalse(imgCompare.exactlyEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertTrue(training.exactlyEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertTrue(imgCompare.exactlyEqual(reference, newImage, maskFile, outPutfile));
+	}
+	
+	@Test
+	public void trainPixelFuzzyEqual() throws IOException {
+		x = 5;
+		outPutfile = new File("test"+x+".png");
+		maskFile = new File("mask"+x+".png");
+		newImage = new BufferedImage(200, 200, BufferedImage.TYPE_INT_ARGB);
+		paintWhite(newImage);
+		paintArea(newImage, 48, 97, 3, 2);
+		Assert.assertFalse(imgCompare.pixelFuzzyEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertTrue(training.pixelFuzzyEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertTrue(imgCompare.pixelFuzzyEqual(reference, newImage, maskFile, outPutfile));
+		
 	}
 	
 	public void paintBlack (BufferedImage img) {
