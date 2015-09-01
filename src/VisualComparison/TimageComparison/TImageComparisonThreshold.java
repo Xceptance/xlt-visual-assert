@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -66,9 +67,6 @@ public class TImageComparisonThreshold {
 		if (!imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut)) {
 			Assert.assertTrue("Threshold should be equal to difference-exactlyTreshold", false);
 		}
-		
-		fileMask.delete();
-		fileOut.delete();
 	}
 	
 	@Test	
@@ -77,9 +75,6 @@ public class TImageComparisonThreshold {
 		if (!imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut)) {
 			Assert.assertTrue("Threshold should be barely above difference-barelyAboveTresholdt", false);
 		}
-		
-		fileMask.delete();
-		fileOut.delete();
 	}
 	
 	@Test	
@@ -88,10 +83,9 @@ public class TImageComparisonThreshold {
 		if (imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut)) {
 			Assert.assertTrue("Threshold should be barely below difference-barelyBelowThreshold", false);
 		}
-		
-		fileMask.delete();
-		fileOut.delete();
 	}
+	
+//		The following three functions test the pixelFuzzyEqual method, ie pixel based comparison
 	
 	@Test	
 	public void exactlyTenPercentPixelFuzzyEqual() throws IOException {	
@@ -99,9 +93,6 @@ public class TImageComparisonThreshold {
 		if (!imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut)) {
 			Assert.assertTrue("An unexpected result in TImageComparisonThreshold.exactlyTenPercent", false);
 		}
-		
-		fileMask.delete();
-		fileOut.delete();
 	}
 	
 	@Test	
@@ -110,9 +101,6 @@ public class TImageComparisonThreshold {
 		if (!imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut)) {
 			Assert.assertTrue("An unexpected result in TImageComparisonThreshold.barelyAboveTenPercent", false);
 		}
-		
-		fileMask.delete();
-		fileOut.delete();
 	}
 	
 	@Test	
@@ -121,8 +109,13 @@ public class TImageComparisonThreshold {
 		if (imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut)) {
 			Assert.assertTrue("An unexpected result in TImageComparisonThreshold.barelyBelowTenPercent", false);
 		}
-		
+	}
+	
+//	Delete created files after tests
+	@After 
+	public void deleteFiles() {
 		fileMask.delete();
 		fileOut.delete();
 	}
+	
 }
