@@ -27,6 +27,7 @@ public class TImageComparisonTraining {
 	
 	@Test
 	public void trainWithNoDifference() throws IOException{
+//		test a run with the training mode without any differences between the images
 		x = 0;
 		setUpFileAndPicture();
 		Assert.assertTrue(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
@@ -36,6 +37,7 @@ public class TImageComparisonTraining {
 	
 	@Test
 	public void trainWithSingleDifference() throws IOException{
+//		a single block is colored different and should be recognized by the training mode
 		x = 1;
 		setUpFileAndPicture();
 		paintArea(newImage, 0, 0, 10, 10);
@@ -44,6 +46,7 @@ public class TImageComparisonTraining {
 	
 	@Test
 	public void trainWithMultipleDifferences() throws IOException{
+//		two areas are colored different and should be recognized by the training mode
 		x = 2;
 		setUpFileAndPicture();
 		paintArea(newImage, 50, 30, 23, 27);
@@ -53,6 +56,8 @@ public class TImageComparisonTraining {
 	
 	@Test
 	public void trainOverMultipleRounds() throws IOException{
+//		after a first round in training mode, additional differences are created to see if the training works
+//		properly over multiple runs
 		x = 3;
 		setUpFileAndPicture();
 		paintArea(newImage, 0, 0, 10, 10);
@@ -63,6 +68,7 @@ public class TImageComparisonTraining {
 	
 	@Test
 	public void trainExactlyEqual() throws IOException {
+//		test if training mode works properly for the exact pixel comparison
 		x = 4;
 		setUpFileAndPicture();
 		paintArea(newImage, 80, 80, 1, 1);
@@ -73,22 +79,13 @@ public class TImageComparisonTraining {
 	
 	@Test
 	public void trainPixelFuzzyEqual() throws IOException {
+//		test if training mode works properly for the fuzzy pixel comparison
 		x = 5;
 		setUpFileAndPicture();
 		paintArea(newImage, 48, 97, 3, 2);
 		pixelFuzzyAssertBlock();		
 	}
-	
-	public void paintBlack (BufferedImage img) {
-//		method for painting the images black
-		int rgb = Color.BLACK.getRGB();
-		for (int x = 0; x<img.getWidth(); x++) {
-			for (int y = 0; y<img.getHeight(); y++) {
-				img.setRGB(x, y, rgb);
-			}
-		}
-	}
-	
+		
 	public void paintWhite (BufferedImage img) {
 //		method for painting the images white
 		int rgb = Color.WHITE.getRGB();
@@ -100,6 +97,7 @@ public class TImageComparisonTraining {
 	}
 	
 	public void paintArea (BufferedImage img, int x, int y, int width, int height) {
+//		method for coloring specific areas of an image to create differences
 		int rgb = Color.BLUE.getRGB();
 		for (int a = 0; a<width; a++){
 			for (int b = 0; b<height; b++) {
@@ -109,24 +107,28 @@ public class TImageComparisonTraining {
 	}
 	
 	public void fuzzyAssertBlock () throws IOException {
+//		this assertion block checks if the fuzzy training was completed succesfully
 		Assert.assertFalse(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
 		Assert.assertTrue(training.fuzzyEqual(reference, newImage, maskFile, outPutfile));
 		Assert.assertTrue(imgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
 	}
 	
 	public void exactlyAssertBlock() throws IOException {
+//		this assertion block checks if the exact training was completed succesfully
 		Assert.assertFalse(imgCompare.exactlyEqual(reference, newImage, maskFile, outPutfile));
 		Assert.assertTrue(training.exactlyEqual(reference, newImage, maskFile, outPutfile));
 		Assert.assertTrue(imgCompare.exactlyEqual(reference, newImage, maskFile, outPutfile));
 	}
 	
 	public void pixelFuzzyAssertBlock() throws IOException {
+//		this assertion block checks if the pixel fuzzy training was completed succesfully
 		Assert.assertFalse(imgCompare.pixelFuzzyEqual(reference, newImage, maskFile, outPutfile));
 		Assert.assertTrue(training.pixelFuzzyEqual(reference, newImage, maskFile, outPutfile));
 		Assert.assertTrue(imgCompare.pixelFuzzyEqual(reference, newImage, maskFile, outPutfile));
 	}
 	
 	public void setUpFileAndPicture() {
+//		setup method for each test
 		outPutfile = new File("test"+x+".png");
 		maskFile = new File("mask"+x+".png");
 		newImage = new BufferedImage(200, 200, BufferedImage.TYPE_INT_ARGB);
