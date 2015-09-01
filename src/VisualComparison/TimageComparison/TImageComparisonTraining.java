@@ -5,6 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -84,6 +85,12 @@ public class TImageComparisonTraining {
 		setUpFileAndPicture();
 		paintArea(newImage, 48, 97, 3, 2);
 		pixelFuzzyAssertBlock();		
+	}
+	
+	@After
+	public void deleteFiles() {
+		outPutfile.delete();
+		maskFile.delete();
 	}
 		
 	public void paintWhite (BufferedImage img) {
