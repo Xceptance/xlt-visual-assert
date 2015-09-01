@@ -15,9 +15,15 @@ import org.junit.Test;
 import VisualComparison.ImageComparison;
 
 public class TimageComparisonMask {
-//	Tests if the mask is working as expected. Specifically, it tests if a difference in the images is marked and detected if 
-//	The mask image is black and if a difference in the images is detected if the mask image is white.
-//	Tests fuzzyEqual, exactlyFuzzyEqual and exactlyEqual
+//	Tests if the mask is working as expected. Specifically, it tests if a difference in the images is marked and detected 
+//	if the mask image is black and if a difference in the images is detected if the mask image is white.
+//	Separate tests for fuzzyEqual, pixelFuzzyEqual and exactlyEqual
+	
+//	For that, the reference image is fully black while the screenshot image is black up to row 200, then white between
+//	rows 200 and 300. The maskimage is black from row 250 to row 300.
+	
+//	The tests test if the resulting markedImage is marked between rows 250 and 300 (it shoudn't be)
+//	and if the resulting markedImage is marked between rows 200 and 250 (it should be)
 	
 		private BufferedImage reference;
 		private BufferedImage screenshot;
@@ -32,7 +38,7 @@ public class TimageComparisonMask {
 		private File fileOut = new File(pathHome + "/output.png");
 		
 		
-//		Initializes the reference, screenshot and maskimages;
+//		Initializes the reference, screenshot and the maskimage;
 		@Before
 		public void initializeImages() throws IOException {
 			BufferedImage reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
@@ -72,6 +78,7 @@ public class TimageComparisonMask {
 		}	
 		
 //		Checks if the masked parts where NOT marked
+//		Tests the normal fuzzyEqual method
 		@Test
 		public void changesCorrectlyHidden() throws IOException {
 			ImageComparison imagecomparison = new ImageComparison(10, 10, 0.1, false);
@@ -86,6 +93,7 @@ public class TimageComparisonMask {
 		}
 		
 //		Checks if the parts that wern't masked are marked
+//		Tests the normal fuzzyEqual method
 		@Test
 		public void changesCorrectlyNotHidden() throws IOException {
 			ImageComparison imagecomparison = new ImageComparison(10, 10, 0.1, false);
@@ -104,6 +112,7 @@ public class TimageComparisonMask {
 		}
 		
 //		Checks if the masked parts where NOT marked
+//		Tests the exactlyEqual method
 		@Test
 		public void changesCorrectlyHiddenExactlyEqual() throws IOException {
 			ImageComparison imagecomparison = new ImageComparison(1, 1, 0.00, false);
@@ -118,6 +127,7 @@ public class TimageComparisonMask {
 		}
 		
 //		Checks if the parts that wern't masked are marked
+//		Tests the exactlyEqual method
 		@Test
 		public void changesCorrectlyNotHiddenExactlyEqual() throws IOException {
 			ImageComparison imagecomparison = new ImageComparison(1, 1, 0.00, false);
@@ -132,6 +142,7 @@ public class TimageComparisonMask {
 		}
 		
 //		Checks if the masked parts where NOT marked
+//		Tests the pixelFuzzyEqual method
 		@Test
 		public void changesCorrectlyPixelFuzzyEqual() throws IOException {
 			ImageComparison imagecomparison = new ImageComparison(1, 1, 0.1, false);
@@ -146,6 +157,7 @@ public class TimageComparisonMask {
 		}
 		
 //		Checks if the parts that wern't masked are marked
+//		Tests the pixelFuzzyEqual method
 		@Test
 		public void changesCorrectlyNotHiddenPixelFuzzyEqual() throws IOException {
 			ImageComparison imagecomparison = new ImageComparison(1, 1, 0.1, false);
@@ -159,6 +171,7 @@ public class TimageComparisonMask {
 			}
 		}
 		
+//		Deletes the created files after the test.
 		@After
 		public void deleteFile() {
 			fileMask.delete();
