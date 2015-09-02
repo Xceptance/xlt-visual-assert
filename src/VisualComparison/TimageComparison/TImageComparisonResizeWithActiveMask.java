@@ -8,6 +8,7 @@ import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -25,9 +26,12 @@ public class TImageComparisonResizeWithActiveMask {
 	private BufferedImage smallBlackImg;
 	private BufferedImage bigWhiteImg;
 	
-	private String pathHome = System.getProperty("user.home");
-	private File fileMask = new File(pathHome + "/maskImage.png");
-	private File fileOut = new File(pathHome + "/output.png");
+	private final static File directory = SystemUtils.getJavaIoTmpDir();
+	private static File fileMask = new File(directory, "/fileMask.png");
+	private static File fileOut = new File(directory, "/fileOut.png");
+	
+	private final static int rgbBlack = Color.BLACK.getRGB();
+	private final static int rgbWhite = Color.WHITE.getRGB();
 	
 	@Before
 	public void initializeImagesAndMask() throws IOException {
@@ -35,8 +39,6 @@ public class TImageComparisonResizeWithActiveMask {
 //		which are white in the bigWhiteImg and nonexistent in the smallBlackImg
 		
 		BufferedImage smallBlackImg = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
-		Color black = Color.BLACK;
-		int rgbBlack = black.getRGB();
 		for (int w=0; w<smallBlackImg.getWidth(); w++) { 
 			for (int h=0; h<smallBlackImg.getHeight(); h++) {
 				smallBlackImg.setRGB(w, h, rgbBlack);
@@ -45,8 +47,6 @@ public class TImageComparisonResizeWithActiveMask {
 		this.smallBlackImg = smallBlackImg;
 	
 		BufferedImage bigWhiteImg = new BufferedImage(400, 400, BufferedImage.TYPE_INT_RGB);
-		Color white = Color.WHITE;
-		int rgbWhite = white.getRGB();
 		for (int w=0; w<bigWhiteImg.getWidth(); w++) { 
 			for (int h=0; h<bigWhiteImg.getHeight(); h++) {
 				bigWhiteImg.setRGB(w, h, rgbWhite);
@@ -64,9 +64,9 @@ public class TImageComparisonResizeWithActiveMask {
 	@Test
 	public void biggerScreenshotImage() throws IOException {
 		ImageComparison imagecomparison1 = new ImageComparison(3, 3, 0.1, false);
-		if (imagecomparison1.fuzzyEqual(smallBlackImg, bigWhiteImg, fileMask, fileOut)) {
-			Assert.assertTrue("Former maskImage shouldn't be used if the screenshot has a bigger size", false);
-		}
+		boolean result = imagecomparison1.fuzzyEqual(smallBlackImg, bigWhiteImg, fileMask, fileOut); 
+		Assert.assertFalse("Former maskImage shouldn't be used if the " +
+				"screenshot has a bigger size - result: " + result, result);		
 	}
 	
 //	Changes the order of the parameters and tests what happens if the screenshot image is smaller.
@@ -74,9 +74,9 @@ public class TImageComparisonResizeWithActiveMask {
 	@Test
 	public void smallerScreenshotImage() throws IOException {
 		ImageComparison imagecomparison1 = new ImageComparison(3, 3, 0.1, false);
-		if (imagecomparison1.fuzzyEqual(bigWhiteImg, smallBlackImg, fileMask, fileOut)) {
-			Assert.assertTrue("Former maskImage shouldn't be used if the screenshot has a smaller size", false);
-		}
+		boolean result = imagecomparison1.fuzzyEqual(bigWhiteImg, smallBlackImg, fileMask, fileOut);
+		Assert.assertFalse("Former maskImage shouldn't be used if the " +
+				"screenshot has a bigger size - result: " + result, result);
 	}
 	
 //	Tests what happens if the screenshotImage is bigger.
@@ -84,19 +84,20 @@ public class TImageComparisonResizeWithActiveMask {
 	@Test
 	public void biggerScreenshotImageExactlyEqual() throws IOException {
 		ImageComparison imagecomparison1 = new ImageComparison(1, 1, 0.00, false);
-		if (imagecomparison1.fuzzyEqual(smallBlackImg, bigWhiteImg, fileMask, fileOut)) {
-			Assert.assertTrue("Former maskImage shouldn't be used if the screenshot has a bigger size", false);
-		}
+		boolean result = imagecomparison1.fuzzyEqual(smallBlackImg, bigWhiteImg, fileMask, fileOut); 
+		Assert.assertFalse("Former maskImage shouldn't be used if the " +
+				"screenshot has a bigger size - result: " + result, result);
 	}
+	
 	
 //	Changes the order of the parameters and tests what happens if the screenshot image is smaller.
 //	Tests the exactlyEqual method.
 	@Test
 	public void smallerScreenshotImageExactlyEqual() throws IOException {
 		ImageComparison imagecomparison1 = new ImageComparison(1, 1, 0.00, false);
-		if (imagecomparison1.fuzzyEqual(bigWhiteImg, smallBlackImg, fileMask, fileOut)) {
-			Assert.assertTrue("Former maskImage shouldn't be used if the screenshot has a smaller size", false);
-		}
+		boolean result = imagecomparison1.fuzzyEqual(bigWhiteImg, smallBlackImg, fileMask, fileOut);
+		Assert.assertFalse("Former maskImage shouldn't be used if the " +
+				"screenshot has a bigger size - result: " + result, result);
 	}
 	
 //	Tests what happens if the screenshotImage is bigger.
@@ -104,9 +105,9 @@ public class TImageComparisonResizeWithActiveMask {
 	@Test
 	public void biggerScreenshotImagePixelFuzzyEqual() throws IOException {
 		ImageComparison imagecomparison1 = new ImageComparison(1, 1, 0.1, false);
-		if (imagecomparison1.fuzzyEqual(smallBlackImg, bigWhiteImg, fileMask, fileOut)) {
-			Assert.assertTrue("Former maskImage shouldn't be used if the screenshot has a bigger size", false);
-		}
+		boolean result = imagecomparison1.fuzzyEqual(smallBlackImg, bigWhiteImg, fileMask, fileOut);
+		Assert.assertFalse("Former maskImage shouldn't be used if the " +
+				"screenshot has a bigger size - result: " + result, result);
 	}
 	
 //	Changes the order of the parameters and tests what happens if the screenshot image is smaller.
@@ -114,9 +115,9 @@ public class TImageComparisonResizeWithActiveMask {
 	@Test
 	public void smallerScreenshotImagePixelFuzzyEqual() throws IOException {
 		ImageComparison imagecomparison1 = new ImageComparison(1, 1, 0.1, false);
-		if (imagecomparison1.fuzzyEqual(bigWhiteImg, smallBlackImg, fileMask, fileOut)) {
-			Assert.assertTrue("Former maskImage shouldn't be used if the screenshot has a smaller size", false);
-		}
+		boolean result = imagecomparison1.fuzzyEqual(bigWhiteImg, smallBlackImg, fileMask, fileOut);
+		Assert.assertFalse("Former maskImage shouldn't be used if the " +
+				"screenshot has a bigger size - result: " + result, result);
 	}
 	
 	
