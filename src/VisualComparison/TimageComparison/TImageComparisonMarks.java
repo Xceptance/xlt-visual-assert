@@ -9,39 +9,40 @@ import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 
-import org.junit.After;
+import org.apache.commons.lang3.SystemUtils;
+import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import VisualComparison.ImageComparison;
 
 public class TImageComparisonMarks {
 
-//	This class tests if differences are marked correctly. Two images are initialized, one black reference image 
-//	and one black screenshot, but the black screenshot has one red rectangle and one white rectangle inside it
+//	This class tests if differences are marked correctly. Two images are initialized, one black reference 
+//	image and one black screenshot, but the black screenshot has one red rectangle and one white 
+//	rectangle inside it.
 //	The red rectangle should be marked green, the white rectangle should be marked red
 	
-	private BufferedImage reference;
-	private BufferedImage screenshot;
+	private static BufferedImage reference;
+	private static BufferedImage screenshot;
 		
-	private String pathHome = System.getProperty("user.home");
-	private File fileMask = new File(pathHome + "/maskImage.png");
-	private File fileOut = new File(pathHome + "/output.png");
+	private final static File directory = SystemUtils.getJavaIoTmpDir();
+	private static File fileMask = new File(directory, "/fileMask.png");
+	private static File fileOut = new File(directory, "/fileOut.png");
 	
-	private int blackRgb = Color.BLACK.getRGB();
-	private int whiteRgb = Color.WHITE.getRGB();
-	private int redRgb = Color.RED.getRGB();
+	private static int blackRgb = Color.BLACK.getRGB();
+	private static int whiteRgb = Color.WHITE.getRGB();
+	private static int redRgb = Color.RED.getRGB();
 	
-	@Before
-	public void initializeImages() throws IOException {
+	@BeforeClass
+	public static void initializeImages() throws IOException {
 		
-		BufferedImage reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_ARGB);
+		reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_ARGB);
 		int[] referenceArray = ((DataBufferInt) reference.getRaster().getDataBuffer()).getData();
 		Arrays.fill(referenceArray, blackRgb);
-		this.reference = reference;
 
-		BufferedImage screenshot = new BufferedImage(300, 300, BufferedImage.TYPE_INT_ARGB);
+		screenshot = new BufferedImage(300, 300, BufferedImage.TYPE_INT_ARGB);
 		int[] screenshotArray = ((DataBufferInt) screenshot.getRaster().getDataBuffer()).getData();
 		Arrays.fill(screenshotArray, blackRgb);
 
@@ -55,8 +56,6 @@ public class TImageComparisonMarks {
 				}
 			}
 		}
-		this.screenshot = screenshot;
-		
 	}
 	
 	@Test
@@ -170,8 +169,8 @@ public class TImageComparisonMarks {
 				"correctlyMarkedGreenPixelFuzzyEqual", hasGreen);
 	}
 	
-	@After
-	public void deleteFiles() {
+	@AfterClass
+	public static void deleteFiles() {
 		fileMask.delete();
 		fileOut.delete();
 	}
