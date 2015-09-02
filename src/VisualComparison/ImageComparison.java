@@ -29,7 +29,6 @@ public class ImageComparison {
        
         boolean equal = true;
        
-        imgOut = img2;
 //      Initializes maskImage
         BufferedImage maskImage = initializeMaskImage(img1, fileMask);
 
@@ -73,7 +72,6 @@ public class ImageComparison {
         //img1: reference Image, img2: screenshot
         boolean exactlyEqual = true;  
        
-        imgOut = img2;
 //      Initializes maskImage
         BufferedImage maskImage = initializeMaskImage(img1, fileMask);
         
@@ -127,18 +125,18 @@ public class ImageComparison {
 			img1 = adaptImageSize(img2, img1);
 		}
 	}
+	
+    imgOut = copyImage(img2);
     
 //        checks if another method fits the given parameters and calls it
         if ((pixelPerBlockX == 1) && (pixelPerBlockY == 1)) {
             if (threshold == 0.00) {
-                return exactlyEqual(img1, img2, fileMask, fileOut);
+                return exactlyEqual(img1, imgOut, fileMask, fileOut);
             }
             else {
                 return pixelFuzzyEqual(img1, img2, fileMask, fileOut);
             }
         }
-
-        imgOut = img2;
        
         int subImageHeight;
         int subImageWidth;
@@ -215,7 +213,16 @@ public class ImageComparison {
         return fuzzyEqual;
     }
 
-    private int calcPixSpan(int pixelPerBlock, int n, int overallSpan) {
+    private BufferedImage copyImage(BufferedImage source) {
+//    Creates a fresh BufferedImage that has the same size and content of the source image
+		BufferedImage copy = new BufferedImage(source.getWidth(), source.getHeight(), BufferedImage.TYPE_INT_ARGB);
+		Graphics g = copy.getGraphics();
+		g.drawImage(source, 0, 0, null);
+		g.dispose();
+		return copy;
+	}
+
+	private int calcPixSpan(int pixelPerBlock, int n, int overallSpan) {
         if (pixelPerBlock * (n + 1) > overallSpan)
             return overallSpan % pixelPerBlock;
         else
