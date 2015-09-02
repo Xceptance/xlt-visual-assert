@@ -4,8 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.After;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import VisualComparison.ImageComparison;
@@ -18,35 +18,33 @@ public class TImageComparisonManualMask {
 //	It is not for automated testing
 //	The initialized Images are completely different at the start
 	
-	private BufferedImage reference;
-	private BufferedImage screenshot;
+//	Includes a method that automatically deletes the maskImages in case this test is used in batch tests
 	
-	private String pathHome = System.getProperty("user.home");
-	private File fileMask = new File(pathHome + "/maskImage.png");
-	private File fileOut = new File(pathHome + "/output.png");
+	private static BufferedImage reference;
+	private static BufferedImage screenshot;
 	
-	@Before
-	public void initializeImages() throws IOException {
-		BufferedImage reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
-		Color black = Color.BLACK;
-		int rgbBlack = black.getRGB();
+	private static String pathHome = System.getProperty("user.home");
+	private static File fileMask = new File(pathHome + "/maskImage.png");
+	private static File fileOut = new File(pathHome + "/output.png");
+	
+	private final static int rgbWhite = Color.WHITE.getRGB();
+	private final static int rgbBlack = Color.BLACK.getRGB();
+	
+	@BeforeClass
+	public static void initializeImages() throws IOException {
+		reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
 		for (int w=0; w<reference.getWidth(); w++) { 
 			for (int h=0; h<reference.getHeight(); h++) {
 				reference.setRGB(w, h, rgbBlack);
 			}
 		}
-		this.reference = reference;
 		
-		BufferedImage screenshot = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
-		Color white = Color.WHITE;
-		int rgbWhite = white.getRGB();
+		screenshot = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
 		for (int w=0; w<screenshot.getWidth(); w++) { 
 			for (int h=0; h<(screenshot.getHeight()/2); h++) {
 				screenshot.setRGB(w, h, rgbWhite);
 			}	
-		}
-		this.screenshot = screenshot;
-		
+		}	
 	}
 	
 //	This method has to be changed manually to do any work, set traininMode = false after you've initialized the mask image
@@ -61,8 +59,10 @@ public class TImageComparisonManualMask {
 		}			
 	}
 	
-	@After
-	public void deleteFile() {
+//	This method deletes the maskFile after is was used, so there won't be difficulties if this test
+//	is part of a batch test. In that case, it will be ineffective.
+	@AfterClass
+	public static void deleteFiles() {
 		fileMask.delete();
 	}
 }

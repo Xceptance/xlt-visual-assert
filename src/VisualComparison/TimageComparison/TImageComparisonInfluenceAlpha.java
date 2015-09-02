@@ -4,9 +4,10 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.After;
+import org.apache.commons.lang3.SystemUtils;
+import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import VisualComparison.ImageComparison;
@@ -15,80 +16,69 @@ public class TImageComparisonInfluenceAlpha {
 //				Tests if the methods detect it if alpha is zero. Expected: Yes, they do. 
 //				The test doesn't test for alpha values between 255 and zero.
 	
-	private BufferedImage notTransparentImg;
-	private BufferedImage transparentImg;
-
-	private String pathHome = System.getProperty("user.home");
-	private File fileMask = new File(pathHome + "/maskImage.png");
-	private File fileOut = new File(pathHome + "/output.png");
-
+	private static BufferedImage notTransparentImg;
+	private static BufferedImage transparentImg;
+	
+	private final static int rgbBlack = new Color(0, false).getRGB(); 
+	private final static int rgbTransparentBlack = new Color(0, true).getRGB(); 
+	
+	private final static File directory = SystemUtils.getJavaIoTmpDir();
+	private static File fileMask = new File(directory, "/fileMask.png");
+	private static File fileOut = new File(directory, "/fileOut.png");
+	
 //	Initializes the images; the notTransparentImg Image is black, the transparentImg image transparent black
-	@Before
-	public void initializeImages() {
-		BufferedImage notTransparentImg = new BufferedImage(300, 300, BufferedImage.TYPE_INT_ARGB);
-		int red = 0;
-		int green = 0;
-		int blue = 0;
-		int alpha = 255;
-		Color cReference = new Color (red, green, blue, alpha);
-		int rgb = cReference.getRGB();
+	@BeforeClass
+	public static void initializeImages() {
+		notTransparentImg = new BufferedImage(300, 300, BufferedImage.TYPE_INT_ARGB);
+
 		for (int w=0; w<notTransparentImg.getWidth(); w++) { 
 			for (int h=0; h<notTransparentImg.getHeight(); h++) {
-				notTransparentImg.setRGB(w, h, rgb);
+				notTransparentImg.setRGB(w, h, rgbBlack);
 			}
 		}
-		this.notTransparentImg = notTransparentImg;
 	
-		BufferedImage transparentImg = new BufferedImage(300, 300, BufferedImage.TYPE_INT_ARGB);
-		alpha = 0;
-		Color cScreenshot = new Color (red, green, blue, alpha);
-		rgb = cScreenshot.getRGB();
+		transparentImg = new BufferedImage(300, 300, BufferedImage.TYPE_INT_ARGB);
 		for (int w=0; w<transparentImg.getWidth(); w++) { 
 			for (int h=0; h<transparentImg.getHeight(); h++) {
-				transparentImg.setRGB(w, h, rgb);
+				transparentImg.setRGB(w, h, rgbTransparentBlack);
 			}	
 		}
-		this.transparentImg = transparentImg;
 	}
 	
-//	Tests as said at the top. Tests once for the transparentImg as screenshot and once for the transparentImg as reference
+//	Tests as said at the top. Tests once for the transparentImg image as screenshot
+//	and once for the transparentImg image as reference
 	@Test
 	public void influenceAlphaFuzzyEqual() throws IOException {
 		ImageComparison imagecomparison = new ImageComparison(2, 2, 0.01, false);
-		if (imagecomparison.fuzzyEqual(notTransparentImg, transparentImg, fileMask, fileOut)) {
-			Assert.assertTrue("A transparent screenshot went undetected - influenceAlphaFuzzyEqual", false);
-		}
-		if (imagecomparison.fuzzyEqual(transparentImg, notTransparentImg, fileMask, fileOut)) {
-			Assert.assertTrue("A transparent reference image went undetected - influenceAlphaFuzzyEqual", false);
-		}
+		boolean result = imagecomparison.fuzzyEqual(notTransparentImg, transparentImg, fileMask, fileOut);
+		Assert.assertFalse("A transparent screenshot went undetected - influenceAlphaFuzzyEqual", result);
+		result = imagecomparison.fuzzyEqual(transparentImg, notTransparentImg, fileMask, fileOut);
+		Assert.assertFalse("A transparent reference image went undetected - influenceAlphaFuzzyEqual", result);
 	}
 	
 //	Tests as said at the top. Tests once for the transparentImg as screenshot and once for the transparentImg as reference
 	@Test
 	public void influenceAlphaPixelFuzzyEqual() throws IOException {
 		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.01, false);
-		if (imagecomparison.fuzzyEqual(notTransparentImg, transparentImg, fileMask, fileOut)) {
-			Assert.assertTrue("A transparent screenshot went undetected - influenceAlphaPixelFuzzyEqual", false);
-		}
-		if (imagecomparison.fuzzyEqual(transparentImg, notTransparentImg, fileMask, fileOut)) {
-			Assert.assertTrue("A transparent reference Image went undetected - influenceAlphaPixelFuzzyEqual", false);
-		}
+		boolean result = imagecomparison.fuzzyEqual(notTransparentImg, transparentImg, fileMask, fileOut);
+		Assert.assertFalse("A transparent screenshot went undetected - influenceAlphaPixelFuzzyEqual", result);
+		
+		result = imagecomparison.fuzzyEqual(transparentImg, notTransparentImg, fileMask, fileOut);
+		Assert.assertFalse("A transparent reference Image went undetected - influenceAlphaPixelFuzzyEqual", result);	
 	}
 	
 //	Tests as said at the top. Tests once for the transparentImg as screenshot and once for the transparentImg as reference
 	@Test
 	public void influenceAlphaExactlyEqual() throws IOException {
 		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.0, false);
-		if (imagecomparison.fuzzyEqual(notTransparentImg, transparentImg, fileMask, fileOut)) {
-			Assert.assertTrue("A transparent screenshot went undetected - influenceAlphaExactlyEqual", false);
-		}
-		if (imagecomparison.fuzzyEqual(transparentImg, notTransparentImg, fileMask, fileOut)) {
-			Assert.assertTrue("A transparent reference Image went undetected - influenceAlphaExactlyEqual", false);
-		}
+		boolean result = imagecomparison.fuzzyEqual(notTransparentImg, transparentImg, fileMask, fileOut);
+		Assert.assertFalse("A transparent screenshot went undetected - influenceAlphaExactlyEqual", result);
+		result = imagecomparison.fuzzyEqual(transparentImg, notTransparentImg, fileMask, fileOut);
+		Assert.assertFalse("A transparent reference Image went undetected - influenceAlphaExactlyEqual", result);
 	}
 	
-	@After
-	public void deleteFile() {
+	@AfterClass
+	public static void deleteFile() {
 		fileMask.delete();
 		fileOut.delete();
 	}
