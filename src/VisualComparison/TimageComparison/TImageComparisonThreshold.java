@@ -6,10 +6,8 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.lang3.SystemUtils;
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -66,19 +64,14 @@ public class TImageComparisonThreshold {
 	
 	@Test	
 	public void exactlyTwentyPercent() throws IOException {	
-		Color c = new Color (screenshot.getRGB(0, 0), true);
-		System.out.println("P: " + c.getBlue());
 		ImageComparison imagecomparison = new ImageComparison(20, 20, 0.2, false);
 		boolean result = imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
 		Assert.assertTrue("Threshold should be exactly equal to the difference - result: " + result, result);
-		c = new Color (screenshot.getRGB(0, 0), true);
-		System.out.println("P': " + c.getBlue());
+
 	}
 	
 	@Test	
 	public void barelyAboveTwentyPercent() throws IOException {
-		Color c = new Color (screenshot.getRGB(0, 0), true);
-		System.out.println(c.getBlue());
 		ImageComparison imagecomparison = new ImageComparison(20, 20, 0.200000000000000000000000000000000001, false);
 		boolean result = imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
 		Assert.assertTrue("Threshold should be barely above difference - result: " + result, result);
@@ -87,12 +80,8 @@ public class TImageComparisonThreshold {
 	
 	@Test	
 	public void barelyBelowTwentyPercent() throws IOException {										//Changes image value
-		Color c = new Color (screenshot.getRGB(0, 0), true);
-		System.out.println("3: " + c.getBlue());
-		ImageComparison imagecomparison = new ImageComparison(20, 20, 1.9999999999999, false);
+		ImageComparison imagecomparison = new ImageComparison(20, 20, 0.1999999999999, false);
 		boolean result = imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
-		c = new Color (screenshot.getRGB(0, 0), true);
-		System.out.println("3': " + c.getBlue());
 		Assert.assertFalse("Threshold should be barely below difference - result: " + result, result);
 	}
 	
@@ -100,8 +89,6 @@ public class TImageComparisonThreshold {
 	
 	@Test	
 	public void exactlyTwentyPercentPixelFuzzyEqual() throws IOException {	
-		Color c = new Color (screenshot.getRGB(0, 0), true);
-		System.out.println("4: " + c.getBlue());
 		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.2, false);
 		boolean result = imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut); 
 		Assert.assertTrue("The threshold should be exactly twenty percent - result: " + result, result);
@@ -109,8 +96,6 @@ public class TImageComparisonThreshold {
 	
 	@Test	
 	public void barelyAboveTwentyPercentPixelFuzzyEqual() throws IOException { 					
-		Color c = new Color (screenshot.getRGB(0, 0), true);
-		System.out.println("5: " + c.getBlue());
 		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.200000000000000000000000000000000001, false);
 		boolean result = imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
 		Assert.assertTrue("The threshold should be barely above twenty percent - result: " + result, result);	
@@ -118,13 +103,9 @@ public class TImageComparisonThreshold {
 	
 	@Test	
 	public void barelyBelowTwentyPercentPixelFuzzyEqual() throws IOException {
-		Color c = new Color (screenshot.getRGB(0, 0), true);
-		System.out.println("6: " + c.getBlue());
 		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.19999999999, false);
 		boolean result = imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
 		Assert.assertFalse("Threshold should be barely below twenty percent - result: " + result, result);
-		c = new Color (screenshot.getRGB(0, 0), true);
-		System.out.println("6': " + c.getBlue());
 	}
 	
 //	Delete created files after tests
