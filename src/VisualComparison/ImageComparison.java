@@ -24,7 +24,7 @@ public class ImageComparison {
     }
    
       
-    public boolean pixelFuzzyEqual (BufferedImage img1, BufferedImage img2, File fileMask, File fileOut) throws IOException {
+    private boolean pixelFuzzyEqual (BufferedImage img1, BufferedImage img2, File fileMask, File fileOut) throws IOException {
         /*Method for pixel-based fuzzy comparison*/
        
         boolean equal = true;
@@ -67,7 +67,7 @@ public class ImageComparison {
         return equal;
     }
 
-    public boolean exactlyEqual (BufferedImage img1, BufferedImage img2, File fileMask, File fileOut) throws IOException {
+    private boolean exactlyEqual (BufferedImage img1, BufferedImage img2, File fileMask, File fileOut) throws IOException {
         /*Method for the exact comparison of two images*/
         //img1: reference Image, img2: screenshot
         boolean exactlyEqual = true;  
