@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -20,9 +20,9 @@ public class TImageComparisonTraining {
 	ImageComparison exactlyCompare = new ImageComparison (1, 1, 0.00, false);
 	ImageComparison pixelFuzzyTraining = new ImageComparison(1, 1, 0.01, true);
 	ImageComparison pixelFuzzyCompare = new ImageComparison(1, 1, 0.01, false);
-	File directory = org.apache.commons.lang3.SystemUtils.getJavaIoTmpDir();
-	File outPutfile = new File(directory+"/test.png");
-	File maskFile = new File(directory+"/mask.png");
+	static File directory = org.apache.commons.lang3.SystemUtils.getJavaIoTmpDir();
+	static File outPutfile = new File(directory+"/test.png");
+	static File maskFile = new File(directory+"/mask.png");
 
 	
 	@BeforeClass
@@ -45,8 +45,10 @@ public class TImageComparisonTraining {
 	@Test
 	public void trainWithSingleDifference() throws IOException{
 		setUpFileAndPicture();
-		paintArea(newImage, 0, 0, 10, 10);
-		fuzzyAssertBlock();
+		paintArea(newImage, 1, 1, 10, 10);
+		Assert.assertFalse(fuzzyImgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertTrue(fuzzyTraining.fuzzyEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertTrue(fuzzyImgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
 	}
 	
 //	two areas are colored different and should be recognized by the training mode
@@ -58,8 +60,8 @@ public class TImageComparisonTraining {
 		fuzzyAssertBlock();
 	}
 	
-//	after a first round in training mode, additional differences are created to see if the training works
-//	properly over multiple runs
+//	after a first round in training mode, additional differences are created to see if 
+//	the training works properly over multiple runs
 	@Test
 	public void trainOverMultipleRounds() throws IOException{
 		setUpFileAndPicture();
@@ -87,8 +89,8 @@ public class TImageComparisonTraining {
 		pixelFuzzyAssertBlock();		
 	}
 	
-	@After
-	public void deleteFiles() {
+	@AfterClass
+	public static void deleteFiles() {
 		outPutfile.delete();
 		maskFile.delete();
 	}

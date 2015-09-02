@@ -6,7 +6,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -17,9 +17,9 @@ import VisualComparison.ImageComparison;
 public class TImageComparisonMarkSizes {
 	static BufferedImage reference, slim, wide, low, high, slimAndLow, wideAndHigh, switched;
 	ImageComparison imgCompare = new ImageComparison(2, 2, 0.00, false);
-	File directory = org.apache.commons.lang3.SystemUtils.getJavaIoTmpDir();
-	File outPutfile = new File(directory+"/test.png");
-	File maskFile = new File(directory+"/mask.png");
+	static File directory = org.apache.commons.lang3.SystemUtils.getJavaIoTmpDir();
+	static File outPutfile = new File(directory+"/test.png");
+	static File maskFile = new File(directory+"/mask.png");
 	
 //	sets up the images for the test
 	@BeforeClass 
@@ -84,8 +84,8 @@ public class TImageComparisonMarkSizes {
 		Assert.assertFalse(imgCompare.fuzzyEqual(reference, switched, maskFile, outPutfile));
 	}
 	
-	@After
-	public void deleteFiles() {
+	@AfterClass
+	public static void deleteFiles() {
 		outPutfile.delete();
 		maskFile.delete();
 	}
