@@ -17,15 +17,22 @@ import org.junit.Test;
 
 import VisualComparison.ImageComparison;
 
-public class TimageComparisonResizeImage {
 
-//	This class tests whether the ResizeImage method is working as expected. Two Images are created, 
-//	both are white, but with different sizes
-	
-//	The tests test whether the resulting image has the correct size and whether or not the break off between 
-//	marked black from resizing and unmarked white is at the correct place
-	
-//	Includes separate methods for exactlyEqual and pixelFuzzyEqual
+/**
+ * Tests if the resizing when images of different size are compared is working as expected.
+ * Specifically it tests if the resulting marked image has the correct size,
+ * if the screenshot image was correctly copied to the marked image and
+ * if it marked the formerly nonexistent part and did not mark the formerly existent parts. 
+ * 
+ * Includes separate tests for the following parameters:
+ * PixelPerBlockX = 10, PixelPerBlockX = 10, Threshold = 0.1
+ * PixelPerBlockX = 1, PixelPerBlockX = 1, Threshold = 0.01
+ * PixelPerBlockX = 1, PixelPerBlockX = 1, Threshold = 0.0
+ * 
+ * @author damian
+ *
+ */
+public class TimageComparisonResizeImage {
 	
 	private static BufferedImage reference;
 	private static BufferedImage screenshot;
@@ -38,9 +45,11 @@ public class TimageComparisonResizeImage {
 	private final static int rgbMarked = -65536;
 
 	
-//	Initializes reference and screenshot images. 
 	@BeforeClass
 	public static void initializeImages() {
+//		Initializes reference and screenshot images. 
+//		Both images are white. Reference image size: 300*300. Screenshot image size: 50*50.
+
 		reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
 		int[] referenceArray = ((DataBufferInt) reference.getRaster().getDataBuffer()).getData();
 		Arrays.fill(referenceArray, rgbWhite);
@@ -50,11 +59,15 @@ public class TimageComparisonResizeImage {
 		Arrays.fill(screenshotArray, rgbWhite);
 	}
 	
-//	Tests if the resulting marked image has the correct size (the same size as the big reference image)
-//	Tests the normal fuzzyEqual method
+	/**
+	 * Tests the resulting marked images size 
+	 * ImageComparison Parameters: 10, 10, 0.1, false
+	 * 
+	 * @throws IOException
+	 */
 	@Test
 	public void correctSize() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(2, 1, 0.01, false);
+		ImageComparison imagecomparison = new ImageComparison(10, 10, 0.1, false);
 		imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
 		BufferedImage img = ImageIO.read(fileOut);
 		
@@ -62,11 +75,16 @@ public class TimageComparisonResizeImage {
 		Assert.assertEquals(reference.getHeight(), img.getHeight());
 	}
 	
-//	Tests if the smaller image correctly preserved during the resizing and if the resized parts are marked
-//	Tests the normal fuzzyEqual method
+	/**
+	 * Tests if the screenshot image was correctly copied and not marked
+	 * And if the formerly nonexistent areas were marked
+	 * ImageComparison Parameters: 10, 10, 0.1, false
+	 * 
+	 * @throws IOException
+	 */
 	@Test
 	public void correctBreakPoint() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(2, 2, 0.01, false);
+		ImageComparison imagecomparison = new ImageComparison(10, 10, 0.1, false);
 		imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
 		BufferedImage img = ImageIO.read(fileOut);
 	
@@ -74,32 +92,12 @@ public class TimageComparisonResizeImage {
 		Assert.assertEquals(rgbMarked, img.getRGB(50, 50));
 	}
 	
-//	Tests if the resulting marked image has the correct size (the same size as the big reference image)
-//	Tests the normal exactlyEqual method	
-	@Test
-	public void correctSizeExactlyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.00, false);
-		imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
-		BufferedImage img = ImageIO.read(fileOut);
-		
-		Assert.assertEquals(reference.getWidth(), img.getWidth());
-		Assert.assertEquals(reference.getHeight(), img.getHeight());
-	}
-	
-//	Tests if the smaller image correctly preserved during the resizing and if the resized parts are marked
-//	Tests the normal exactlyEqual method		
-	@Test
-	public void correctBreakPointExactlyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.00, false);
-		imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
-		BufferedImage img = ImageIO.read(fileOut);
-		
-		Assert.assertEquals(rgbWhite, img.getRGB(49, 49));
-		Assert.assertEquals(rgbMarked, img.getRGB(50, 50));
-	}
-	
-//	Tests if the resulting marked image has the correct size (the same size as the big reference image)
-//	Tests the normal pixelFuzzyEqual method	
+	/**
+	 * Tests the resulting marked images size 
+	 * ImageComparison Parameters: 1, 1, 0.01, false
+	 * 
+	 * @throws IOException
+	 */
 	@Test
 	public void correctSizePixelFuzzyEqual() throws IOException {
 		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.01, false);
@@ -110,8 +108,13 @@ public class TimageComparisonResizeImage {
 		Assert.assertEquals(reference.getHeight(), img.getHeight());
 	}
 	
-//	Tests if the smaller image correctly preserved during the resizing and if the resized parts are marked
-//	Tests the normal pixelFuzzyEqual method	
+	/**
+	 * Tests if the screenshot image was correctly copied and not marked
+	 * And if the formerly nonexistent areas were marked
+	 * ImageComparison Parameters: 1, 1, 0.01, false
+	 * 
+	 * @throws IOException
+	 */
 	@Test
 	public void correctBreakPointPixelFuzzyEqual() throws IOException {
 		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.01, false);
@@ -122,6 +125,42 @@ public class TimageComparisonResizeImage {
 		Assert.assertEquals(rgbMarked, img.getRGB(50, 50));
 	}
 	
+	/**
+	 * Tests the resulting marked images size 
+	 * ImageComparison Parameters: 1, 1, 0.00, false
+	 * 
+	 * @throws IOException
+	 */
+	@Test
+	public void correctSizeExactlyEqual() throws IOException {
+		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.00, false);
+		imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
+		BufferedImage img = ImageIO.read(fileOut);
+		
+		Assert.assertEquals(reference.getWidth(), img.getWidth());
+		Assert.assertEquals(reference.getHeight(), img.getHeight());
+	}
+	
+	/**
+	 * Tests if the screenshot image was correctly copied and not marked
+	 * And if the formerly nonexistent areas were marked
+	 * ImageComparison Parameters: 1, 1, 0.00, false
+	 * 
+	 * @throws IOException
+	 */		
+	@Test
+	public void correctBreakPointExactlyEqual() throws IOException {
+		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.00, false);
+		imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
+		BufferedImage img = ImageIO.read(fileOut);
+		
+		Assert.assertEquals(rgbWhite, img.getRGB(49, 49));
+		Assert.assertEquals(rgbMarked, img.getRGB(50, 50));
+	}
+	
+	/**
+	 * Deletes the temporary files which were created for this test
+	 */
 	@AfterClass
 	public static void deleteFile() {
 		fileMask.delete();

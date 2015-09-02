@@ -16,12 +16,18 @@ import org.junit.Test;
 
 import VisualComparison.ImageComparison;
 
-
+/**
+ * Tests whether an existent mask would be used if the screenshot image is smaller or bigger.
+ * It should not be. A change in size means a new mask image will be created.
+ * 
+ * Includes separate methods for the following parameters:
+ * PixelPerBlockX = 10, PixelPerBlockX = 10, Threshold = 0.1
+ * PixelPerBlockX = 1, PixelPerBlockX = 1, Threshold = 0.01
+ * PixelPerBlockX = 1, PixelPerBlockX = 1, Threshold = 0.00
+ * 
+ * @author damian
+ */
 public class TImageComparisonResizeWithActiveMask {
-	
-//	Tests whether a pre-existent mask would be used if the screenshot image is smaller or bigger
-//  The intention is that, no, if there's change in size, a new maskImage should be created
-//	Includes separate methods for exactlyEqual and pixelFuzzyEqual
 	
 	private static BufferedImage smallBlackImg;
 	private static BufferedImage bigWhiteImg;
@@ -57,28 +63,68 @@ public class TImageComparisonResizeWithActiveMask {
 		ImageIO.write(img, "PNG", fileMask);
 	}
 	
-//	Tests what happens if the screenshotImage is bigger. 
-//	Tests the normal fuzzyEqual method.
+	/**
+	 * Tests what happens if the image to compare is bigger.
+	 * ImageComparison Parameters: 10, 10, 0.1, false
+	 * 
+	 * @throws IOException
+	 */
 	@Test
 	public void biggerScreenshotImage() throws IOException {
-		ImageComparison imagecomparison1 = new ImageComparison(3, 3, 0.1, false);
+		ImageComparison imagecomparison1 = new ImageComparison(10, 10, 0.1, false);
 		boolean result = imagecomparison1.fuzzyEqual(smallBlackImg, bigWhiteImg, fileMask, fileOut); 
 		Assert.assertFalse("Former maskImage shouldn't be used if the " +
 				"screenshot has a bigger size - result: " + result, result);		
 	}
 	
-//	Changes the order of the parameters and tests what happens if the screenshot image is smaller.
-//	Tests the normal fuzzyEqual method.
+	/**
+	 * Tests what happens if the image to compare is smaller.
+	 * ImageComparison Parameters: 10, 10, 0.1, false
+	 * 
+	 * @throws IOException
+	 */
 	@Test
 	public void smallerScreenshotImage() throws IOException {
-		ImageComparison imagecomparison1 = new ImageComparison(3, 3, 0.1, false);
+		ImageComparison imagecomparison1 = new ImageComparison(10, 10, 0.1, false);
 		boolean result = imagecomparison1.fuzzyEqual(bigWhiteImg, smallBlackImg, fileMask, fileOut);
 		Assert.assertFalse("Former maskImage shouldn't be used if the " +
 				"screenshot has a bigger size - result: " + result, result);
 	}
 	
-//	Tests what happens if the screenshotImage is bigger.
-//	Tests the exactlyEqual method.
+	/**
+	 * Tests what happens if the image to compare is bigger.
+	 * ImageComparison Parameters: 1, 1, 0.1, false
+	 * 
+	 * @throws IOException
+	 */
+	@Test
+	public void biggerScreenshotImagePixelFuzzyEqual() throws IOException {
+		ImageComparison imagecomparison1 = new ImageComparison(1, 1, 0.1, false);
+		boolean result = imagecomparison1.fuzzyEqual(smallBlackImg, bigWhiteImg, fileMask, fileOut);
+		Assert.assertFalse("Former maskImage shouldn't be used if the " +
+				"screenshot has a bigger size - result: " + result, result);
+	}
+	
+	/**
+	 * Tests what happens if the image to compare is smaller.
+	 * ImageComparison Parameters: 1, 1, 0.1, false
+	 * 
+	 * @throws IOException
+	 */
+	@Test
+	public void smallerScreenshotImagePixelFuzzyEqual() throws IOException {
+		ImageComparison imagecomparison1 = new ImageComparison(1, 1, 0.1, false);
+		boolean result = imagecomparison1.fuzzyEqual(bigWhiteImg, smallBlackImg, fileMask, fileOut);
+		Assert.assertFalse("Former maskImage shouldn't be used if the " +
+				"screenshot has a bigger size - result: " + result, result);
+	}
+	
+	/**
+	 * Tests what happens if the image to compare is bigger.
+	 * ImageComparison Parameters: 1, 1, 0.00, false
+	 * 
+	 * @throws IOException
+	 */
 	@Test
 	public void biggerScreenshotImageExactlyEqual() throws IOException {
 		ImageComparison imagecomparison1 = new ImageComparison(1, 1, 0.00, false);
@@ -88,48 +134,33 @@ public class TImageComparisonResizeWithActiveMask {
 	}
 	
 	
-//	Changes the order of the parameters and tests what happens if the screenshot image is smaller.
-//	Tests the exactlyEqual method.
+	/**
+	 * Tests what happens if the image to compare is smaller.
+	 * ImageComparison Parameters: 1, 1, 0.00, false
+	 * 
+	 * @throws IOException
+	 */
 	@Test
 	public void smallerScreenshotImageExactlyEqual() throws IOException {
 		ImageComparison imagecomparison1 = new ImageComparison(1, 1, 0.00, false);
 		boolean result = imagecomparison1.fuzzyEqual(bigWhiteImg, smallBlackImg, fileMask, fileOut);
 		Assert.assertFalse("Former maskImage shouldn't be used if the " +
 				"screenshot has a bigger size - result: " + result, result);
-	}
+	}	
 	
-//	Tests what happens if the screenshotImage is bigger.
-//	Tests the pixelFuzzyEqual method.
-	@Test
-	public void biggerScreenshotImagePixelFuzzyEqual() throws IOException {
-		ImageComparison imagecomparison1 = new ImageComparison(1, 1, 0.1, false);
-		boolean result = imagecomparison1.fuzzyEqual(smallBlackImg, bigWhiteImg, fileMask, fileOut);
-		Assert.assertFalse("Former maskImage shouldn't be used if the " +
-				"screenshot has a bigger size - result: " + result, result);
-	}
-	
-//	Changes the order of the parameters and tests what happens if the screenshot image is smaller.
-//	Tests the pixelFuzzyEqual method.
-	@Test
-	public void smallerScreenshotImagePixelFuzzyEqual() throws IOException {
-		ImageComparison imagecomparison1 = new ImageComparison(1, 1, 0.1, false);
-		boolean result = imagecomparison1.fuzzyEqual(bigWhiteImg, smallBlackImg, fileMask, fileOut);
-		Assert.assertFalse("Former maskImage shouldn't be used if the " +
-				"screenshot has a bigger size - result: " + result, result);
-	}
-	
-	
-	
-//	Deletes the created imagefiles. sComment this out if you want to see the output
+	/**
+	 * Deletes the temporary files which were created for this test
+	 */
 	@AfterClass
 	public static void deleteFiles() {
 		fileMask.delete();
 		fileOut.delete();
 	}
 	
-//	No relation to the code in ImageComparison
-//	Creates the maskImage image, creates the array with its pixels and fills the array with zeroes
 	private static BufferedImage initializeBlackMaskImage(BufferedImage img) {
+//		No relation to the code in ImageComparison
+//		Creates the maskImage image, creates the array with its pixels and fills the array with zeroes
+		
 		BufferedImage maskImg = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		int[] maskImgArray = ((DataBufferInt) maskImg.getRaster().getDataBuffer()).getData();
 		Arrays.fill(maskImgArray, 0);
