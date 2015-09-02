@@ -11,8 +11,10 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import VisualComparison.ImageComparison;
@@ -27,8 +29,8 @@ public class TimageComparisonResizeImage {
 	
 //	Includes separate methods for exactlyEqual and pixelFuzzyEqual
 	
-	private BufferedImage reference;
-	private BufferedImage screenshot;
+	private static BufferedImage reference;
+	private static BufferedImage screenshot;
 	
 	private final static File directory = SystemUtils.getJavaIoTmpDir();
 	private static File fileMask = new File(directory, "/fileMask.png");
@@ -39,17 +41,15 @@ public class TimageComparisonResizeImage {
 
 	
 //	Initializes reference and screenshot images. 
-	@Before
-	public void initializeImages() {
-		BufferedImage reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
+	@BeforeClass
+	public static void initializeImages() {
+		reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
 		int[] referenceArray = ((DataBufferInt) reference.getRaster().getDataBuffer()).getData();
 		Arrays.fill(referenceArray, rgbWhite);
-		this.reference = reference;
 		
-		BufferedImage screenshot = new BufferedImage(50, 50, BufferedImage.TYPE_INT_RGB);
+		screenshot = new BufferedImage(50, 50, BufferedImage.TYPE_INT_RGB);
 		int[] screenshotArray = ((DataBufferInt) screenshot.getRaster().getDataBuffer()).getData();
 		Arrays.fill(screenshotArray, rgbWhite);
-		this.screenshot = screenshot;
 	}
 	
 //	Tests if the resulting marked image has the correct size (the same size as the big reference image)
@@ -124,8 +124,8 @@ public class TimageComparisonResizeImage {
 		Assert.assertEquals(rgbMarked, img.getRGB(50, 50));
 	}
 	
-	@After
-	public void deleteFile() {
+	@AfterClass
+	public static void deleteFile() {
 		fileMask.delete();
 		fileOut.delete();
 	}

@@ -5,9 +5,9 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.commons.lang3.SystemUtils;
-import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import VisualComparison.ImageComparison;
@@ -21,8 +21,8 @@ public class TimageComparisonResizedImageColor {
 //  This Test is supplemented by the TimageComparisonInfluenceAlpha Test, this one tests both alpha detection and resizing, but it does
 //	not check alpha detection as thoroughly; there are some redundancies
 	
-	private BufferedImage reference;
-	private BufferedImage screenshot;
+	private static BufferedImage reference;
+	private static BufferedImage screenshot;
 		
 	private final static File directory = SystemUtils.getJavaIoTmpDir();
 	private static File fileMask = new File(directory, "/fileMask.png");
@@ -31,23 +31,21 @@ public class TimageComparisonResizedImageColor {
 	private final static int rgbBlack = Color.BLACK.getRGB();
 	
 	//	Initializes two black images, one with a size of 300*300px, the other 1*1px
-	@Before
-	public void initializeImages() throws IOException {
-		BufferedImage reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_ARGB);
+	@BeforeClass
+	public static void initializeImages() throws IOException {
+		reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_ARGB);
 		for (int w=0; w<reference.getWidth(); w++) { 
 			for (int h=0; h<reference.getHeight(); h++) {
 				reference.setRGB(w, h, rgbBlack);
 			}
 		}
-		this.reference = reference;
 
-		BufferedImage screenshot = new BufferedImage(30, 30, BufferedImage.TYPE_INT_ARGB);
+		screenshot = new BufferedImage(30, 30, BufferedImage.TYPE_INT_ARGB);
 		for (int w=0; w<screenshot.getWidth(); w++) { 
 			for (int h=0; h<screenshot.getHeight(); h++) {
 					screenshot.setRGB(w, h, rgbBlack);
 			}	
 		}
-		this.screenshot = screenshot;
 		
 	}
 
@@ -84,8 +82,8 @@ public class TimageComparisonResizedImageColor {
 		Assert.assertTrue("Failure, a threshold of one should return true - testFuzzyEqualThresholdOfOne", result);
 	}
 	
-	@After
-	public void deleteFile() {
+	@AfterClass
+	public static void deleteFile() {
 		fileMask.delete();
 		fileOut.delete();
 	}

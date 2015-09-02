@@ -7,9 +7,10 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import org.junit.After;
+import org.apache.commons.lang3.SystemUtils;
+import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import VisualComparison.ImageComparison;
@@ -25,32 +26,29 @@ public class TimageComparisonMask {
 //	The tests test if the resulting markedImage is marked between rows 250 and 300 (it shoudn't be)
 //	and if the resulting markedImage is marked between rows 200 and 250 (it should be)
 	
-		private BufferedImage reference;
-		private BufferedImage screenshot;
+		private static BufferedImage reference;
+		private static BufferedImage screenshot;
 		
-		private int rgbBlack = Color.BLACK.getRGB();
-		private int rgbWhite = Color.WHITE.getRGB();
-		private int rgbMarked = Color.RED.getRGB();
+		private final static File directory = SystemUtils.getJavaIoTmpDir();
+		private static File fileMask = new File(directory, "/fileMask.png");
+		private static File fileOut = new File(directory, "/fileOut.png");
 		
-		
-		private String pathHome = System.getProperty("user.home");
-		private File fileMask = new File(pathHome + "/maskImage.png");
-		private File fileOut = new File(pathHome + "/output.png");
-		
-		
-//		Initializes the reference, screenshot and the maskimage;
-		@Before
-		public void initializeImages() throws IOException {
-			BufferedImage reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
+		private final static int rgbBlack = Color.BLACK.getRGB();
+		private final static int rgbWhite = Color.WHITE.getRGB();
+		private final int rgbMarked = Color.RED.getRGB();
+				
+//		Initializes the reference, screenshot and the maskImage;
+		@BeforeClass
+		public static void initializeImages() throws IOException {
+			reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
 
 			for (int w=0; w<reference.getWidth(); w++) { 
 				for (int h=0; h<reference.getHeight(); h++) {
 					reference.setRGB(w, h, rgbBlack);
 				}
 			}
-			this.reference = reference;
 			
-			BufferedImage screenshot = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
+			screenshot = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
 			for (int w=0; w<screenshot.getWidth(); w++) { 
 				for (int h=0; h<screenshot.getHeight(); h++) {
 					if (h >= 200) { 
@@ -61,7 +59,6 @@ public class TimageComparisonMask {
 					}
 				}	
 			}
-			this.screenshot = screenshot;
 			
 			BufferedImage maskImage = new BufferedImage(300, 300,BufferedImage.TYPE_INT_BGR);
 			for (int w=0; w<screenshot.getWidth(); w++) { 
@@ -172,8 +169,8 @@ public class TimageComparisonMask {
 		}
 		
 //		Deletes the created files after the test.
-		@After
-		public void deleteFile() {
+		@AfterClass
+		public static void deleteFile() {
 			fileMask.delete();
 			fileOut.delete();
 		}
