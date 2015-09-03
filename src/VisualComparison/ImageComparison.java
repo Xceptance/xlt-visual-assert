@@ -9,6 +9,11 @@ import java.util.Arrays;
 
 import javax.imageio.ImageIO;
 
+/**
+ * Class for comparison of images, in particular screenshots of websites.
+ * 
+ * @author lucas & damian
+ */
 public class ImageComparison {
     private BufferedImage imgOut = null;
     private int pixelPerBlockX;
@@ -16,6 +21,28 @@ public class ImageComparison {
     private double threshold;
     private boolean trainingMode;
    
+    
+    /**
+     * The parameters pixelPerBlockX, pixelPerBlockY and threshold define the fuzzyness in the comparison, 
+     * higher parameters mean a comparison that is less strict.
+     * 
+     * The algorithm divides the image in blocks, the parameters pixelPerBlockX, pixelPerBlockY define the size 
+     * of the block. It compares the average color in the blocks. The threshold parameter decides how big a difference
+     * in color will remain unnoticed. For example, threshold = 0.2 means a 20% difference will be tolerated.
+     * 
+     * In case images should only be equal in certain areas or certain areas should not be compared, a mask image
+     * will be created. Black areas in the mask image will be ignored. Users can manually paint it black or use the 
+     * trainingMode to do so.
+     * 
+     * If the trainingMode parameter is true, differences will not be marked, but the corresponding areas in the 
+     * mask image will be painted black. So barring manual intervention, differences in these areas will not be
+     * detected in later runs.
+     * 
+     * @param pixelPerBlockX 
+     * @param pixelPerBlockY
+     * @param threshold
+     * @param trainingMode
+     */
     public ImageComparison(int pixelPerBlockX, int pixelPerBlockY, double threshold, boolean trainingMode) {
         this.pixelPerBlockX = pixelPerBlockX;
         this.pixelPerBlockY = pixelPerBlockY;
@@ -40,7 +67,7 @@ public class ImageComparison {
             	boolean isTransparent = isTransparent(img1.getRGB(x, y)) || isTransparent(img2.getRGB(x, y));
 
 //                calculates difference and marks them red if above threshold or transparent...
-                if ( (calculatePixelRgbDiff(x, y, img1, img2) > threshold) || isTransparent ) {
+                if ( (calculatePixelRgbDiff(x, y, img1, img2) > threshold) || (isTransparent && threshold < 1) ) {
                 	
 //                  and if the maskImage is not Black ...                	
                 	if ( maskImage.getRGB(x, y) != Color.BLACK.getRGB() ) {   
@@ -110,6 +137,22 @@ public class ImageComparison {
         return exactlyEqual;
     }
    
+    /**
+     * Compares the img2 image to the img1 image using the parameters defined in the 
+     * ImageComparison constructor. 
+     * 
+     * If the images do not have the same size, the difference in size will be filled up and marked.
+     * Differences will be marked red unless the image itself is red. In that case, they will be marked green.
+     * 
+     * @param img1 the reference image
+     * @param img2 the image that will be compared with the reference image
+     * @param fileMask the file where the mask image is or where it should be
+     * @param fileOut the file where, if there are difference, the img2 with the differences marked will be saved
+     * @return a boolean value; true if the images are equal or trainingMode is true, 
+     * 			false if differences were detected
+     * 
+     * @throws IOException
+     */
     public boolean fuzzyEqual(BufferedImage img1, BufferedImage img2, File fileMask, File fileOut) throws IOException {
         /*Method for the regular fuzzy comparison*/
        
