@@ -30,6 +30,10 @@ import com.xceptance.xlt.api.util.XltProperties;
  */
 public class CompareScreenshots implements WebDriverCustomModule {
 	final String PPREFIX = "com.xceptance.xlt.imageComparison";
+	final String DWAITTIME = "100";
+	final String DPIXELPBLOCKX = "20";
+	final String DPIXELPBLOCKY = "20";
+	final String TDIFFERENCES = "0.05";
 
 	/**
 	 * No parameters beyond the webdriver are required. For properties, look at
@@ -64,24 +68,27 @@ public class CompareScreenshots implements WebDriverCustomModule {
 	 * com.xceptance.xlt.imageComparison.pixelPerBlockX - fuzzyness parameter,
 	 * see ImageComparison. com.xceptance.xlt.imageComparison.pixelPerBlockY -
 	 * fuzzyness parameter, see ImageComparison.
-	 * com.xceptance.xlt.imageComparison.threshold - fuzzyness parameter, see
-	 * ImageComparison. com.xceptance.xlt.imageComparison.threshold.trainingMode
+	 * com.xceptance.xlt.imageComparison.toleratedDifferences - fuzzyness parameter, see
+	 * ImageComparison. com.xceptance.xlt.imageComparison.toleratedDifferences.trainingMode
 	 * - See ImageComparison
-	 * com.xceptance.xlt.imageComparison.threshold.trainingMode.currentID
+	 * com.xceptance.xlt.imageComparison.toleratedDifferences.trainingMode.currentID
 	 * <p>
 	 * {@inheritDoc}
 	 */
 
 	@Override
 	public void execute(WebDriver webDriver, String... args) {
-		// Wait 100 miliseconds so the website is fully loaded
+
+		XltProperties x = XltProperties.getInstance();
+
+		// Wait a few miliseconds so the website is fully loaded
+		String waitTimeS = x.getProperty(PPREFIX + ".waitTime", DWAITTIME);
+		int waitTime = Integer.parseInt(waitTimeS);
 		try {
-			TimeUnit.MILLISECONDS.sleep(100);
+			TimeUnit.MILLISECONDS.sleep(waitTime);
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
-
-		XltProperties x = XltProperties.getInstance();
 
 		// Checks if this is a new testcase. If yes, (re)sets index. If not.
 		// increments index
@@ -141,12 +148,13 @@ public class CompareScreenshots implements WebDriverCustomModule {
 
 			// Get fuzzyness properties and convert them from String to
 			// integer/double
-			int pixelPerBlockX = Integer.parseInt(x.getProperty(PPREFIX
-					+ ".pixelPerBlockX"));
-			int pixelPerBlockY = Integer.parseInt(x.getProperty(PPREFIX
-					+ ".pixelPerBlockY"));
-			double threshold = Double.parseDouble(x.getProperty(PPREFIX
-					+ ".threshold"));
+			String pixelPerBlockXS = x.getProperty(PPREFIX + ".pixelPerBlockX", DPIXELPBLOCKX);
+			int pixelPerBlockX = Integer.parseInt(pixelPerBlockXS);
+			String pixelPerBlockYS = x.getProperty(PPREFIX + ".pixelPerBlockY", DPIXELPBLOCKY);
+			int pixelPerBlockY = Integer.parseInt(pixelPerBlockYS);
+			
+			String toleratedDifferencesS = x.getProperty(PPREFIX + ".toleratedDifferences", TDIFFERENCES);
+			double toleratedDifferences = Double.parseDouble(toleratedDifferencesS);
 
 			try {
 				// Initialize referenceImage, screenshotImage, delete
@@ -172,9 +180,8 @@ public class CompareScreenshots implements WebDriverCustomModule {
 				Boolean trainingMode = Boolean.parseBoolean(trainingModeString);
 
 				ImageComparison imagecomparison = new ImageComparison(
-						pixelPerBlockX, pixelPerBlockY, threshold, trainingMode);
-				if (!imagecomparison.fuzzyEqual(reference, screenshot,
-						maskImageFile, markedImageFile)) {
+						pixelPerBlockX, pixelPerBlockY, toleratedDifferences, trainingMode, "exactComparison");
+				if (!imagecomparison.isEqual(reference, screenshot, maskImageFile, markedImageFile)); {
 
 					// Give an assertion. The marked Image was saved in the
 					// fuzzyEqual method
@@ -182,7 +189,8 @@ public class CompareScreenshots implements WebDriverCustomModule {
 							+ currentActionName;
 					Assert.assertTrue(assertMessage, false);
 				}
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				throw new RuntimeIOException();
 			}
 		}
