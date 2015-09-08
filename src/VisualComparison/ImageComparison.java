@@ -300,13 +300,12 @@ public class ImageComparison {
 		int imageheight = img1.getHeight();
 		for (int x = 0; x < imagewidth; x++) {
 			for (int y = 0; y < imageheight; y++) {
-				System.out.println(x+" "+y);
 
 				int xBlock = x / markingX;
 				int yBlock = y / markingY;
 				subImageWidth = calcPixSpan(markingX, xBlock, imageWidth);
 				subImageHeight = calcPixSpan(markingY, yBlock, imageHeight);
-				
+
 				// if the RGB values of 2 pixels differ or one of them is
 				// print them red and set equal false ...
 				if (img1.getRGB(x, y) != img2.getRGB(x, y)) {
@@ -827,8 +826,8 @@ public class ImageComparison {
 			int xBlock = pixels[x][0] / markingX;
 			int yBlock = pixels[x][1] / markingY;
 			if (xBlock != lastX || yBlock != lastY) {
-				int subImageWidth = calcPixSpan(markingX, xBlock, imageWidth);
-				int subImageHeight = calcPixSpan(markingY, yBlock, imageHeight);
+				subImageWidth = calcPixSpan(markingX, xBlock, imageWidth);
+				subImageHeight = calcPixSpan(markingY, yBlock, imageHeight);
 				drawBorders(xBlock, yBlock, markingX, markingY);
 				lastX = xBlock;
 				lastY = yBlock;
@@ -838,7 +837,7 @@ public class ImageComparison {
 
 	/**
 	 * Colors the borders of a certain rectangle. Used to mark blocks. Uses the
-	 * colorPixel method.
+	 * colorPixel method.subImageHeight
 	 * 
 	 * @param img
 	 *            The image in which something will be marked
