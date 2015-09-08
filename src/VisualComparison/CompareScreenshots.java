@@ -31,9 +31,9 @@ import com.xceptance.xlt.api.util.XltProperties;
 public class CompareScreenshots implements WebDriverCustomModule {
 	final String PPREFIX = "com.xceptance.xlt.imageComparison";
 	final String DWAITTIME = "100";
-	final String DPIXELPBLOCKX = "20";
-	final String DPIXELPBLOCKY = "20";
+	final String DPIXELPBLOCKXY = "20";
 	final String TDIFFERENCES = "0.05";
+	final String DALGORITHM = "FUZZYEQUAL";
 
 	/**
 	 * No parameters beyond the webdriver are required. For properties, look at
@@ -65,14 +65,13 @@ public class CompareScreenshots implements WebDriverCustomModule {
 	 * Necessary properties are as follows:
 	 * com.xceptance.xlt.imageComparison.directoryToScreenshots - the directory
 	 * in which the screenshots will be saved
-	 * com.xceptance.xlt.imageComparison.pixelPerBlockX - fuzzyness parameter,
-	 * see ImageComparison. com.xceptance.xlt.imageComparison.pixelPerBlockY -
-	 * fuzzyness parameter, see ImageComparison.
-	 * com.xceptance.xlt.imageComparison.toleratedDifferences - fuzzyness parameter, see
-	 * ImageComparison. com.xceptance.xlt.imageComparison.toleratedDifferences.trainingMode
-	 * - See ImageComparison
-	 * com.xceptance.xlt.imageComparison.toleratedDifferences.trainingMode.currentID
-	 * <p>
+	 * com.xceptance.xlt.imageComparison.pixelPerBlockXY - fuzzyness parameter,
+	 * see ImageComparison. <br>
+	 * com.xceptance.xlt.imageComparison.pixelPerBlockXY - fuzzyness parameter,
+	 * see ImageComparison. 
+	 * com.xceptance.xlt.imageComparison.toleratedDifferences - fuzzyness
+	 * parameter, see ImageComparison.
+	 * com.xceptance.xlt.imageComparison.trainingMode - See ImageComparison.
 	 * {@inheritDoc}
 	 */
 
@@ -81,9 +80,31 @@ public class CompareScreenshots implements WebDriverCustomModule {
 
 		XltProperties x = XltProperties.getInstance();
 
-		// Wait a few miliseconds so the website is fully loaded
+		// Get Properties and convert them from String if necessary
+
+		// waitTime
 		String waitTimeS = x.getProperty(PPREFIX + ".waitTime", DWAITTIME);
 		int waitTime = Integer.parseInt(waitTimeS);
+		
+		// pixelPerBlockXY, fuzzyness parameter 
+		String pixelPerBlockXYS = x.getProperty(PPREFIX + ".pixelPerBlockXY",
+				DPIXELPBLOCKXY);
+		int pixelPerBlockXY = Integer.parseInt(pixelPerBlockXYS);
+
+		//toleratedDifferences, fuzzyness parameter
+		String toleratedDifferencesS = x.getProperty(PPREFIX
+				+ ".toleratedDifferences", TDIFFERENCES);
+		double toleratedDifferences = Double.parseDouble(toleratedDifferencesS);
+
+		//trainingMode
+		String trainingModeString = x.getProperty(PPREFIX
+				+ ".trainingMode");
+		Boolean trainingMode = Boolean.parseBoolean(trainingModeString);
+		
+		//comparisonAlgorithm
+		String comparisonAlgorithm = x.getProperty(PPREFIX + ".comparisonAlgorithm", DALGORITHM );
+		
+		// Wait a few miliseconds so the website is fully loaded
 		try {
 			TimeUnit.MILLISECONDS.sleep(waitTime);
 		} catch (InterruptedException e) {
@@ -146,16 +167,6 @@ public class CompareScreenshots implements WebDriverCustomModule {
 				throw new RuntimeIOException();
 			}
 
-			// Get fuzzyness properties and convert them from String to
-			// integer/double
-			String pixelPerBlockXS = x.getProperty(PPREFIX + ".pixelPerBlockX", DPIXELPBLOCKX);
-			int pixelPerBlockX = Integer.parseInt(pixelPerBlockXS);
-			String pixelPerBlockYS = x.getProperty(PPREFIX + ".pixelPerBlockY", DPIXELPBLOCKY);
-			int pixelPerBlockY = Integer.parseInt(pixelPerBlockYS);
-			
-			String toleratedDifferencesS = x.getProperty(PPREFIX + ".toleratedDifferences", TDIFFERENCES);
-			double toleratedDifferences = Double.parseDouble(toleratedDifferencesS);
-
 			try {
 				// Initialize referenceImage, screenshotImage, delete
 				// screenshotImageFile
@@ -174,22 +185,19 @@ public class CompareScreenshots implements WebDriverCustomModule {
 						+ "-mask" + ".png";
 				File maskImageFile = new File(maskImagePath);
 
-				// Initializes boolean variable for training mode
-				String trainingModeString = x.getProperty(PPREFIX
-						+ ".trainingMode");
-				Boolean trainingMode = Boolean.parseBoolean(trainingModeString);
-
+				//Initializes ImageComparison and calls isEqual
 				ImageComparison imagecomparison = new ImageComparison(
-						pixelPerBlockX, pixelPerBlockY, toleratedDifferences, trainingMode, "exactComparison");
-				if (!imagecomparison.isEqual(reference, screenshot, maskImageFile, markedImageFile)); {
+						pixelPerBlockXY, toleratedDifferences, trainingMode,
+						comparisonAlgorithm);
+				if (!imagecomparison.isEqual(reference, screenshot,
+						maskImageFile, markedImageFile));
 
 					// Give an assertion. The marked Image was saved in the
-					// fuzzyEqual method
+					// comparison method
 					String assertMessage = "Website does not match the reference screenshot: "
 							+ currentActionName;
 					Assert.assertTrue(assertMessage, false);
 				}
-			}
 			catch (IOException e) {
 				throw new RuntimeIOException();
 			}
