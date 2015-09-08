@@ -19,7 +19,7 @@ import javax.imageio.ImageIO;
 public class ImageComparison {
 	private BufferedImage imgOut = null;
 	private int pixelPerBlockX, pixelPerBlockY, imageWidth, imageHeight,
-			markingX, markingY;
+			markingX, markingY, subImageWidth, subImageHeight;
 	private double threshold;
 	private boolean trainingMode;
 
@@ -63,8 +63,8 @@ public class ImageComparison {
 		this.pixelPerBlockY = pixelPerBlockY;
 		this.threshold = threshold;
 		this.trainingMode = trainingMode;
-		markingX = 10;
-		markingY = 10;
+		markingX = 8;
+		markingY = 8;
 
 		try {
 			this.algorithm = ComparisonAlgorithm.valueOf(algorithm);
@@ -215,6 +215,10 @@ public class ImageComparison {
 		int imageheight = img1.getHeight();
 		for (int x = 0; x < imagewidth; x++) {
 			for (int y = 0; y < imageheight; y++) {
+				int xBlock = x / markingX;
+				int yBlock = y / markingY;
+				subImageWidth = calcPixSpan(markingX, xBlock, imageWidth);
+				subImageHeight = calcPixSpan(markingY, yBlock, imageHeight);
 
 				// calculates difference and marks them red if above threshold
 				if ((calculatePixelRgbDiff(x, y, img1, img2) > threshold)) {
@@ -226,8 +230,6 @@ public class ImageComparison {
 						// the maskImage
 						// The markedImage will not be saved
 						if (trainingMode) {
-							int xBlock = x / markingX;
-							int yBlock = y / markingY;
 							colorArea(maskImage, xBlock, yBlock);
 						}
 
@@ -298,7 +300,13 @@ public class ImageComparison {
 		int imageheight = img1.getHeight();
 		for (int x = 0; x < imagewidth; x++) {
 			for (int y = 0; y < imageheight; y++) {
+				System.out.println(x+" "+y);
 
+				int xBlock = x / markingX;
+				int yBlock = y / markingY;
+				subImageWidth = calcPixSpan(markingX, xBlock, imageWidth);
+				subImageHeight = calcPixSpan(markingY, yBlock, imageHeight);
+				
 				// if the RGB values of 2 pixels differ or one of them is
 				// print them red and set equal false ...
 				if (img1.getRGB(x, y) != img2.getRGB(x, y)) {
@@ -310,8 +318,6 @@ public class ImageComparison {
 						// pixel will be set black in the maskImage
 						// The markedImage will not be saved
 						if (trainingMode) {
-							int xBlock = x / markingX;
-							int yBlock = y / markingY;
 							colorArea(maskImage, xBlock, yBlock);
 						}
 
@@ -433,7 +439,7 @@ public class ImageComparison {
 
 						// mark the current block. Set fuzzyEqual false ONLY IF
 						// trainingMode is false
-						drawBorders(x, y, subImageWidth, subImageHeight);
+						drawBorders(x, y, pixelPerBlockX, pixelPerBlockY);
 
 						// If trainingMode is on, all marked areas will be set
 						// black in the maskImage
@@ -820,10 +826,10 @@ public class ImageComparison {
 		for (int x = 0; x < pixels.length; x++) {
 			int xBlock = pixels[x][0] / markingX;
 			int yBlock = pixels[x][1] / markingY;
-			if (xBlock != lastX && yBlock != lastY) {
+			if (xBlock != lastX || yBlock != lastY) {
 				int subImageWidth = calcPixSpan(markingX, xBlock, imageWidth);
 				int subImageHeight = calcPixSpan(markingY, yBlock, imageHeight);
-				drawBorders(xBlock, yBlock, subImageWidth, subImageHeight);
+				drawBorders(xBlock, yBlock, markingX, markingY);
 				lastX = xBlock;
 				lastY = yBlock;
 			}
@@ -845,25 +851,24 @@ public class ImageComparison {
 	 * @param currentY
 	 *            Starting position
 	 */
-	private void drawBorders(int currentX, int currentY, int subImageWidth,
-			int subImageHeight) {
+	private void drawBorders(int currentX, int currentY, int width, int height) {
 		int x, y;
 
 		for (int a = 0; a < subImageWidth; a++) {
-			x = currentX * pixelPerBlockX + a;
-			y = currentY * pixelPerBlockY;
+			x = currentX * width + a;
+			y = currentY * height;
 			colorPixel(x, y);
 
-			y = currentY * pixelPerBlockY + subImageHeight - 1;
+			y = currentY * height + subImageHeight - 1;
 			colorPixel(x, y);
 		}
 
 		for (int b = 1; b < subImageHeight - 1; b++) {
-			x = currentX * pixelPerBlockX;
-			y = currentY * pixelPerBlockY + b;
+			x = currentX * width;
+			y = currentY * height + b;
 			colorPixel(x, y);
 
-			x = currentX * pixelPerBlockX + subImageWidth - 1;
+			x = currentX * width + subImageWidth - 1;
 			colorPixel(x, y);
 		}
 	}
@@ -885,13 +890,13 @@ public class ImageComparison {
 		newRgb = newColor.getRGB();
 		imgOut.setRGB(x, y, newRgb);
 	}
-	
-	private void colorArea (BufferedImage mask, int x, int y) {
+
+	private void colorArea(BufferedImage mask, int x, int y) {
 		int rgb = Color.BLACK.getRGB();
 		int xCorner = x * markingX;
 		int yCorner = y * markingY;
-		for (int a = 0; a<markingX; a++){
-			for (int b = 0; b<markingY; b++) {
+		for (int a = 0; a < subImageWidth; a++) {
+			for (int b = 0; b < subImageHeight; b++) {
 				mask.setRGB(xCorner + a, yCorner + b, rgb);
 			}
 		}
