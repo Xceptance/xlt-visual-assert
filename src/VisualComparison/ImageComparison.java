@@ -137,14 +137,14 @@ public class ImageComparison {
 		case EXACTLYEQUAL:
 			if (exactlyEqual(img1, imgOut, maskImage, fileMask) != null) {
 				markDifferences(exactlyEqual(img1, imgOut, maskImage, fileMask));
+				markedImage = imgOut;
 			}
-			markedImage = imgOut;
 			break;
 		case PIXELFUZZYEQUAL:
 			if (pixelFuzzyEqual(img1, imgOut, maskImage, fileMask) != null) {
 				markDifferences(exactlyEqual(img1, imgOut, maskImage, fileMask));
+				markedImage = imgOut;
 			}
-			markedImage = imgOut;
 			break;
 		case FUZZYEQUAL:
 			markedImage = fuzzyEqual(img1, imgOut, maskImage, fileMask);
@@ -226,7 +226,9 @@ public class ImageComparison {
 						// the maskImage
 						// The markedImage will not be saved
 						if (trainingMode) {
-							maskImage.setRGB(x, y, Color.black.getRGB());
+							int xBlock = x / markingX;
+							int yBlock = y / markingY;
+							colorArea(maskImage, xBlock, yBlock);
 						}
 
 						else {
@@ -308,7 +310,9 @@ public class ImageComparison {
 						// pixel will be set black in the maskImage
 						// The markedImage will not be saved
 						if (trainingMode) {
-							maskImage.setRGB(x, y, Color.black.getRGB());
+							int xBlock = x / markingX;
+							int yBlock = y / markingY;
+							colorArea(maskImage, xBlock, yBlock);
 						}
 
 						else {
@@ -369,7 +373,7 @@ public class ImageComparison {
 	 * 
 	 * @throws IOException
 	 */
-	public BufferedImage fuzzyEqual(BufferedImage img1, BufferedImage img2,
+	private BufferedImage fuzzyEqual(BufferedImage img1, BufferedImage img2,
 			BufferedImage maskImage, File fileMask) throws IOException {
 		/* Method for the regular fuzzy comparison */
 
@@ -880,6 +884,17 @@ public class ImageComparison {
 		newColor = getComplementary(currentColor);
 		newRgb = newColor.getRGB();
 		imgOut.setRGB(x, y, newRgb);
+	}
+	
+	private void colorArea (BufferedImage mask, int x, int y) {
+		int rgb = Color.BLACK.getRGB();
+		int xCorner = x * markingX;
+		int yCorner = y * markingY;
+		for (int a = 0; a<markingX; a++){
+			for (int b = 0; b<markingY; b++) {
+				mask.setRGB(xCorner + a, yCorner + b, rgb);
+			}
+		}
 	}
 
 	/**
