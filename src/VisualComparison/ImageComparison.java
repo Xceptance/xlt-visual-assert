@@ -358,6 +358,7 @@ public class ImageComparison {
 			imgOut = imageoperations.scaleImage(shrunkImg2, prevWidth,
 					prevHeight);
 
+			int l = pixels.length;
 			// Scale back the array ...
 			// For that, just mark every pixel in the scaling block
 			// Created with pixelPerBlockXY
@@ -379,12 +380,12 @@ public class ImageComparison {
 				yCoordinates = pixels[i][1];
 				
 				//Go through every pixel in the block
-				for (int x = xCoordinates; x < xCoordinates * pixelPerBlockXY; x++) {						//TODO
-					for (int y = yCoordinates; y < yCoordinates * pixelPerBlockXY; y++) {
+				for (int x = xCoordinates * pixelPerBlockXY; x < (xCoordinates + 1) * pixelPerBlockXY; x++) {						
+					for (int y = yCoordinates * pixelPerBlockXY; y < (yCoordinates + 1) * pixelPerBlockXY; y++) {
 						
 						//And set the resulting coordinates in the scaled pixels array
-						if (x == 1682000 && y == 1682000) {
-							;
+						if (x == 1682000 && y == 1682000) {							//DEBUG TODO
+							System.out.println("");
 						}
 						
 						scaledPixels[indexScaledPixels][0] = x;
