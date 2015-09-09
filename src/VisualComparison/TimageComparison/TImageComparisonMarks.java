@@ -75,8 +75,8 @@ public class TImageComparisonMarks {
 	 */
 	@Test
 	public void correctlyMarkedRed() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(5, 5, 0.1, false);
-		imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
+		ImageComparison imagecomparison = new ImageComparison(5, 0.1, false, "FUZZYEQUAL");
+		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 		BufferedImage output = ImageIO.read(fileOut);
 		boolean hasRed = false;
 		int redRgb = Color.RED.getRGB();
@@ -98,8 +98,8 @@ public class TImageComparisonMarks {
 	 */
 	@Test
 	public void correctlyMarkedGreen() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(5, 5, 0.1, false);
-		imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
+		ImageComparison imagecomparison = new ImageComparison(5, 0.1, false, "FUZZYEQUAL");
+		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 		BufferedImage output = ImageIO.read(fileOut);
 		boolean hasGreen = false;
 		int greenRgb = Color.GREEN.getRGB();
@@ -122,8 +122,8 @@ public class TImageComparisonMarks {
 	 */
 	@Test
 	public void correctlyMarkedRedPixelFuzzyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.01, false);
-		imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
+		ImageComparison imagecomparison = new ImageComparison(1, 0.01, false, "FUZZYEQUAL");
+		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 		BufferedImage output = ImageIO.read(fileOut);
 		boolean hasRed = true;
 		int redRgb = Color.RED.getRGB();
@@ -148,8 +148,8 @@ public class TImageComparisonMarks {
 	 */
 	@Test
 	public void correctlyMarkedGreenPixelFuzzyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.01, false);
-		imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
+		ImageComparison imagecomparison = new ImageComparison(1, 0.01, false, "PIXELFUZZYEQUAL");
+		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 		BufferedImage output = ImageIO.read(fileOut);
 		boolean hasGreen = true;
 		int greenRgb = Color.GREEN.getRGB();
@@ -173,8 +173,8 @@ public class TImageComparisonMarks {
 	 */
 	@Test
 	public void correctlyMarkedRedExactlyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.00, false);
-		imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
+		ImageComparison imagecomparison = new ImageComparison(1, 0.00, false, "EXACTLYEQUAL");
+		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 		BufferedImage output = ImageIO.read(fileOut);
 		boolean hasRed = true;
 		int redRgb = Color.RED.getRGB();
@@ -198,8 +198,8 @@ public class TImageComparisonMarks {
 	 */
 	@Test
 	public void correctlyMarkedGreenExactlyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.00, false);
-		imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
+		ImageComparison imagecomparison = new ImageComparison(1, 0.00, false, "EXACTLYEQUAL");
+		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 		BufferedImage output = ImageIO.read(fileOut);
 		boolean hasGreen = true;
 		int greenRgb = Color.GREEN.getRGB();

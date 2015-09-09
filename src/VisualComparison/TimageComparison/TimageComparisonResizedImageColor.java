@@ -66,9 +66,9 @@ public class TimageComparisonResizedImageColor {
 	 */
 	@Test
 	public void testFuzzyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(10, 10,
-				0.99999999, false);
-		boolean result = imagecomparison.fuzzyEqual(reference, screenshot,
+		ImageComparison imagecomparison = new ImageComparison(10,
+				0.99999999, false, "FUZZYEQUAL");
+		boolean result = imagecomparison.isEqual(reference, screenshot,
 				fileMask, fileOut);
 		Assert.assertFalse(
 				"Failure,  images of different size shoudn't be equal - testFuzzyEqual",
@@ -84,8 +84,8 @@ public class TimageComparisonResizedImageColor {
 	 */
 	@Test
 	public void testFuzzyEqualThresholdOfOne() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 1, false);
-		boolean result = imagecomparison.fuzzyEqual(reference, screenshot,
+		ImageComparison imagecomparison = new ImageComparison(10, 1, false, "FUZZYEQUAL");
+		boolean result = imagecomparison.isEqual(reference, screenshot,
 				fileMask, fileOut);
 		Assert.assertTrue(
 				"Failure, a threshold of one should return true - testFuzzyEqualThresholdOfOne",
@@ -101,9 +101,9 @@ public class TimageComparisonResizedImageColor {
 	 */
 	@Test
 	public void testPixelFuzzyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.999,
-				false);
-		boolean result = imagecomparison.fuzzyEqual(reference, screenshot,
+		ImageComparison imagecomparison = new ImageComparison(1, 0.999,
+				false, "PIXELFUZZYEQUAL");
+		boolean result = imagecomparison.isEqual(reference, screenshot,
 				fileMask, fileOut);
 		Assert.assertFalse(
 				"Failure,  images of different size shoudn't be equal - testPixelFuzzyEqual",
@@ -120,8 +120,8 @@ public class TimageComparisonResizedImageColor {
 	 */
 	@Test
 	public void testPixelFuzzyEqualThresholdOfOne() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 1, 1, false);
-		boolean result = imagecomparison.fuzzyEqual(reference, screenshot,
+		ImageComparison imagecomparison = new ImageComparison(1, 1, false, "PIXELFUZZYEQUAL");
+		boolean result = imagecomparison.isEqual(reference, screenshot,
 				fileMask, fileOut);
 		Assert.assertTrue(
 				"A threshold of 1 should always return true - testPixelFuzzyEqual",
@@ -136,8 +136,8 @@ public class TimageComparisonResizedImageColor {
 	 */
 	@Test
 	public void testExactlyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.00, false);
-		boolean result = imagecomparison.fuzzyEqual(reference, screenshot,
+		ImageComparison imagecomparison = new ImageComparison(1, 0.00, false, "EXACTLYEQUAL");
+		boolean result = imagecomparison.isEqual(reference, screenshot,
 				fileMask, fileOut);
 		Assert.assertFalse(
 				"Failure,  images of different size shoudn't be equal - testExactlyEqual",

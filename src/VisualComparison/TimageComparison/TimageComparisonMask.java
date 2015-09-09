@@ -92,8 +92,8 @@ public class TimageComparisonMask {
 		 */
 		@Test
 		public void changesCorrectlyHidden() throws IOException {
-			ImageComparison imagecomparison = new ImageComparison(10, 10, 0.1, false);
-			imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
+			ImageComparison imagecomparison = new ImageComparison(10, 0.1, false, "FUZZYEQUAL");
+			imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 			BufferedImage output = ImageIO.read(fileOut);
 			
 			for (int w=0; w<reference.getWidth(); w++) {
@@ -111,8 +111,8 @@ public class TimageComparisonMask {
 		 */
 		@Test
 		public void changesCorrectlyMarked() throws IOException {
-			ImageComparison imagecomparison = new ImageComparison(10, 10, 0.1, false);
-			imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
+			ImageComparison imagecomparison = new ImageComparison(10, 0.1, false, "FUZZYEQUAL");
+			imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 			BufferedImage output = ImageIO.read(fileOut);
 			boolean hasRed = false;
 			
@@ -134,8 +134,8 @@ public class TimageComparisonMask {
 		 */
 		@Test
 		public void changesCorrectlyHiddenPixelFuzzyEqual() throws IOException {
-			ImageComparison imagecomparison = new ImageComparison(1, 1, 0.1, false);
-			imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
+			ImageComparison imagecomparison = new ImageComparison(1, 0.1, false, "PIXELFUZZYEQUAL");
+			imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 			BufferedImage output = ImageIO.read(fileOut);
 			
 			for (int w=0; w<reference.getWidth(); w++) {
@@ -153,8 +153,8 @@ public class TimageComparisonMask {
 		 */
 		@Test
 		public void changesCorrectlyMarkedPixelFuzzyEqual() throws IOException {
-			ImageComparison imagecomparison = new ImageComparison(1, 1, 0.1, false);
-			imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
+			ImageComparison imagecomparison = new ImageComparison(1, 0.1, false, "PIXELFUZZYEQUAL");
+			imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 			BufferedImage output = ImageIO.read(fileOut);
 			
 			for (int w=0; w<reference.getWidth(); w++) {
@@ -172,8 +172,8 @@ public class TimageComparisonMask {
 		 */
 		@Test
 		public void changesCorrectlyHiddenExactlyEqual() throws IOException {
-			ImageComparison imagecomparison = new ImageComparison(1, 1, 0.00, false);
-			imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
+			ImageComparison imagecomparison = new ImageComparison(1, 0.00, false, "EXACTLYEQUAL");
+			imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 			BufferedImage output = ImageIO.read(fileOut);
 			
 			for (int w=0; w<reference.getWidth(); w++) {
@@ -191,8 +191,8 @@ public class TimageComparisonMask {
 		 */
 		@Test
 		public void changesCorrectlyMarkedExactlyEqual() throws IOException {
-			ImageComparison imagecomparison = new ImageComparison(1, 1, 0.00, false);
-			imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
+			ImageComparison imagecomparison = new ImageComparison(1, 0.00, false, "EXACTLYEQUAL");
+			imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 			BufferedImage output = ImageIO.read(fileOut);
 			
 			for (int w=0; w<reference.getWidth(); w++) {

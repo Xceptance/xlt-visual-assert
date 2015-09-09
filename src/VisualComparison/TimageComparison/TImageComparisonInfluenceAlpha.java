@@ -64,10 +64,10 @@ public class TImageComparisonInfluenceAlpha {
 	 */
 	@Test
 	public void influenceAlphaFuzzyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 0.01, false);
-		boolean result = imagecomparison.fuzzyEqual(notTransparentImg, transparentImg, fileMask, fileOut);
+		ImageComparison imagecomparison = new ImageComparison(10, 0.01, false, "FUZZYEQUAL");
+		boolean result = imagecomparison.isEqual(notTransparentImg, transparentImg, fileMask, fileOut);
 		Assert.assertFalse("A transparent screenshot went undetected - influenceAlphaFuzzyEqual", result);
-		result = imagecomparison.fuzzyEqual(transparentImg, notTransparentImg, fileMask, fileOut);
+		result = imagecomparison.isEqual(transparentImg, notTransparentImg, fileMask, fileOut);
 		Assert.assertFalse("A transparent reference image went undetected - influenceAlphaFuzzyEqual", result);
 	}
 	
@@ -80,11 +80,11 @@ public class TImageComparisonInfluenceAlpha {
 	 */	
 	@Test
 	public void influenceAlphaPixelFuzzyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.01, false);
-		boolean result = imagecomparison.fuzzyEqual(notTransparentImg, transparentImg, fileMask, fileOut);
+		ImageComparison imagecomparison = new ImageComparison(1, 0.01, false, "PIXELFUZZYEQUAL");
+		boolean result = imagecomparison.isEqual(notTransparentImg, transparentImg, fileMask, fileOut);
 		Assert.assertFalse("A transparent screenshot went undetected - influenceAlphaPixelFuzzyEqual", result);
 		
-		result = imagecomparison.fuzzyEqual(transparentImg, notTransparentImg, fileMask, fileOut);
+		result = imagecomparison.isEqual(transparentImg, notTransparentImg, fileMask, fileOut);
 		Assert.assertFalse("A transparent reference Image went undetected - influenceAlphaPixelFuzzyEqual", result);	
 	}
 	
@@ -97,10 +97,10 @@ public class TImageComparisonInfluenceAlpha {
 	 */	
 	@Test
 	public void influenceAlphaExactlyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.0, false);
-		boolean result = imagecomparison.fuzzyEqual(notTransparentImg, transparentImg, fileMask, fileOut);
+		ImageComparison imagecomparison = new ImageComparison(1, 0.0, false, "EXACTLYEQUAL");
+		boolean result = imagecomparison.isEqual(notTransparentImg, transparentImg, fileMask, fileOut);
 		Assert.assertFalse("A transparent screenshot went undetected - influenceAlphaExactlyEqual", result);
-		result = imagecomparison.fuzzyEqual(transparentImg, notTransparentImg, fileMask, fileOut);
+		result = imagecomparison.isEqual(transparentImg, notTransparentImg, fileMask, fileOut);
 		Assert.assertFalse("A transparent reference Image went undetected - influenceAlphaExactlyEqual", result);
 	}
 	

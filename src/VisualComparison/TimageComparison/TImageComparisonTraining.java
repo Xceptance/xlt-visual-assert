@@ -14,12 +14,12 @@ import VisualComparison.ImageComparison;
 
 public class TImageComparisonTraining {
 	static BufferedImage reference, newImage;
-	ImageComparison fuzzyTraining = new ImageComparison (10, 10, 0.00, true);
-	ImageComparison fuzzyImgCompare = new ImageComparison (10, 10, 0.00, false);
-	ImageComparison exactlyTraining = new ImageComparison (1, 1, 0.00, true);
-	ImageComparison exactlyCompare = new ImageComparison (1, 1, 0.00, false);
-	ImageComparison pixelFuzzyTraining = new ImageComparison(1, 1, 0.01, true);
-	ImageComparison pixelFuzzyCompare = new ImageComparison(1, 1, 0.01, false);
+	ImageComparison fuzzyTraining = new ImageComparison (10, 0.00, true, "FUZZYEQUAL");
+	ImageComparison fuzzyImgCompare = new ImageComparison (10, 0.00, false, "FUZZYEQUAL");
+	ImageComparison exactlyTraining = new ImageComparison (1, 0.00, true, "EXACTLYEQUAL");
+	ImageComparison exactlyCompare = new ImageComparison (1, 0.00, false, "EXACTLYEQUAL");
+	ImageComparison pixelFuzzyTraining = new ImageComparison(1, 0.01, true, "PIXELFUZZYEQUAL");
+	ImageComparison pixelFuzzyCompare = new ImageComparison(1, 0.01, false, "PIXELFUZZYEQUAL");
 	static File directory = org.apache.commons.lang3.SystemUtils.getJavaIoTmpDir();
 	static File outPutfile = new File(directory+"/test.png");
 	static File maskFile = new File(directory+"/mask.png");
@@ -36,9 +36,9 @@ public class TImageComparisonTraining {
 	@Test
 	public void trainWithNoDifference() throws IOException{
 		setUpFileAndPicture();
-		Assert.assertTrue(fuzzyImgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
-		Assert.assertTrue(fuzzyTraining.fuzzyEqual(reference, newImage, maskFile, outPutfile));
-		Assert.assertTrue(fuzzyImgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertTrue(fuzzyImgCompare.isEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertTrue(fuzzyTraining.isEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertTrue(fuzzyImgCompare.isEqual(reference, newImage, maskFile, outPutfile));
 	}
 	
 //	a single block is colored different and should be recognized by the training mode
@@ -46,9 +46,9 @@ public class TImageComparisonTraining {
 	public void trainWithSingleDifference() throws IOException{
 		setUpFileAndPicture();
 		paintArea(newImage, 1, 1, 10, 10);
-		Assert.assertFalse(fuzzyImgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
-		Assert.assertTrue(fuzzyTraining.fuzzyEqual(reference, newImage, maskFile, outPutfile));
-		Assert.assertTrue(fuzzyImgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertFalse(fuzzyImgCompare.isEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertTrue(fuzzyTraining.isEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertTrue(fuzzyImgCompare.isEqual(reference, newImage, maskFile, outPutfile));
 	}
 	
 //	two areas are colored different and should be recognized by the training mode
@@ -117,23 +117,23 @@ public class TImageComparisonTraining {
 
 //	this assertion block checks if the fuzzy training was completed succesfully
 	public void fuzzyAssertBlock () throws IOException {
-		Assert.assertFalse(fuzzyImgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
-		Assert.assertTrue(fuzzyTraining.fuzzyEqual(reference, newImage, maskFile, outPutfile));
-		Assert.assertTrue(fuzzyImgCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertFalse(fuzzyImgCompare.isEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertTrue(fuzzyTraining.isEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertTrue(fuzzyImgCompare.isEqual(reference, newImage, maskFile, outPutfile));
 	}
 	
 //	this assertion block checks if the exact training was completed succesfully
 	public void exactlyAssertBlock() throws IOException {
-		Assert.assertFalse(exactlyCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
-		Assert.assertTrue(exactlyTraining.fuzzyEqual(reference, newImage, maskFile, outPutfile));
-		Assert.assertTrue(exactlyCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertFalse(exactlyCompare.isEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertTrue(exactlyTraining.isEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertTrue(exactlyCompare.isEqual(reference, newImage, maskFile, outPutfile));
 	}
 	
 //	this assertion block checks if the pixel fuzzy training was completed succesfully
 	public void pixelFuzzyAssertBlock() throws IOException {
-		Assert.assertFalse(pixelFuzzyCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
-		Assert.assertTrue(pixelFuzzyTraining.fuzzyEqual(reference, newImage, maskFile, outPutfile));
-		Assert.assertTrue(pixelFuzzyCompare.fuzzyEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertFalse(pixelFuzzyCompare.isEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertTrue(pixelFuzzyTraining.isEqual(reference, newImage, maskFile, outPutfile));
+		Assert.assertTrue(pixelFuzzyCompare.isEqual(reference, newImage, maskFile, outPutfile));
 	}
 
 //	setup method for each test

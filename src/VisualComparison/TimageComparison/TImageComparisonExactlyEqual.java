@@ -58,8 +58,8 @@ public class TImageComparisonExactlyEqual {
 	 */
 	@Test
 	public void almostEqualButNotQuite() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.00, false);
-		boolean result = imagecomparison.fuzzyEqual(reference, screenshot,
+		ImageComparison imagecomparison = new ImageComparison(1, 0.00, false,"EXACTLYEQUAL");
+		boolean result = imagecomparison.isEqual(reference, screenshot,
 				fileMask, fileOut);
 		Assert.assertFalse(
 				"The images arn't quite equal,  he apparently missed something "

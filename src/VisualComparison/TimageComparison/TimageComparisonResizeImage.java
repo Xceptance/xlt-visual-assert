@@ -67,8 +67,8 @@ public class TimageComparisonResizeImage {
 	 */
 	@Test
 	public void correctSize() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 0.1, false);
-		imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
+		ImageComparison imagecomparison = new ImageComparison(10, 0.1, false, "FUZZYEQUAL");
+		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 		BufferedImage img = ImageIO.read(fileOut);
 		
 		Assert.assertEquals(reference.getWidth(), img.getWidth());
@@ -84,8 +84,8 @@ public class TimageComparisonResizeImage {
 	 */
 	@Test
 	public void correctBreakPoint() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 0.1, false);
-		imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
+		ImageComparison imagecomparison = new ImageComparison(10, 0.1, false, "FUZZYEQUAL");
+		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 		BufferedImage img = ImageIO.read(fileOut);
 	
 		Assert.assertEquals(rgbWhite, img.getRGB(49, 49));
@@ -100,8 +100,8 @@ public class TimageComparisonResizeImage {
 	 */
 	@Test
 	public void correctSizePixelFuzzyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.01, false);
-		imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
+		ImageComparison imagecomparison = new ImageComparison(1, 0.01, false, "PIXELFUZZYEQUAL");
+		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 		BufferedImage img = ImageIO.read(fileOut);
 		
 		Assert.assertEquals(reference.getWidth(), img.getWidth());
@@ -117,8 +117,8 @@ public class TimageComparisonResizeImage {
 	 */
 	@Test
 	public void correctBreakPointPixelFuzzyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.01, false);
-		imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
+		ImageComparison imagecomparison = new ImageComparison(1, 0.01, false, "PIXELFUZZYEQUAL");
+		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 		BufferedImage img = ImageIO.read(fileOut);
 		
 		Assert.assertEquals(rgbWhite, img.getRGB(49, 49));
@@ -133,8 +133,8 @@ public class TimageComparisonResizeImage {
 	 */
 	@Test
 	public void correctSizeExactlyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.00, false);
-		imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
+		ImageComparison imagecomparison = new ImageComparison(1, 0.00, false, "EXACTLYEQUAL");
+		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 		BufferedImage img = ImageIO.read(fileOut);
 		
 		Assert.assertEquals(reference.getWidth(), img.getWidth());
@@ -150,8 +150,8 @@ public class TimageComparisonResizeImage {
 	 */		
 	@Test
 	public void correctBreakPointExactlyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 1, 0.00, false);
-		imagecomparison.fuzzyEqual(reference, screenshot, fileMask, fileOut);
+		ImageComparison imagecomparison = new ImageComparison(1, 0.00, false, "EXACTLYYEQUAL");
+		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 		BufferedImage img = ImageIO.read(fileOut);
 		
 		Assert.assertEquals(rgbWhite, img.getRGB(49, 49));
