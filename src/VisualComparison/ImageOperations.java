@@ -65,7 +65,7 @@ public class ImageOperations {
 	 * @param compressionFactor
 	 * @param structElementScale
 	 */
-	protected ImageOperations(int compressionFactor, int structElementScale) {
+	protected ImageOperations(int compressionFactor, double structElementScale) {
 		this.rgbBackgroundColor = new Color(255, 255, 255, 0).getRGB();
 		this.rgbForegroundColor = Color.BLACK.getRGB();
 		this.compressionFactor = compressionFactor;
@@ -81,7 +81,7 @@ public class ImageOperations {
 	 * @param compressionFactor
 	 * @param structElementScale
 	 */
-	protected ImageOperations(int rgbBackgroundColor, int rgbForegroundColor, int compressionFactor, int structElementScale) {
+	protected ImageOperations(int rgbBackgroundColor, int rgbForegroundColor, int compressionFactor, double structElementScale) {
 		this.rgbBackgroundColor = rgbBackgroundColor;
 		this.rgbForegroundColor = rgbForegroundColor;
 		this.compressionFactor = compressionFactor;
