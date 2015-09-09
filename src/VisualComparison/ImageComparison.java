@@ -208,10 +208,10 @@ public class ImageComparison {
 		int imageheight = img1.getHeight();
 		for (int x = 0; x < imagewidth; x++) {
 			for (int y = 0; y < imageheight; y++) {
-				int xBlock = x / markingX;
+				int xBlock = x / markingX;											
 				int yBlock = y / markingY;
-				subImageWidth = calcPixSpan(markingX, xBlock, imageWidth);
-				subImageHeight = calcPixSpan(markingY, yBlock, imageHeight);
+ 				subImageWidth = calcPixSpan(markingX, xBlock, imageWidth);			
+				subImageHeight = calcPixSpan(markingY, yBlock, imageHeight);		
 
 				// calculates difference and marks them red if above threshold
 				if ((calculatePixelRgbDiff(x, y, img1, img2) > threshold)) {
@@ -219,7 +219,7 @@ public class ImageComparison {
 					// If trainingMode is on, the pixel will be set black in
 					// the maskImage. The markedImage will not be saved here.
 					if (trainingMode) {
-						colorArea(maskImage, xBlock, yBlock);
+						colorArea(maskImage, xBlock, yBlock);						//TODO
 					}
 
 					else {
@@ -367,8 +367,8 @@ public class ImageComparison {
 		imgOut = imageoperations.scaleImage(shrunkImg2, prevWidth, prevHeight);
 
 		//Scale back the array 
-		for (int x = 0; x < pixels[0].length; x++) {
-			for (int y = 0; x < pixels[1].length; y++) {
+		for (int x = 0; x < pixels.length; x++) {
+			for (int y = 0; x < pixels.length; y++) {
 				pixels[x][y] = pixels[x][y] * pixelPerBlockXY;
 			}
 		}
@@ -398,21 +398,26 @@ public class ImageComparison {
 	}
 
 	/**
-	 * The method determines the difference as humans would see it. Based on a
-	 * comparison algorithm from http://www.compuphase.com/cmetric.htm The
+	 * The method weights the red, green and blue values and 
+	 * determines the difference as humans would see it.
+	 * 
+	 * Based on a comparison algorithm from http://www.compuphase.com/cmetric.htm . The
 	 * algorithm is based on experiments with people, not theoretics. It is
-	 * thereby not certain. An overload of the above method
+	 * thereby not certain.
 	 * 
 	 * @param col1
 	 * @param col2
 	 * @return the difference between the colors as an int value. Higher ->
 	 *         Bigger difference
 	 */
-	protected double calculateColorDifference(int rgb1, int rgb2) {
+	private double calculatePixelRgbDiff(int x, int y, BufferedImage img1, BufferedImage img2) {
 
+		final double MAXDIFF = 721.2489168102785;
+
+		int rgb1 = img1.getRGB(x, y);
+		int rgb2 = img2.getRGB(x, y);
+		
 		// Initialize the red, green, blue values
-		final double MAXDIFF = 7344.36;
-
 		int r1 = (rgb1 >> 16) & 0xFF;
 		int g1 = (rgb1 >> 8) & 0xFF;
 		int b1 = rgb1 & 0xFF;
@@ -435,44 +440,6 @@ public class ImageComparison {
 		double cDiffInPercent = cDiff / MAXDIFF;
 
 		return cDiffInPercent;
-	}
-
-	/**
-	 * Method calculates the RGB difference between two pixels in comparison to
-	 * the maximum possible difference. If one of the pixels is transparent,
-	 * presumably because of the resizeImage method, it will return the
-	 * maxDifference.
-	 * 
-	 * @param x
-	 *            pixelPosition width
-	 * @param y
-	 *            pixelPosition height
-	 * @param img1
-	 *            reference image
-	 * @param img2
-	 *            image to compare
-	 * @return the difference between the pixels
-	 */
-	private double calculatePixelRgbDiff(int x, int y, BufferedImage img1,
-			BufferedImage img2) {
-
-		Color color1 = new Color(img1.getRGB(x, y));
-		Color color2 = new Color(img2.getRGB(x, y));
-
-		int red1 = color1.getRed();
-		int red2 = color2.getRed();
-		int green1 = color1.getGreen();
-		int green2 = color2.getGreen();
-		int blue1 = color1.getBlue();
-		int blue2 = color2.getBlue();
-
-		double maxDifference = Math.max(red1, 255 - red1)
-				+ Math.max(green1, 255 - green1) + Math.max(blue1, 255 - blue1);
-
-		double difference = Math.abs(blue1 - blue2) + Math.abs(red1 - red2)
-				+ Math.abs(green1 - green2);
-
-		return difference / maxDifference;
 	}
 
 	/**
