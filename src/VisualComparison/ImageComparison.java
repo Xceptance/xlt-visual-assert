@@ -475,17 +475,21 @@ public class ImageComparison {
 	 * @param pixels
 	 */
 	private void markDifferences(int[][] pixels) {
-		int lastX = -1;						
-		int lastY = -1;
+
+		int blocksX = imageWidth / markingX;
+		int blocksY = imageHeight / markingY;
+		boolean [][] markedBlocks = new boolean[blocksX][blocksY];
+		for (boolean[] row : markedBlocks) {
+			Arrays.fill(row, false);
+		}
 		for (int x = 0; x < pixels.length; x++) {
 			int xBlock = pixels[x][0] / markingX;
 			int yBlock = pixels[x][1] / markingY;
-			if (xBlock != lastX || yBlock != lastY) {
+			if (!markedBlocks[xBlock][yBlock]) {
 				subImageWidth = calcPixSpan(markingX, xBlock, imageWidth);
 				subImageHeight = calcPixSpan(markingY, yBlock, imageHeight);
-				drawBorders(xBlock, yBlock, markingX, markingY);				//TODO
-				lastX = xBlock;
-				lastY = yBlock;
+				drawBorders(xBlock, yBlock, markingX, markingY);
+				markedBlocks[xBlock][yBlock] = true;
 			}
 		}
 	}
