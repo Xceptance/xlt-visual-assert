@@ -16,12 +16,9 @@ import VisualComparison.ImageComparison;
 /**
  * If one image is smaller then the other, the resizeImage method will adapt
  * their size and fill the formerly nonexistent pixels with transparent black.
- * This class tests whether or not the relevant methods detect the difference
- * between transparent and opaque black.
  * 
- * This Test is supplemented by the TimageComparisonInfluenceAlpha Test. This
- * tests both alpha detection and resizing, but it does not check alpha
- * detection as thoroughly; there are some redundancies between both tests.
+ * This test tests if the previously nonexistent parts in the reference image
+ * or the screenshot were marked.
  * 
  * @author damian
  * 
@@ -39,6 +36,7 @@ public class TimageComparisonResizedImageColor {
 
 	@BeforeClass
 	public static void initializeImages() throws IOException {
+		
 		// Initializes two black images, one with a size of 300*300px, the other
 		// with a size of 30*30
 		reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_ARGB);
@@ -59,88 +57,33 @@ public class TimageComparisonResizedImageColor {
 
 	/**
 	 * Tests if two black images of different sizes are recognized as different
-	 * despite a threshold barely below 1. 
-	 * ImageComparison parameters: 1, 1, 0.9999999, false
+	 * despite a threshold significantly above 1. 
 	 * 
 	 * @throws IOException
 	 */
 	@Test
-	public void testFuzzyEqual() throws IOException {
+	public void testDifferentSizeT() throws IOException {
 		ImageComparison imagecomparison = new ImageComparison(10,
-				0.99999999, false, "FUZZYEQUAL");
+				10, false, false, "PIXELFUZZYEQUAL");
 		boolean result = imagecomparison.isEqual(reference, screenshot,
 				fileMask, fileOut);
 		Assert.assertFalse(
-				"Failure,  images of different size shoudn't be equal - testFuzzyEqual",
+				"Images of different size shoudn't be equal",
 				result);
 	}
 
 	/**
-	 * Tests if two black images of different sizes are recognized as different
-	 * with a threshold of 1. They should NOT be. A threshold of 1 should always
-	 * return true. ImageComparison parameters: 10, 10, 1, false
+	 * Tests if two black images of different sizes are recognized as different with a threshold of 0.
 	 * 
 	 * @throws IOException
 	 */
 	@Test
-	public void testFuzzyEqualThresholdOfOne() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(10, 1, false, "FUZZYEQUAL");
-		boolean result = imagecomparison.isEqual(reference, screenshot,
-				fileMask, fileOut);
-		Assert.assertTrue(
-				"Failure, a threshold of one should return true - testFuzzyEqualThresholdOfOne",
-				result);
-	}
-
-	/**
-	 * Tests if two black images of different sizes are recognized as different
-	 * despite a threshold barely below 1.
-	 * ImageComparison parameters: 1, 1, 0.9999999, false
-	 * 
-	 * @throws IOException
-	 */
-	@Test
-	public void testPixelFuzzyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 0.999,
-				false, "PIXELFUZZYEQUAL");
+	public void testDifferentSize() throws IOException {
+		ImageComparison imagecomparison = new ImageComparison(1, 0.00, false, false, "PIXELFUZZYEQUAL");
 		boolean result = imagecomparison.isEqual(reference, screenshot,
 				fileMask, fileOut);
 		Assert.assertFalse(
-				"Failure,  images of different size shoudn't be equal - testPixelFuzzyEqual",
-				result);
-	}
-
-	/**
-	 * Tests if two black images of different sizes are recognized as different
-	 * despite a threshold barely below 1 They should NOT be. A threshold of 1
-	 * should always return true. 
-	 * ImageComparison parameters: 1, 1, 1, false
-	 * 
-	 * @throws IOException
-	 */
-	@Test
-	public void testPixelFuzzyEqualThresholdOfOne() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 1, false, "PIXELFUZZYEQUAL");
-		boolean result = imagecomparison.isEqual(reference, screenshot,
-				fileMask, fileOut);
-		Assert.assertTrue(
-				"A threshold of 1 should always return true - testPixelFuzzyEqual",
-				result);
-	}
-
-	/**
-	 * Tests if two black images of different sizes are recognized as different.
-	 * ImageComparison parameters: 1, 1, 0.00, false
-	 * 
-	 * @throws IOException
-	 */
-	@Test
-	public void testExactlyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 0.00, false, "EXACTLYEQUAL");
-		boolean result = imagecomparison.isEqual(reference, screenshot,
-				fileMask, fileOut);
-		Assert.assertFalse(
-				"Failure,  images of different size shoudn't be equal - testExactlyEqual",
+				"Images of different size shoudn't be equal",
 				result);
 	}
 

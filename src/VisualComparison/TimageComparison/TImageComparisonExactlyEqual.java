@@ -52,13 +52,13 @@ public class TImageComparisonExactlyEqual {
 	/**
 	 * Checks whether or not the fuzzyEqual method catches the smallest
 	 * difference possible as long as the parameters of ImageComparison are (1,
-	 * 1, 0.0, false)
+	 * 0.0, false, EXACTLYEQUAL)
 	 * 
 	 * @throws IOException
 	 */
 	@Test
 	public void almostEqualButNotQuite() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 0.00, false,"EXACTLYEQUAL");
+		ImageComparison imagecomparison = new ImageComparison(1, 0.00, false,false, "EXACTLY");
 		boolean result = imagecomparison.isEqual(reference, screenshot,
 				fileMask, fileOut);
 		Assert.assertFalse(

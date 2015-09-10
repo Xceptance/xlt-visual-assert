@@ -45,12 +45,13 @@ public class TimageComparisonMask {
 		
 		private final static int rgbBlack = Color.BLACK.getRGB();
 		private final static int rgbWhite = Color.WHITE.getRGB();
+		private final static int rgbTransparentWhite = new Color(255, 255, 255, 0).getRGB();
 		private final int rgbMarked = Color.RED.getRGB();
 				
 		@BeforeClass
 		public static void initializeImages() throws IOException {
 //			Initializes the reference, screenshot and the maskImage;
-			reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
+			reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_ARGB);
 
 			for (int w=0; w<reference.getWidth(); w++) { 
 				for (int h=0; h<reference.getHeight(); h++) {
@@ -58,7 +59,7 @@ public class TimageComparisonMask {
 				}
 			}
 			
-			screenshot = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
+			screenshot = new BufferedImage(300, 300, BufferedImage.TYPE_INT_ARGB);
 			for (int w=0; w<screenshot.getWidth(); w++) { 
 				for (int h=0; h<screenshot.getHeight(); h++) {
 					if (h >= 200) { 
@@ -70,14 +71,14 @@ public class TimageComparisonMask {
 				}	
 			}
 			
-			BufferedImage maskImage = new BufferedImage(300, 300,BufferedImage.TYPE_INT_BGR);
+			BufferedImage maskImage = new BufferedImage(300, 300,BufferedImage.TYPE_INT_ARGB);
 			for (int w=0; w<screenshot.getWidth(); w++) { 
 				for (int h=0; h<screenshot.getHeight(); h++) {
 					if (h >= 250) { 
 						maskImage.setRGB(w, h, rgbBlack);
 					}
 					else {
-						maskImage.setRGB(w, h, rgbWhite);
+						maskImage.setRGB(w, h, rgbTransparentWhite);
 					}
 				}	
 			}
@@ -85,123 +86,55 @@ public class TimageComparisonMask {
 		}	
 		
 		/**
-		 * Tests if the parts where the mask is black and there were differences was NOT marked
-		 * ImageComparison parameters: 10, 10, 0.1, false
-		 * 
-		 * @throws IOException
-		 */
-		@Test
-		public void changesCorrectlyHidden() throws IOException {
-			ImageComparison imagecomparison = new ImageComparison(10, 0.1, false, "FUZZYEQUAL");
-			imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
-			BufferedImage output = ImageIO.read(fileOut);
-			
-			for (int w=0; w<reference.getWidth(); w++) {
-				for (int h=250; h<reference.getHeight(); h++) {
-					Assert.assertEquals(rgbWhite, output.getRGB(w, h));
-				}
-			}
-		}
-		
-		/**
-		 * Tests if the parts where the mask is white and there were differences was marked
-		 * ImageComparison parameters: 10, 10, 0.1, false
+		 * Tests if the parts where the mask is transparent and there were differences was marked
 		 * 
 		 * @throws IOException
 		 */
 		@Test
 		public void changesCorrectlyMarked() throws IOException {
-			ImageComparison imagecomparison = new ImageComparison(10, 0.1, false, "FUZZYEQUAL");
-			imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
-			BufferedImage output = ImageIO.read(fileOut);
-			boolean hasRed = false;
+			ImageComparison imagecomparison = new ImageComparison(10, 0.1, false, false, "PIXELFUZZYEQUAL");
+				
+			boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
+			Assert.assertFalse("A difference that wasn't masked went undetected", result);
+			
+			BufferedImage output = ImageIO.read(fileOut);	
+			
+			//Checks if the unmarked parts have both white and red in them
+			boolean hasWhite = false;
+			boolean isMarked = false;
 			
 			for (int w=0; w<reference.getWidth(); w++) {
 				for (int h=200; h<250; h++) {
-					if (rgbMarked == output.getRGB(w, h)) {
-						hasRed = true;
+					if (output.getRGB(w, h) == rgbWhite) {
+						hasWhite = true;
+					}
+					if (output.getRGB(w, h) == rgbMarked) {
+						isMarked = true;
 					}
 				}
-			}
-			Assert.assertTrue("Unmasked part with changes should be marked", hasRed);
+			}	
+			Assert.assertTrue(hasWhite);
+			Assert.assertTrue(isMarked);
 		}
 		
 		/**
-		 * Tests if the parts where the mask is black and there were differences was NOT marked
-		 * ImageComparison parameters: 1, 1, 0.1, false
+		 * Tests if the parts where the mask is black and there were differences was marked
 		 * 
 		 * @throws IOException
 		 */
 		@Test
-		public void changesCorrectlyHiddenPixelFuzzyEqual() throws IOException {
-			ImageComparison imagecomparison = new ImageComparison(1, 0.1, false, "PIXELFUZZYEQUAL");
+		public void changesCorrectlyHidden() throws IOException {
+			ImageComparison imagecomparison = new ImageComparison(10, 0.1, false, false, "FUZZY");
 			imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 			BufferedImage output = ImageIO.read(fileOut);
 			
 			for (int w=0; w<reference.getWidth(); w++) {
-				for (int h=250; h<reference.getHeight(); h++) {
-					Assert.assertEquals(rgbWhite, output.getRGB(w, h));
+				for (int h=250; h<output.getHeight(); h++) {
+					Assert.assertEquals(Color.BLACK.getRGB(), output.getRGB(w, h));
 				}
 			}
 		}
-		
-		/**
-		 * Tests if the parts where the mask is white and there were differences was marked
-		 * ImageComparison parameters: 1, 1, 0.1, false
-		 * 
-		 * @throws IOException
-		 */
-		@Test
-		public void changesCorrectlyMarkedPixelFuzzyEqual() throws IOException {
-			ImageComparison imagecomparison = new ImageComparison(1, 0.1, false, "PIXELFUZZYEQUAL");
-			imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
-			BufferedImage output = ImageIO.read(fileOut);
-			
-			for (int w=0; w<reference.getWidth(); w++) {
-				for (int h=200; h<250; h++) {
-					Assert.assertEquals(rgbMarked, output.getRGB(w, h));
-				}
-			}
-		}
-		
-		/**
-		 * Tests if the parts where the mask is black and there were differences was NOT marked
-		 * ImageComparison parameters: 1, 1, 0.00, false
-		 * 
-		 * @throws IOException
-		 */
-		@Test
-		public void changesCorrectlyHiddenExactlyEqual() throws IOException {
-			ImageComparison imagecomparison = new ImageComparison(1, 0.00, false, "EXACTLYEQUAL");
-			imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
-			BufferedImage output = ImageIO.read(fileOut);
-			
-			for (int w=0; w<reference.getWidth(); w++) {
-				for (int h=250; h<reference.getHeight(); h++) {
-					Assert.assertEquals(rgbWhite, output.getRGB(w, h));
-				}
-			}
-		}
-		
-		/**
-		 * Tests if the parts where the mask is white and there were differences was marked
-		 * ImageComparison parameters: 1, 1, 0.00, false
-		 * 
-		 * @throws IOException
-		 */
-		@Test
-		public void changesCorrectlyMarkedExactlyEqual() throws IOException {
-			ImageComparison imagecomparison = new ImageComparison(1, 0.00, false, "EXACTLYEQUAL");
-			imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
-			BufferedImage output = ImageIO.read(fileOut);
-			
-			for (int w=0; w<reference.getWidth(); w++) {
-				for (int h=200; h<250; h++) {
-					Assert.assertEquals(rgbMarked, output.getRGB(w, h));
-				}
-			}
-		}
-		
+				
 		/**
 		 * Deletes the temporary files which were created for this test
 		 */

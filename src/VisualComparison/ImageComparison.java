@@ -12,91 +12,110 @@ import java.util.Arrays;
 import javax.imageio.ImageIO;
 
 /**
- * Class for comparison of images, in particular screenshots of websites.
+ * Class for comparison of images, written to continously compare screenshots of
+ * websites. The class consists of a wrapper method isEqual and several internal
+ * methods. It uses the ImageOperations class.
+ * 
+ * The algorithm to be used, fuzzyness parameters and whether or not a mask
+ * should be created is determined at the instantiation. The isEqual method
+ * marks differences with rectangles. Their size can not be changed.
  * 
  * @author lucas & damian
  */
 public class ImageComparison {
 	private BufferedImage imgOut = null;
 	private BufferedImage maskImage = null;
-	private int pixelPerBlockXY, imageWidth, imageHeight, markingX, markingY,
-			subImageWidth, subImageHeight;
-	private double threshold;
+	private int pixelPerBlockXY, imageWidth, imageHeight, subImageWidth,
+			subImageHeight;
+	private final int markingX = 10;
+	private final int markingY = 10;
+	private double colTolerance;
 	private boolean trainingMode;
+	private boolean closeMask;
 
 	protected enum ComparisonAlgorithm {
-		EXACTLYEQUAL, PIXELFUZZYEQUAL, FUZZYEQUAL
+		EXACTLY, PIXELFUZZYEQUAL, FUZZY
 	}
 
 	private final ComparisonAlgorithm algorithm;
 
 	/**
-	 * The parameters pixelPerBlockXY, pixelPerBlockXY and threshold define the
-	 * fuzzyness in the comparison, higher parameters mean a comparison that is
-	 * less strict.
-	 * <p>
-	 * The algorithm divides the image in blocks, the parameters
-	 * pixelPerBlockXY, pixelPerBlockXY define the size of the block. It
-	 * compares the average color in the blocks. The threshold parameter decides
-	 * how big a difference in color will remain unnoticed. For example,
-	 * threshold = 0.2 means a 20% difference will be tolerated.
+	 * The parameters pixelPerBlockXY and colTolerance define the fuzzyness of
+	 * the comparison, higher parameters mean a comparison that is less strict.
+	 * The pixelPerBlock parameter is only used in the 'FUZZY' algorithm, the
+	 * colTolerance in the 'FUZZY' and the 'PIXELFUZZYEQUAL' algorithm.
 	 * <p>
 	 * In case images should only be equal in certain areas or certain areas
-	 * should not be compared, a mask image will be created. Black areas in the
+	 * should not be compared, a mask image can be created. Black areas in the
 	 * mask image will be ignored. Users can manually paint it black or use the
 	 * trainingMode to do so.
 	 * <p>
 	 * If the trainingMode parameter is true, differences will not be marked,
-	 * but the corresponding areas in the mask image will be painted black.
-	 * Barring manual intervention, differences in these areas will not be
-	 * detected in later runs.
+	 * instead the corresponding areas in the mask image will be painted black.
+	 * If the closeMask parameter is true, small gaps in he maskImage will be
+	 * closed. Black areas in the mask image will not be detected in later
+	 * comparisons.
 	 * <p>
 	 * 
 	 * @param pixelPerBlockXY
-	 * @param pixelPerBlockXY
-	 * @param threshold
-	 * @param trainingMod
+	 *            in the fuzzyEqual method, the images are divided into blocks
+	 *            for further fuzzyness. This parameter determines the width and
+	 *            height of the blocks.
+	 * @param colTolerance
+	 *            up to where small differences in color should be tolerated. A
+	 *            value between zero and one should be given. Zero: No
+	 *            tolerance.
+	 * @param trainingMode
+	 *            whether or not the training mode should be used
+	 * @param closeMask
 	 * @param comparisonAlgorithm
+	 *            the algorithm the comparison should use. If the given string
+	 *            does not match any algorithm, it throws an
+	 *            IllegalArgumentException.
 	 */
-	public ImageComparison(int pixelPerBlockXY, double threshold,
-			boolean trainingMode, String algorithm) {
+	public ImageComparison(int pixelPerBlockXY, double colTolerance,
+			boolean trainingMode, boolean closeMask, String algorithm) {
 		this.pixelPerBlockXY = pixelPerBlockXY;
-		this.threshold = threshold;
+		this.colTolerance = colTolerance;
 		this.trainingMode = trainingMode;
-		markingX = 8;
-		markingY = 8;
+		this.closeMask = closeMask;
 
 		try {
 			this.algorithm = ComparisonAlgorithm.valueOf(algorithm);
 		} catch (IllegalArgumentException e) {
 			throw new IllegalArgumentException("Specified algorithm not found");
 		}
-
 	}
 
 	/**
 	 * Wrapper method for the different comparison methods. Handles resizing,
-	 * mask initialization and mask overlay. Calls the comparison method And
-	 * saves the markedImage. Also marks the resized parts.
-	 * 
-	 * Does not modify the maskImage, that happens in the actual comparison
-	 * methods. It does however save the maskImage.
+	 * masking, calls the comparison method and marks the differences or masks
+	 * them if trainingMode is true. Also saves the marked image/ the mask
+	 * image.
 	 * 
 	 * @param img1
+	 *            the reference image
 	 * @param img2
-	 * @param maskImage
+	 *            the image that will be compared to the reference image
+	 * @param fileMask
+	 *            the file where the mask image can be found or where it should
+	 *            be created
 	 * @param fileOut
+	 *            the file where the marked image should be saved if there are
+	 *            differences
 	 * @return false if there were changes, true otherwise
 	 * @throws IOException
 	 */
 	public boolean isEqual(BufferedImage img1, BufferedImage img2,
 			File fileMask, File fileOut) throws IOException {
 
+		boolean isEqual = true;
+
 		// Initializes ImageOperations object to access it's methods later
 		ImageOperations imageoperations = new ImageOperations();
 
 		// Checks if one image is smaller then the other and if yes which.
-		// Increases width/ height so the images will have the same.
+		// Increases width/ height so the images will have the same size.
 		// The original Images will be in the top left corner
 		// Remembers the previous width and height so it can be marked later
 		int prevWidth = img1.getWidth();
@@ -106,11 +125,11 @@ public class ImageComparison {
 		while (img1.getWidth() != img2.getWidth()) {
 			if (img1.getWidth() > img2.getWidth()) {
 				prevWidth = img2.getWidth();
-				imageoperations.increaseImageSize(img2, img1.getWidth(),
+				img2 = imageoperations.increaseImageSize(img2, img1.getWidth(),
 						img2.getHeight());
 			}
 			if (img2.getWidth() > img1.getWidth()) {
-				imageoperations.increaseImageSize(img1, img2.getWidth(),
+				img1 = imageoperations.increaseImageSize(img1, img2.getWidth(),
 						img1.getHeight());
 			}
 		}
@@ -130,58 +149,67 @@ public class ImageComparison {
 
 		imageWidth = img2.getWidth();
 		imageHeight = img2.getHeight();
+
+		// copies the images, so it doesn't work directly on them
 		imgOut = imageoperations.copyImage(img2);
+		BufferedImage copyImg1 = imageoperations.copyImage(img1);
 
 		// initializes maskImage and masks both images:
-		maskImage = initializeMaskImage(img1, fileMask);
-		img1 = overlayMaskImage(img1, maskImage);
-		imgOut = overlayMaskImage(imgOut, maskImage);
+		maskImage = initializeMaskImage(copyImg1, fileMask);
+		copyImg1 = imageoperations.overlayImage(copyImg1, maskImage);
+		imgOut = imageoperations.overlayImage(imgOut, maskImage);
 
-		BufferedImage markedImage = null;
 		int[][] differentPixels = null;
 
 		// Checks which imagecomparison method to call and calls it.
 		// Sets the differentPixels array
 		switch (algorithm) {
-		case EXACTLYEQUAL:
-			differentPixels = exactlyEqual(img1, imgOut);
+		case EXACTLY:
+			differentPixels = exactlyEqual(copyImg1, imgOut);
 			break;
 		case PIXELFUZZYEQUAL:
-			differentPixels = pixelFuzzyEqual(img1, imgOut);
+			differentPixels = pixelFuzzyEqual(copyImg1, imgOut);
 			break;
-		case FUZZYEQUAL:
-			differentPixels = fuzzyEqual(img1, imgOut);
+		case FUZZY:
+			differentPixels = fuzzyEqual(copyImg1, imgOut);
 			break;
 		}
 
 		if (differentPixels != null) {
 			if (trainingMode) {
-				// Mask differences in the maskImage
-				// save it and return true
-				maskDifferences(differentPixels);
-				ImageIO.write(maskImage, "PNG", fileMask);
-				return true;
-			} else {
 
+				// Mask differences in the maskImage
+				// if closeMask is true, close the mask,
+				// save the mask and return true in any case
+				maskDifferences(differentPixels);
+				if (closeMask) {
+					imageoperations = new ImageOperations();
+					maskImage = imageoperations.closeImage(maskImage);
+				}
+				ImageIO.write(maskImage, "PNG", fileMask);
+				isEqual = true;
+			} else {
 				// Mark the differences
 				markDifferences(differentPixels);
-				markedImage = imgOut;
-
-				// Mark the previously not existent areas, save the image and
-				// return false
-				markedImage = markImageBorders(markedImage, prevWidth,
-						prevHeight);
-				ImageIO.write(markedImage, "PNG", fileOut);
-
-				return false;
+				isEqual = false;
 			}
-		} else {
+		}
+		// If the size changed, mark the differences
+		if (prevWidth != imgOut.getWidth() || prevHeight != imgOut.getHeight()) {
+			imgOut = markImageBorders(imgOut, prevWidth, prevHeight);
+			isEqual = false;
+		}
+
+		if (isEqual) {
 			return true;
+		} else {
+			ImageIO.write(imgOut, "PNG", fileOut);
+			return false;
 		}
 	}
 
 	/**
-	 * Method for the pixel based comparison with a threshold. So it will
+	 * Method for the pixel based comparison with a colTolerance. So it will
 	 * compare pixel by pixel, but it will have a certain tolerance.
 	 * <p>
 	 * If the images do not have the same size, the difference in size will be
@@ -213,8 +241,8 @@ public class ImageComparison {
 
 				// calculates difference and adds the coordinates to
 				// the relevant ArrayList if the difference is above the
-				// threshold
-				if ((calculatePixelRgbDiff(x, y, img1, img2) > threshold)) {
+				// colTolerance
+				if ((calculatePixelRgbDiff(x, y, img1, img2) > colTolerance)) {
 					xCoords.add(x);
 					yCoords.add(y);
 					equal = false;
@@ -345,59 +373,52 @@ public class ImageComparison {
 				0.2);
 		BufferedImage shrunkImg1 = imageoperations.shrinkImage(img1);
 		BufferedImage shrunkImg2 = imageoperations.shrinkImage(img2);
-		maskImage = imageoperations.shrinkImage(maskImage);
 
 		int[][] pixels = pixelFuzzyEqual(shrunkImg1, shrunkImg2);
 
 		// If there's a difference ...
 		if (pixels != null) {
 
-			// Scale back the maskImage and img2
-			maskImage = imageoperations.scaleImage(maskImage, prevWidth,
-					prevHeight);
+			// Scale back img2
 			imgOut = imageoperations.scaleImage(shrunkImg2, prevWidth,
 					prevHeight);
 
-			int l = pixels.length;
 			// Scale back the array ...
 			// For that, just mark every pixel in the scaling block
 			// Created with pixelPerBlockXY
 			// Much room for performance increase here
-			
-			//It could be just one pixel in every marking block
-			//And no pixels over the border
-			
-			int size = pixels.length * pixelPerBlockXY * pixelPerBlockXY;			
+
+			// It could be just one pixel in every marking block
+			// And no pixels over the border
+
+			int size = pixels.length * pixelPerBlockXY * pixelPerBlockXY;
 			int xCoordinates;
 			int yCoordinates;
-			
+
 			int[][] scaledPixels = new int[size][2];
 			int indexScaledPixels = 0;
-			
+
 			// Go through every non-scaled pixel difference
 			for (int i = 0; i < pixels.length; i++) {
 				xCoordinates = pixels[i][0];
 				yCoordinates = pixels[i][1];
-				
-				//Go through every pixel in the block
-				for (int x = xCoordinates * pixelPerBlockXY; x < (xCoordinates + 1) * pixelPerBlockXY; x++) {						
-					for (int y = yCoordinates * pixelPerBlockXY; y < (yCoordinates + 1) * pixelPerBlockXY; y++) {
-						
-						//And set the resulting coordinates in the scaled pixels array
-						if (x == 1682000 && y == 1682000) {							//DEBUG TODO
-							System.out.println("");
-						}
-						
+
+				// Go through every pixel in the block
+				for (int x = xCoordinates * pixelPerBlockXY; x < (xCoordinates + 1)
+						* pixelPerBlockXY; x++) {
+					for (int y = yCoordinates * pixelPerBlockXY; y < (yCoordinates + 1)
+							* pixelPerBlockXY; y++) {
+
 						scaledPixels[indexScaledPixels][0] = x;
 						scaledPixels[indexScaledPixels][1] = y;
 						indexScaledPixels++;
 					}
 				}
 			}
-			
+
 			return scaledPixels;
 		}
-		
+
 		else {
 			return null;
 		}
@@ -500,7 +521,7 @@ public class ImageComparison {
 
 		int blocksX = imageWidth / markingX;
 		int blocksY = imageHeight / markingY;
-		boolean[][] markedBlocks = new boolean[blocksX][blocksY];
+		boolean[][] markedBlocks = new boolean[blocksX + 1][blocksY + 1];
 		for (boolean[] row : markedBlocks) {
 			Arrays.fill(row, false);
 		}
@@ -622,14 +643,13 @@ public class ImageComparison {
 	 */
 	private BufferedImage markImageBorders(BufferedImage img, int startW,
 			int startH) {
-		final int redRgb = Color.RED.getRGB();
-		int[] imgArray = ((DataBufferInt) img.getRaster().getDataBuffer())
-				.getData();
-		for (int w = startW; w < img.getWidth(); w++) {
-			for (int h = startH; h < img.getHeight(); h++) {
-				imgArray[(h - 1) * w + w] = redRgb;
-			}
-		}
+		final Color markColor = Color.RED;
+		Graphics g = img.getGraphics();
+		g.setColor(markColor);
+		g.fillRect(startW, 0, img.getWidth() - startW, img.getHeight());
+		g.fillRect(0, startH, img.getWidth(), img.getHeight() - startH);
+		g.dispose();
+
 		return img;
 	}
 
@@ -654,12 +674,6 @@ public class ImageComparison {
 			BufferedImage mask = ImageIO.read(file);
 			if ((mask.getWidth() == img.getWidth())
 					&& (mask.getHeight() == img.getHeight())) {
-
-				// //Initialize an ImageOperations object and close the mask
-				// image
-				// ImageOperations imageoperations = new ImageOperations();
-				// mask = imageoperations.closeImage(mask);
-
 				return mask;
 			}
 		}
@@ -672,27 +686,5 @@ public class ImageComparison {
 				.getData();
 		Arrays.fill(maskArray, rgbTransparentWhite);
 		return mask;
-	}
-
-	/**
-	 * Overlays one image over another. Intended for use with a mask image where
-	 * every pixel is either transparent white or fully black. Should be used on
-	 * both images before they are compared. That way differences will be
-	 * ignored if the mask image is black in that area.
-	 * 
-	 * @param imageToMask
-	 *            the image that should be masked, ie one of the images to
-	 *            compare
-	 * @param maskImage
-	 *            the maskimage consisting of transparent, white pixels and
-	 *            black pixels
-	 * @return
-	 */
-	private BufferedImage overlayMaskImage(BufferedImage imageToMask,
-			BufferedImage maskImage) {
-		Graphics gImageToMask = imageToMask.getGraphics();
-		gImageToMask.drawImage(maskImage, 0, 0, null);
-		gImageToMask.dispose();
-		return imageToMask;
 	}
 }

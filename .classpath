@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry excluding="foo/|foo/" kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="lib" path="lib/thumbnailator-0.4.7.jar"/>
 	<classpathentry kind="lib" path="/home/daniel/xlt-4.5.5/lib/aws-java-sdk-core-1.9.3.jar"/>
 	<classpathentry kind="lib" path="/home/daniel/xlt-4.5.5/lib/aws-java-sdk-ec2-1.9.3.jar"/>
 	<classpathentry kind="lib" path="/home/daniel/xlt-4.5.5/lib/commons-cli-1.2.jar"/>

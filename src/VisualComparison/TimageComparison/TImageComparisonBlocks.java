@@ -14,15 +14,12 @@ import org.junit.Test;
 import VisualComparison.ImageComparison;
 
 /**
- * Tests whether or not the pixelPerBlock parameters are working as expected. 
- * Also tests if the method can handle it if the blocks would go over the border
+ * Tests if the method can handle it if the blocks would go over the border
  *
  * @author damian
  *
  */
 public class TImageComparisonBlocks {
-//	The initialized images have a difference every tenth pixel. 
-//	With a threshold of 0.1, the methods should return true if there is one pixel per block.
 
 	private static BufferedImage reference;
 	private static BufferedImage screenshot;
@@ -57,46 +54,16 @@ public class TImageComparisonBlocks {
 	}	
 	
 	/**
-	 * Tests if the block calculations are working as expected 
-	 * @throws IOException
-	 */
-	@Test	
-	public void blocksCalculations() throws IOException {
-//		The blocks are exactly ten pixels wide, there should be one difference every tenth pixel
-		ImageComparison imagecomparison1 = new ImageComparison(10, 0.1, false, "FUZZYEQUAL");
-		boolean result = imagecomparison1.isEqual(reference, screenshot, fileMask, fileOut);
-		Assert.assertTrue("With these parameters, fuzzyEqual should be true - result: " + result, result);
-		
-//		The blocks are slightly wider then ten pixels and should shift relative to the image 
-//		until there are two differences in one block
-		ImageComparison imagecomparison2 = new ImageComparison(11, 0.1, false, "FUZZYEQUAL");
-		result = imagecomparison2.isEqual(reference, screenshot, fileMask, fileOut);
-		Assert.assertFalse("With these parameters, fuzzyEqual should be false - result: " + result, result);
-		
-//		The blocks are slightly smaller then ten pixels and should shift relative to he image
-//		until there are two differences in one block
-		ImageComparison imagecomparison3 = new ImageComparison(9, 0.1, false, "FUZZYEQUAL");
-		result = imagecomparison3.isEqual(reference, screenshot, fileMask, fileOut);
-		Assert.assertFalse("With these parameters, fuzzyEqual should be false - result: " + result, result);
-	}
-	
-	/**
 	 * Tests what happens if the blocks go over the border
 	 * @throws IOException
 	 */
 	@Test				
-	public void blocksGoOverBorderLeft() throws IOException {
-//		This test what happens if the borders go over the edge on the right
-//		It should also check the drawBorders method, since the treshold is so low, it should find differences everywhere
-		ImageComparison imagecomparison1 = new ImageComparison(14, 0.0000000000000001, false, "FUZZYEQUAL");
-		boolean result = imagecomparison1.isEqual(reference, screenshot, fileMask, fileOut);
-		Assert.assertFalse("the drawBorders function could not be tested, " +
-				"blocksGoOverBorderLeft didn't find a difference to mark", result);
+	public void blocksGoOverBorder() throws IOException {
 		
-//		This test tests what happens if the borders go over the edge on the bottom
+//		This test tests what happens if the borders go over the edge
 //		It should also check the drawBorders method, since the treshold is so low, it should find differences everywhere
-		ImageComparison imagecomparison2 = new ImageComparison(28, 0.0000000000000001, false, "FUZZYEQUAL");
-		result = imagecomparison2.isEqual(reference, screenshot, fileMask, fileOut);
+		ImageComparison imagecomparison2 = new ImageComparison(20, 0.0, false, false, "FUZZY");
+		boolean result = imagecomparison2.isEqual(reference, screenshot, fileMask, fileOut);
 		Assert.assertFalse("the drawBorders function could not be tested, " +
 				"blocksGoOverBorderLeft didn't find a difference to mark", result);
 	}

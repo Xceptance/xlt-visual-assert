@@ -13,7 +13,8 @@ import org.junit.Test;
 import VisualComparison.ImageComparison;
 
 /**
- * Tests the correct behavior of ImageComparison for differently sized images
+ * Tests the return value of ImageComparison for differently sized images.
+ * It should return false for images of different sizes.
  * 
  * @author Lucas
  * 
@@ -21,7 +22,7 @@ import VisualComparison.ImageComparison;
 public class TImageComparisonMarkSizes {
 	static BufferedImage reference, slim, wide, low, high, slimAndLow,
 			wideAndHigh, switched;
-	ImageComparison imgCompare = new ImageComparison(2, 0.00, false, "FUZZYEQUAL");
+	ImageComparison imgCompare = new ImageComparison(2, 0.00, false, false, "FUZZY");
 	static File directory = org.apache.commons.lang3.SystemUtils
 			.getJavaIoTmpDir();
 	static File outPutfile = new File(directory + "/test.png");
