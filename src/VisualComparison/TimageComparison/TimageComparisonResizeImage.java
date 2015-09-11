@@ -22,7 +22,7 @@ import VisualComparison.ImageComparison;
  * Tests if the resizing when images of different size are compared is working as expected.
  * Specifically it tests if the resulting marked image has the correct size,
  * if the screenshot image was correctly copied to the marked image and
- * if it marked the formerly nonexistent part and did not mark the formerly existent parts. 
+ * if it marked the formerly nonexistent parts and did not mark the formerly existent parts. 
  * 
  * 
  * @author damian
@@ -62,7 +62,7 @@ public class TimageComparisonResizeImage {
 	 */
 	@Test
 	public void correctSizePixelFuzzyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 0.01, false, false, "PIXELFUZZYEQUAL");
+		ImageComparison imagecomparison = new ImageComparison(1, 0.01, false, false, "PIXELFUZZY");
 		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 		BufferedImage img = ImageIO.read(fileOut);
 		
@@ -73,13 +73,13 @@ public class TimageComparisonResizeImage {
 	/**
 	 * Tests if the screenshot image was correctly copied and not marked.
 	 * And if the formerly nonexistent areas were marked
-	 * ImageComparison Parameters: 1, 1, 0.01, false
+	 * ImageComparison Parameters: 1, 1, 0.01, false, false, PIXELFUZZY
 	 * 
 	 * @throws IOException
 	 */
 	@Test
 	public void correctBreakPointPixelFuzzyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 0.01, false, false, "PIXELFUZZYEQUAL");
+		ImageComparison imagecomparison = new ImageComparison(1, 0.01, false, false, "PIXELFUZZY");
 		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 		BufferedImage img = ImageIO.read(fileOut);
 		

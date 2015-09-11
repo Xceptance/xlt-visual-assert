@@ -8,32 +8,39 @@ import java.io.IOException;
 
 /**
  * Provides methods to perform operations on images. Methods are shrinking,
- * scaling, resizing, erosion, dilation and closing.
+ * scaling, increasing, copying, overlay, erosion, dilation and closing. Written
+ * for use in ImageComparison.
  * <p>
- * For erosion and dilation, the background/ foreground colors can be manually
- * set, defaults are below. The structure element is always a square filled with
- * ones. It's width and height are relative to the image it is performing an
- * erosion or dilation on. The relative size can be set with the
- * structElementScale attribute, it's default value can be found below.
+ * The scaling factor for the shrinkImage method can be set in the constructor;
+ * with the compressionFactor parameter. The width and height of the image will
+ * be divided by the compressionFactor to form the width and height of the new
+ * image.
+ * 
+ * Regarding erosion, dilation and closing: The background/ foreground colors
+ * can be manually set, defaults are below. The structure element is always a
+ * square filled with ones. It's width and height are relative to the image it
+ * is performing an erosion or dilation on. The relative size can be set with
+ * the structElementScale attribute, it's default value can be found below.
  * <p>
  * For an example: If an image has a width and height of 1000 pixels and it is
  * shrinked with a compressionFactor of 10, the shrinked image will be 100
  * pixels wide and high. With structElementScale = 0.1, the structure element to
  * that image will be 10 pixels wide and high.
  * <p>
- * I bigger structElementScale means a bigger structElement which means the
+ * A bigger structElementScale means a bigger structElement which means the
  * erosion, dilation and closing methods have more impact. So the erosion will
  * erode more, the dilation will dilate more and the closing method will close
  * wider gaps.
  * <p>
- * The compressionFactor, meaning the pixels per block in x and y direction can
- * be set in the constructor.
+ * These methods were only made to work with binary images.
  * <p>
  * The constructor without parameters initializes these defaults:
  * <p>
- * Foreground color: Black from the import java.awt.Color class, Color.BLACK
+ * Foreground color: Black from the java.awt.Color class, Color.BLACK <br>
  * Background color: Transparent white with rgb values of 255, 255, 255 and
- * alpha = 0 CompressionFactor: 10 structElementScale: 0.1
+ * alpha = 0 <br>
+ * CompressionFactor: 10 <br>
+ * structElementScale: 0.1 <br>
  * 
  * @author damian
  * 
@@ -46,8 +53,8 @@ public class ImageOperations {
 	double structElementScale;
 
 	/**
-	 * Sets the background/ foreground colors for erosion/ dilation and
-	 * derivative methods.
+	 * Sets the background/ foreground colors for erosion/ dilation and the
+	 * derivative closing method.
 	 * <p>
 	 * Background color: Transparent white. <br>
 	 * Foreground color: Black.
@@ -65,7 +72,10 @@ public class ImageOperations {
 	 * (Parameter structElementScale)
 	 * 
 	 * @param compressionFactor
+	 *            the compressionFactor for shrinkImage
 	 * @param structElementScale
+	 *            to determine the size of the structuring element for erosion/
+	 *            dilation
 	 */
 	protected ImageOperations(int compressionFactor, double structElementScale) {
 		this.rgbBackgroundColor = new Color(255, 255, 255, 0).getRGB();
@@ -79,11 +89,14 @@ public class ImageOperations {
 	 * dilation methods and derivative methods.
 	 * 
 	 * @param rgbBackgroundColor
-	 *            the rgb value of the background color
+	 *            the rgb value of the background color for erosion/ dilation
 	 * @param rgbForegroundColor
-	 *            the rgb value of the foreground color
+	 *            the rgb value of the foreground color erosion/ dilation
 	 * @param compressionFactor
+	 *            the compressionFactor for shrinkImage
 	 * @param structElementScale
+	 *            to determine the size of the structuring element for erosion/
+	 *            dilation
 	 */
 	protected ImageOperations(int rgbBackgroundColor, int rgbForegroundColor,
 			int compressionFactor, double structElementScale) {
@@ -137,7 +150,7 @@ public class ImageOperations {
 	 * @param img
 	 * @param width
 	 * @param height
-	 * @return
+	 * @return the resulting image
 	 */
 	protected BufferedImage increaseImageSize(BufferedImage img, int width,
 			int height) {
@@ -177,7 +190,7 @@ public class ImageOperations {
 	}
 
 	/**
-	 * Overlays one image over another. Uses transparency
+	 * Overlays one image over another. Uses transparency.
 	 * 
 	 * @param image
 	 * 
@@ -197,27 +210,19 @@ public class ImageOperations {
 	 * Creates and returns an erosion image, using the alorithm from
 	 * morphological image processing.
 	 * <p>
-	 * Assumes the structuring element is filled with 1 and thereby only needs
-	 * it's width and height. The origin is placed in the middle of the
+	 * Assumes the structuring element is filled with ones and thereby only
+	 * needs it's width and height. The origin is placed in the middle of the
 	 * structuring element. If width and/ or height are even, they are
 	 * incremented to make sure there is a middle pixel.
 	 * 
-	 * 
 	 * @param img
+	 *            the image to erode
 	 * @param structElementWidth
 	 * @param structElementHeight
-	 * @return
+	 * @return the eroded image
 	 */
-	protected BufferedImage erodeImage(BufferedImage img) {
-
-		int structElementWidth = (int) Math.floor(img.getWidth() * structElementScale);
-		int structElementHeight = (int) Math.floor(img.getHeight() * structElementScale);
-
-		if (structElementWidth == 1 || structElementHeight == 1) {
-			throw new IllegalArgumentException(
-					"The comressionFactor and structElementScale lead to "
-							+ "to small a structure element. Increase at least one of them.");
-		}
+	protected BufferedImage erodeImage(BufferedImage img,
+			int structElementWidth, int structElementHeight) {
 
 		BufferedImage erosionedImage = new BufferedImage(img.getWidth(),
 				img.getHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -279,27 +284,23 @@ public class ImageOperations {
 	 * Creates and returns a dilation image using the algorithm for
 	 * morphological image processing.
 	 * <p>
-	 * Assumes the structuring element is filled with 1 and thereby only needs
-	 * it's width and height. The origin is placed in the middle of the
+	 * Assumes the structuring element is filled with ones and thereby only
+	 * needs it's width and height. The origin is placed in the middle of the
 	 * structuring element. If width and/ or height are even, they are
 	 * incremented to make sure there is a middle pixel.
+	 * <p>
+	 * Uses the rgbForegroundColor and rgbBackgroundColor instance variables to
+	 * determine the background and the foreground color.
 	 * 
 	 * @param img
+	 *            the image to dilate
 	 * @param structElementWidth
 	 * @param structElementHeight
-	 * @return
-	 * @throws IOException 
+	 * @return the dilated image
+	 * @throws IOException
 	 */
-	protected BufferedImage dilateImage(BufferedImage img) throws IOException {
-
-		int structElementWidth = (int) Math.floor(img.getWidth() * structElementScale);
-		int structElementHeight = (int) Math.floor(img.getHeight() * structElementScale);
-
-		if (structElementWidth <= 1 || structElementHeight <= 1) {
-			throw new IllegalArgumentException(
-					"The comressionFactor and structElementScale lead to "
-							+ "to small a structure element. Increase at least one of them.");
-		}
+	protected BufferedImage dilateImage(BufferedImage img,
+			int structElementWidth, int structElementHeight) throws IOException {
 
 		BufferedImage dilationImage = new BufferedImage(img.getWidth(),
 				img.getHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -307,7 +308,7 @@ public class ImageOperations {
 
 		// The origin of the structuring element will be it's middle pixel
 		// Therefore make sure there is a middle pixel, ie make width and height
-		// uneven
+		// uneven.
 		if ((structElementWidth % 2) == 0) {
 			structElementWidth++;
 		}
@@ -320,8 +321,8 @@ public class ImageOperations {
 		for (int w = 0; w < img.getWidth(); w++) {
 			for (int h = 0; h < img.getHeight(); h++) {
 
-				hits = false;			
-				
+				hits = false;
+
 				// Check every pixel of the structured element
 				// against the pixel it metaphorically overlaps
 				// There might be some room for performance increase here
@@ -337,7 +338,8 @@ public class ImageOperations {
 
 							// Assumes all the pixels in the structureImage are
 							// 1. If the pixel is black, set hits true, set the
-							// pixel in the dilationImage to the foreground color
+							// pixel in the dilationImage to the foreground
+							// color
 							// and break the loop
 							if (img.getRGB(x, y) == rgbForegroundColor) {
 								hits = true;
@@ -358,17 +360,37 @@ public class ImageOperations {
 	}
 
 	/**
-	 * Closes an image using the dilation and erosion methods in this class
+	 * Closes an image using the dilation and erosion methods. Determines the
+	 * width and height of the structuring element using the instance
+	 * variable structElementScale. The width and height will be the the 
+	 * with and height of the image multiplied by structElementScale.
 	 * 
 	 * @param img
-	 * @param structElementWidth
-	 * @param structElementHeight
-	 * @return
-	 * @throws IOException 
+	 *            the image to close
+	 * @return the closed image
+	 * @throws IOException
 	 */
 	protected BufferedImage closeImage(BufferedImage img) throws IOException {
-		img = dilateImage(img);
-		img = erodeImage(img);
+
+		//Scale the image for performance reasons.
+		BufferedImage shrunkImg = shrinkImage(img);
+
+		int structElementWidth = (int) Math.floor(shrunkImg.getWidth()
+				* structElementScale);
+		int structElementHeight = (int) Math.floor(shrunkImg.getHeight()
+				* structElementScale);
+
+		if (structElementWidth == 1 || structElementHeight == 1) {
+			throw new IllegalArgumentException(
+					"The comressionFactor and structElementScale lead to "
+							+ "to small a structure element. Increase at least one of them.");
+		}
+
+		shrunkImg = dilateImage(shrunkImg, structElementWidth, structElementHeight);
+		shrunkImg = erodeImage(shrunkImg, structElementWidth, structElementHeight);
+		
+		//Scale the image back
+		img = scaleImage(shrunkImg, img.getWidth(), img.getHeight());
 		return img;
 	}
 }

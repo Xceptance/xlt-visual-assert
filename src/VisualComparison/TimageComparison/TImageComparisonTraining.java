@@ -13,6 +13,12 @@ import org.junit.Test;
 
 import VisualComparison.ImageComparison;
 
+/**
+ * Tests if the training mode marks what it should.
+ * 
+ * @author daniel
+ *
+ */
 public class TImageComparisonTraining {
 	static BufferedImage reference, newImage;
 	ImageComparison fuzzyTraining = new ImageComparison(10, 0.00, true,
@@ -24,9 +30,9 @@ public class TImageComparisonTraining {
 	ImageComparison exactlyCompare = new ImageComparison(1, 0.00, false,
 			false, "EXACTLY");
 	ImageComparison pixelFuzzyTraining = new ImageComparison(1, 0.01, true,
-			false, "PIXELFUZZYEQUAL");
+			false, "PIXELFUZZY");
 	ImageComparison pixelFuzzyCompare = new ImageComparison(1, 0.01, false,
-			false, "PIXELFUZZYEQUAL");
+			false, "PIXELFUZZY");
 	static File directory = org.apache.commons.lang3.SystemUtils
 			.getJavaIoTmpDir();
 	static File outPutfile = new File(directory + "/test.png");

@@ -14,10 +14,9 @@ import org.junit.Test;
 import VisualComparison.ImageComparison;
 
 /**
- * Tests if the method can handle it if the blocks would go over the border
+ * Tests if the method can handle it should the blocks would go over the border
  *
  * @author damian
- *
  */
 public class TImageComparisonBlocks {
 
@@ -33,14 +32,14 @@ public class TImageComparisonBlocks {
 	
 	@BeforeClass
 	public static void initializeImages() {
-		reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
+		reference = new BufferedImage(301, 301, BufferedImage.TYPE_INT_RGB);
 		for (int w=0; w<reference.getWidth(); w++) { 
 			for (int h=0; h<reference.getHeight(); h++) {
 				reference.setRGB(w, h, rgbBlack);
 			}
 		}
 		
-		screenshot = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
+		screenshot = new BufferedImage(301, 301, BufferedImage.TYPE_INT_RGB);
 		for (int w=0; w<screenshot.getWidth(); w++) { 
 			for (int h=0; h<screenshot.getHeight(); h++) {
 				if ((w % 10) == 0) { 
@@ -64,8 +63,7 @@ public class TImageComparisonBlocks {
 //		It should also check the drawBorders method, since the treshold is so low, it should find differences everywhere
 		ImageComparison imagecomparison2 = new ImageComparison(20, 0.0, false, false, "FUZZY");
 		boolean result = imagecomparison2.isEqual(reference, screenshot, fileMask, fileOut);
-		Assert.assertFalse("the drawBorders function could not be tested, " +
-				"blocksGoOverBorderLeft didn't find a difference to mark", result);
+		Assert.assertFalse("This wasn't what the test is for, but it's still wrong", result);
 	}
 	
 	/**

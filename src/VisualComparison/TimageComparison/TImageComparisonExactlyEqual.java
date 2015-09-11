@@ -17,7 +17,6 @@ import VisualComparison.ImageComparison;
  * Tests if the smallest possible difference would be detected
  * 
  * @author damian
- * 
  */
 public class TImageComparisonExactlyEqual {
 	private static BufferedImage reference;

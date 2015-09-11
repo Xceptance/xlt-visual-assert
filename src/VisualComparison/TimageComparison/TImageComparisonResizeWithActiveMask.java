@@ -19,9 +19,7 @@ import VisualComparison.ImageComparison;
 
 /**
  * Tests whether an existent mask would be used if the screenshot image is
- * smaller or bigger. It should not be. A change in size means a new mask image
- * will be created.
- * 
+ * smaller or bigger. It should not be. A change in size should mean a new mask image.
  * 
  * @author damian
  */
@@ -71,7 +69,7 @@ public class TImageComparisonResizeWithActiveMask {
 	@Test
 	public void biggerScreenshotImage() throws IOException {
 		ImageComparison imagecomparison1 = new ImageComparison(10, 0.1, false,
-				false, "PIXELFUZZYEQUAL");
+				false, "PIXELFUZZY");
 		boolean result = imagecomparison1.isEqual(smallBlackImg, bigWhiteImg,
 				fileMask, fileOut);
 		Assert.assertFalse("Former maskImage shouldn't be used if the "
@@ -86,11 +84,11 @@ public class TImageComparisonResizeWithActiveMask {
 	@Test
 	public void smallerScreenshotImage() throws IOException {
 		ImageComparison imagecomparison1 = new ImageComparison(10, 0.1, false,
-				false, "PIXELFUZZYEQUAL");
+				false, "PIXELFUZZY");
 		boolean result = imagecomparison1.isEqual(bigWhiteImg, smallBlackImg,
 				fileMask, fileOut);
 		Assert.assertFalse("Former maskImage shouldn't be used if the "
-				+ "screenshot has a bigger size - result: " + result, result);
+				+ "screenshot has a smaller size - result: " + result, result);
 	}
 
 	/**

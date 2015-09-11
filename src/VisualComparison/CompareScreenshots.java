@@ -24,8 +24,8 @@ import com.xceptance.xlt.api.util.XltProperties;
  * A java module for the visual comparison of websites implementing the
  * WebDriverCustomModule. For the comparison itself, the ImageComparison class
  * is used. The ImageComparison class uses the ImageOperations class. <br>
- * The java module is written for use in an Xlt test case. Selenium
- * APIs were also used.
+ * The java module is written for use in an Xlt test case. Selenium APIs were
+ * also used.
  * 
  * @author lucas & damian
  */
@@ -34,7 +34,7 @@ public class CompareScreenshots implements WebDriverCustomModule {
 	final String DWAITTIME = "100";
 	final String DPIXELPBLOCKXY = "20";
 	final String TDIFFERENCES = "0.05";
-	final String DALGORITHM = "FUZZYEQUAL";
+	final String DALGORITHM = "FUZZY";
 
 	/**
 	 * No parameters beyond the webdriver are required. Necessary and possible
@@ -63,13 +63,12 @@ public class CompareScreenshots implements WebDriverCustomModule {
 	 * barring manual intervention, differences in these areas will not be
 	 * detected in later runs. <br>
 	 * <p>
-	 * <p>
 	 * Properties and their default values:
 	 * com.xceptance.xlt.imageComparison.directory: The directory in which the
 	 * screenshots will be saved. <br>
 	 * No default value, the property is required.
 	 * <p>
-	 * com.xceptance.xlt.imageComparison.waitTime: The program will wait that 
+	 * com.xceptance.xlt.imageComparison.waitTime: The program will wait that
 	 * many miliseconds for the website to load. <br>
 	 * Default: 100.
 	 * <p>
@@ -89,7 +88,7 @@ public class CompareScreenshots implements WebDriverCustomModule {
 	 * <p>
 	 * com.xceptance.xlt.imageComparison.closeMask: If true, small gaps in the
 	 * maskImage will be closed after a training run, making the masked parts
-	 * more cohesive. <br>
+	 * more cohesive. That is quite performance heavy at the moment.<br>
 	 * Default: false.
 	 * <p>
 	 * 
@@ -119,14 +118,13 @@ public class CompareScreenshots implements WebDriverCustomModule {
 		// trainingMode
 		String trainingModeString = x.getProperty(PPREFIX + "trainingMode");
 		Boolean trainingMode = Boolean.parseBoolean(trainingModeString);
-		
+
 		// closeMask
 		String closeMaskString = x.getProperty(PPREFIX + "closeMask");
 		Boolean closeMask = Boolean.parseBoolean(closeMaskString);
 
-		// comparisonAlgorithm
-		String comparisonAlgorithm = x.getProperty(PPREFIX
-				+ ".comparisonAlgorithm", DALGORITHM);
+		// algorithm
+		String algorithm = x.getProperty(PPREFIX + "algorithm", DALGORITHM);
 
 		// Wait a few miliseconds so the website is fully loaded
 		try {
@@ -212,14 +210,14 @@ public class CompareScreenshots implements WebDriverCustomModule {
 				// Initializes ImageComparison and calls isEqual
 				ImageComparison imagecomparison = new ImageComparison(
 						pixelPerBlockXY, tolerance, trainingMode, closeMask,
-						comparisonAlgorithm);
-				
+						algorithm);
 				boolean result = imagecomparison.isEqual(reference, screenshot,
 						maskImageFile, markedImageFile);
+
 				String assertMessage = "Website does not match the reference screenshot: "
 						+ currentActionName;
 				Assert.assertTrue(assertMessage, result);
-				
+
 			} catch (IOException e) {
 				throw new RuntimeIOException();
 			}

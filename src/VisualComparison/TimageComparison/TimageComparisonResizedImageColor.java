@@ -57,14 +57,14 @@ public class TimageComparisonResizedImageColor {
 
 	/**
 	 * Tests if two black images of different sizes are recognized as different
-	 * despite a threshold significantly above 1. 
+	 * despite colTolerance significantly above 1. They should be.
 	 * 
 	 * @throws IOException
 	 */
 	@Test
 	public void testDifferentSizeT() throws IOException {
 		ImageComparison imagecomparison = new ImageComparison(10,
-				10, false, false, "PIXELFUZZYEQUAL");
+				10, false, false, "PIXELFUZZY");
 		boolean result = imagecomparison.isEqual(reference, screenshot,
 				fileMask, fileOut);
 		Assert.assertFalse(
@@ -73,13 +73,14 @@ public class TimageComparisonResizedImageColor {
 	}
 
 	/**
-	 * Tests if two black images of different sizes are recognized as different with a threshold of 0.
+	 * Tests if two black images of different sizes are recognized as different 
+	 * with a colTolerance value of 0.
 	 * 
 	 * @throws IOException
 	 */
 	@Test
 	public void testDifferentSize() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 0.00, false, false, "PIXELFUZZYEQUAL");
+		ImageComparison imagecomparison = new ImageComparison(1, 0.00, false, false, "PIXELFUZZY");
 		boolean result = imagecomparison.isEqual(reference, screenshot,
 				fileMask, fileOut);
 		Assert.assertFalse(

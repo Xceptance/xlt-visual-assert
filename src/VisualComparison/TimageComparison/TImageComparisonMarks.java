@@ -42,10 +42,10 @@ public class TImageComparisonMarks {
 	
 	@BeforeClass
 	public static void initializeImages() throws IOException {
+		
 //		Two images are initialized, one black reference image and one black screenshot.
 //		The black screenshot has one red and one white rectangle inside it.
 //		The red rectangle should be marked green, the white rectangle should be marked red
-		
 		reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_ARGB);
 		int[] referenceArray = ((DataBufferInt) reference.getRaster().getDataBuffer()).getData();
 		Arrays.fill(referenceArray, blackRgb);
@@ -75,7 +75,7 @@ public class TImageComparisonMarks {
 	 */
 	@Test
 	public void correctlyMarkedRed() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 0.1, false, false, "PIXELFUZZYEQUAL");
+		ImageComparison imagecomparison = new ImageComparison(1, 0.1, false, false, "PIXELFUZZY");
 		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 		BufferedImage output = ImageIO.read(fileOut);
 		boolean hasRed = false;
@@ -100,7 +100,7 @@ public class TImageComparisonMarks {
 	 */
 	@Test
 	public void correctlyMarkedGreen() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 0.1, false, false, "PIXELFUZZYEQUAL");
+		ImageComparison imagecomparison = new ImageComparison(1, 0.1, false, false, "PIXELFUZZY");
 		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 		BufferedImage output = ImageIO.read(fileOut);
 		boolean hasGreen = false;
@@ -114,7 +114,7 @@ public class TImageComparisonMarks {
 		}
 		Assert.assertTrue("The difference wasn't marked green - " +
 				"correctlyMarkedGreen", hasGreen);
-	}	
+	}		
 	
 	/**
 	 * Deletes the temporary files which were created for this test
