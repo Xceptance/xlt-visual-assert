@@ -99,6 +99,7 @@ public class TImageComparisonResizeWithActiveMask {
 	public static void deleteFiles() {
 		fileMask.delete();
 		fileOut.delete();
+		differenceFile.delete();
 	}
 
 	private static BufferedImage initializeBlackMaskImage(BufferedImage img) {

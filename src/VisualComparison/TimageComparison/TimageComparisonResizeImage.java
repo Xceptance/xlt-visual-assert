@@ -104,5 +104,6 @@ public class TimageComparisonResizeImage {
 	public static void deleteFile() {
 		fileMask.delete();
 		fileOut.delete();
+		differenceFile.delete();
 	}
 }

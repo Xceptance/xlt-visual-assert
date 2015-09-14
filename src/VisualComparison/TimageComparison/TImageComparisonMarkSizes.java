@@ -133,6 +133,7 @@ public class TImageComparisonMarkSizes {
 	public static void deleteFiles() {
 		outPutfile.delete();
 		maskFile.delete();
+		differenceFile.delete();
 	}
 
 	/**

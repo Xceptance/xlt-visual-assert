@@ -295,6 +295,7 @@ public class TImageComparisonColTolerance {
 	public static void deleteFiles() {
 		fileMask.delete();
 		fileOut.delete();
+		differenceFile.delete();
 	}
 	
 	// Here come the setup methods

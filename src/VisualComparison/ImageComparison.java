@@ -251,7 +251,14 @@ public class ImageComparison {
 				// calculates difference and adds the coordinates to
 				// the relevant ArrayList if the difference is above the
 				// colTolerance
-				if ((calculatePixelRgbDiff(x, y, img1, img2) > colTolerance)) {
+				double difference = calculatePixelRgbDiff(x, y, img1, img2);
+				
+				//draws the differenceImage if needed
+				if(differenceImage) {
+					drawDifferencePicture(difference, x, y);
+				}
+				
+				if (difference > colTolerance) {
 					xCoords.add(x);
 					yCoords.add(y);
 					equal = false;
@@ -308,6 +315,12 @@ public class ImageComparison {
 		int imageheight = img1.getHeight();
 		for (int x = 0; x < imagewidth; x++) {
 			for (int y = 0; y < imageheight; y++) {
+				
+				//draws the differenceImage if needed
+				if (differenceImage) {
+					double difference = calculatePixelRgbDiff(x, y, img1, img2);
+					drawDifferencePicture(difference, x, y);
+				}
 
 				// if the RGB values of 2 pixels differ
 				// add the x- and y- coordinates to the corresponding ArrayLists
@@ -387,9 +400,15 @@ public class ImageComparison {
 
 						int xCoord = x * pixelPerBlockXY + w;
 						int yCoord = y * pixelPerBlockXY + h;
-
+						
+						//calculate the difference and draw the differenceImage if needed
+						double difference = calculatePixelRgbDiff(xCoord, yCoord, img1, img2);
+						if(differenceImage) {
+							drawDifferencePicture(difference, xCoord, yCoord);
+						}
+						
 						// If there is a notable difference
-						if (calculatePixelRgbDiff(xCoord, yCoord, img1, img2) > colTolerance) {
+						if (difference > colTolerance) {
 
 							// Increment differencesPerBlock and add the
 							// coordinates to the
@@ -503,11 +522,6 @@ public class ImageComparison {
 
 		double cDiffInPercent = cDiff / MAXDIFF;
 		
-		// draws the differenceImage if needed
-		if(differenceImage) {
-			drawDifferencePicture(cDiffInPercent, x, y);
-		}
-
 		return cDiffInPercent;
 	}
 

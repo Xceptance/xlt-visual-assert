@@ -124,6 +124,7 @@ public class TImageComparisonMarks {
 	public static void deleteFiles() {
 		fileMask.delete();
 		fileOut.delete();
+		differenceFile.delete();
 	}
 	
 }

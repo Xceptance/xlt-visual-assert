@@ -74,5 +74,6 @@ public class TImageComparisonBlocks {
 	public static void deleteFile() {
 		fileMask.delete();
 		fileOut.delete();
+		differenceFile.delete();
 	}
 }

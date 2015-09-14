@@ -130,6 +130,7 @@ public class TImageComparisonTraining {
 	public static void deleteFiles() {
 		outPutfile.delete();
 		maskFile.delete();
+		differenceFile.delete();
 	}
 
 	// method for painting the images white

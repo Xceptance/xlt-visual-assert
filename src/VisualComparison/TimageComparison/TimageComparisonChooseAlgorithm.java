@@ -97,5 +97,6 @@ public class TimageComparisonChooseAlgorithm {
 		public static void deleteFile() {
 			fileMask.delete();
 			fileOut.delete();
+			differenceFile.delete();
 		}
 }
