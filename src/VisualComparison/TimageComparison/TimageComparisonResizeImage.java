@@ -62,7 +62,7 @@ public class TimageComparisonResizeImage {
 	 */
 	@Test
 	public void correctSizePixelFuzzyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 0.01, false, false, "PIXELFUZZY");
+		ImageComparison imagecomparison = new ImageComparison(1, 0.01, 0.01, false, false, "PIXELFUZZY");
 		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 		BufferedImage img = ImageIO.read(fileOut);
 		
@@ -79,7 +79,7 @@ public class TimageComparisonResizeImage {
 	 */
 	@Test
 	public void correctBreakPointPixelFuzzyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 0.01, false, false, "PIXELFUZZY");
+		ImageComparison imagecomparison = new ImageComparison(1, 0.01, 0.01, false, false, "PIXELFUZZY");
 		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 		BufferedImage img = ImageIO.read(fileOut);
 		

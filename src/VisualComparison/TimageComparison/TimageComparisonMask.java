@@ -92,8 +92,8 @@ public class TimageComparisonMask {
 	 */
 	@Test
 	public void changesCorrectlyMarked() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(10, 0.1, false,
-				false, "PIXELFUZZY");
+		ImageComparison imagecomparison = new ImageComparison(10, 0.1, 0.01,
+				false, false, "PIXELFUZZY");
 
 		boolean result = imagecomparison.isEqual(reference, screenshot,
 				fileMask, fileOut);
@@ -128,8 +128,8 @@ public class TimageComparisonMask {
 	 */
 	@Test
 	public void changesCorrectlyHidden() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(10, 0.1, false,
-				false, "FUZZY");
+		ImageComparison imagecomparison = new ImageComparison(10, 0.1, 0.01,
+				false, false, "FUZZY");
 		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
 		BufferedImage output = ImageIO.read(fileOut);
 

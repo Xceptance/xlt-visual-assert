@@ -57,7 +57,7 @@ public class TImageComparisonExactlyEqual {
 	 */
 	@Test
 	public void almostEqualButNotQuite() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 0.00, false,false, "EXACTLY");
+		ImageComparison imagecomparison = new ImageComparison(1, 0.00, 0.01,false, false, "EXACTLY");
 		boolean result = imagecomparison.isEqual(reference, screenshot,
 				fileMask, fileOut);
 		Assert.assertFalse(

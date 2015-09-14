@@ -21,18 +21,18 @@ import VisualComparison.ImageComparison;
  */
 public class TImageComparisonTraining {
 	static BufferedImage reference, newImage;
-	ImageComparison fuzzyTraining = new ImageComparison(10, 0.00, true,
-			false, "FUZZY");
-	ImageComparison fuzzyImgCompare = new ImageComparison(10, 0.00, false,
-			false, "FUZZY");
-	ImageComparison exactlyTraining = new ImageComparison(1, 0.00, true,
-			false, "EXACTLY");
-	ImageComparison exactlyCompare = new ImageComparison(1, 0.00, false,
-			false, "EXACTLY");
-	ImageComparison pixelFuzzyTraining = new ImageComparison(1, 0.01, true,
-			false, "PIXELFUZZY");
-	ImageComparison pixelFuzzyCompare = new ImageComparison(1, 0.01, false,
-			false, "PIXELFUZZY");
+	ImageComparison fuzzyTraining = new ImageComparison(10, 0.00, 0.01,
+			true, false, "FUZZY");
+	ImageComparison fuzzyImgCompare = new ImageComparison(10, 0.00, 0.01,
+			false, false, "FUZZY");
+	ImageComparison exactlyTraining = new ImageComparison(1, 0.00, 0.01,
+			true, false, "EXACTLY");
+	ImageComparison exactlyCompare = new ImageComparison(1, 0.00, 0.01,
+			false, false, "EXACTLY");
+	ImageComparison pixelFuzzyTraining = new ImageComparison(1, 0.01, 0.01,
+			true, false, "PIXELFUZZY");
+	ImageComparison pixelFuzzyCompare = new ImageComparison(1, 0.01, 0.01,
+			false, false, "PIXELFUZZY");
 	static File directory = org.apache.commons.lang3.SystemUtils
 			.getJavaIoTmpDir();
 	static File outPutfile = new File(directory + "/test.png");

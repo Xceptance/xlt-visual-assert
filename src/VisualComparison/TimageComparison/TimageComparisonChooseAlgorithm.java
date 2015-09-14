@@ -40,9 +40,9 @@ public class TimageComparisonChooseAlgorithm {
 		private static File fileMask = new File(directory, "/fileMask.png");
 		private static File fileOut = new File(directory, "/fileOut.png");
 		
-		private ImageComparison exactComp = new ImageComparison(50, 0.2, false, false, "EXACTLY");
-		private final ImageComparison pixelFuzzyComp = new ImageComparison(50, 0.2, false, false, "PIXELFUZZY");
-		private final ImageComparison fuzzyComp = new ImageComparison(50, 0.2, false, false, "FUZZY");
+		private ImageComparison exactComp = new ImageComparison(50, 0.2, 0.01, false, false, "EXACTLY");
+		private final ImageComparison pixelFuzzyComp = new ImageComparison(50, 0.2, 0.01, false, false, "PIXELFUZZY");
+		private final ImageComparison fuzzyComp = new ImageComparison(50, 0.2, 0.01, false, false, "FUZZY");
 
 
 		@BeforeClass
@@ -85,7 +85,7 @@ public class TimageComparisonChooseAlgorithm {
 		@Test (expected = IllegalArgumentException.class)
 		public void noAlgorithmFound() {
 			initializeImages();
-			exactComp = new ImageComparison(20, 0.2, false, false, "exactlyEQUAL");
+			exactComp = new ImageComparison(20, 0.2, 10, false, false, "exactlyEQUAL");
 		
 		}
 		

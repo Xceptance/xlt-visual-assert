@@ -15,7 +15,7 @@ import java.io.IOException;
  * with the compressionFactor parameter. The width and height of the image will
  * be divided by the compressionFactor to form the width and height of the new
  * image.
- * 
+ * <p>
  * Regarding erosion, dilation and closing: The background/ foreground colors
  * can be manually set, defaults are below. The structure element is always a
  * square filled with ones. It's width and height are relative to the image it
@@ -24,8 +24,8 @@ import java.io.IOException;
  * <p>
  * For an example: If an image has a width and height of 1000 pixels and it is
  * shrinked with a compressionFactor of 10, the shrinked image will be 100
- * pixels wide and high. With structElementScale = 0.1, the structure element to
- * that image will be 10 pixels wide and high.
+ * pixels wide and high. With strucxetElementScale = 0.1, the structure element
+ * to that image will be 10 pixels wide and high.
  * <p>
  * A bigger structElementScale means a bigger structElement which means the
  * erosion, dilation and closing methods have more impact. So the erosion will
@@ -107,7 +107,7 @@ public class ImageOperations {
 	}
 
 	/**
-	 * Shrinks the given image by the given factor
+	 * Shrinks the given image by the given factor. Used in closeImage.
 	 * 
 	 * @param img
 	 *            the image to shrink
@@ -126,7 +126,7 @@ public class ImageOperations {
 
 	/**
 	 * Scales an image up (or down) to the given size. Does not innately
-	 * preserve Width/ Height ratio.
+	 * preserve Width/ Height ratio. Used in closeImage.
 	 * 
 	 * @param img
 	 * @param newWidth
@@ -360,10 +360,14 @@ public class ImageOperations {
 	}
 
 	/**
-	 * Closes an image using the dilation and erosion methods. Determines the
-	 * width and height of the structuring element using the instance
-	 * variable structElementScale. The width and height will be the the 
-	 * with and height of the image multiplied by structElementScale.
+	 * Shrinks an image using the shrinkImage method, closes it and scales it
+	 * back up again for performance reasons. Depending on the images size and
+	 * the compressionfactor, it may still be very performance heavy.
+	 * 
+	 * Closes an image using the dilation and erosion methods. It determines the
+	 * width and height of the structuring element using the instance variable
+	 * structElementScale. The width and height will be the the with and height
+	 * of the image multiplied by structElementScale.
 	 * 
 	 * @param img
 	 *            the image to close
@@ -372,7 +376,7 @@ public class ImageOperations {
 	 */
 	protected BufferedImage closeImage(BufferedImage img) throws IOException {
 
-		//Scale the image for performance reasons.
+		// Scale the image for performance reasons.
 		BufferedImage shrunkImg = shrinkImage(img);
 
 		int structElementWidth = (int) Math.floor(shrunkImg.getWidth()
@@ -386,10 +390,12 @@ public class ImageOperations {
 							+ "to small a structure element. Increase at least one of them.");
 		}
 
-		shrunkImg = dilateImage(shrunkImg, structElementWidth, structElementHeight);
-		shrunkImg = erodeImage(shrunkImg, structElementWidth, structElementHeight);
-		
-		//Scale the image back
+		shrunkImg = dilateImage(shrunkImg, structElementWidth,
+				structElementHeight);
+		shrunkImg = erodeImage(shrunkImg, structElementWidth,
+				structElementHeight);
+
+		// Scale the image back
 		img = scaleImage(shrunkImg, img.getWidth(), img.getHeight());
 		return img;
 	}

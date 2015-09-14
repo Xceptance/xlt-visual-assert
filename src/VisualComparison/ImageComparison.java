@@ -30,6 +30,7 @@ public class ImageComparison {
 	private final int markingX = 10;
 	private final int markingY = 10;
 	private double colTolerance;
+	private double pixTolerance;
 	private boolean trainingMode;
 	private boolean closeMask;
 
@@ -42,8 +43,9 @@ public class ImageComparison {
 	/**
 	 * The parameters pixelPerBlockXY and colTolerance define the fuzzyness of
 	 * the comparison, higher parameters mean a comparison that is less strict.
-	 * The pixelPerBlock parameter is only used in the 'FUZZY' algorithm, the
-	 * colTolerance in the 'FUZZY' and the 'PIXELFUZZY' algorithm.
+	 * The pixelPerBlock and pixTolerance parameters are only used in the
+	 * 'FUZZY' algorithm, the colTolerance in the 'FUZZY' and the 'PIXELFUZZY'
+	 * algorithm.
 	 * <p>
 	 * In case images should only be equal in certain areas or certain areas
 	 * should not be compared, a mask image can be created. Black areas in the
@@ -65,18 +67,25 @@ public class ImageComparison {
 	 *            up to where small differences in color should be tolerated. A
 	 *            value between zero and one should be given. Zero: No
 	 *            tolerance.
+	 * @param pixTolerance
+	 *            how many differences per block will be tolerated, in percent.
+	 *            value between zero and one should be given. One: 100%. All 
+	 *            pixels can be different.
 	 * @param trainingMode
 	 *            whether or not the training mode should be used
 	 * @param closeMask
+	 * @param pixTolerance
 	 * @param comparisonAlgorithm
 	 *            the algorithm the comparison should use. If the given string
 	 *            does not match any algorithm, it throws an
 	 *            IllegalArgumentException.
 	 */
 	public ImageComparison(int pixelPerBlockXY, double colTolerance,
-			boolean trainingMode, boolean closeMask, String algorithm) {
+			double pixTolerance, boolean trainingMode, boolean closeMask,
+			String algorithm) {
 		this.pixelPerBlockXY = pixelPerBlockXY;
 		this.colTolerance = colTolerance;
+		this.pixTolerance = pixTolerance;
 		this.trainingMode = trainingMode;
 		this.closeMask = closeMask;
 
@@ -113,7 +122,7 @@ public class ImageComparison {
 
 		// Initializes ImageOperations object to access it's methods later
 		ImageOperations imageoperations = new ImageOperations();
-		
+
 		// copies the images, so it doesn't work directly on them
 		imgOut = imageoperations.copyImage(img2);
 		BufferedImage copyImg1 = imageoperations.copyImage(img1);
@@ -125,24 +134,24 @@ public class ImageComparison {
 		// Increases the smaller images width to match the larger one
 		while (copyImg1.getWidth() != imgOut.getWidth()) {
 			if (copyImg1.getWidth() > imgOut.getWidth()) {
-				imgOut = imageoperations.increaseImageSize(img2, copyImg1.getWidth(),
-						imgOut.getHeight());
+				imgOut = imageoperations.increaseImageSize(img2,
+						copyImg1.getWidth(), imgOut.getHeight());
 			}
 			if (imgOut.getWidth() > copyImg1.getWidth()) {
-				copyImg1 = imageoperations.increaseImageSize(copyImg1, imgOut.getWidth(),
-						copyImg1.getHeight());
+				copyImg1 = imageoperations.increaseImageSize(copyImg1,
+						imgOut.getWidth(), copyImg1.getHeight());
 			}
 		}
 
 		// Increases the smaller images height to match the larger one
 		while (copyImg1.getHeight() != imgOut.getHeight()) {
 			if (copyImg1.getHeight() > imgOut.getHeight()) {
-				imgOut = imageoperations.increaseImageSize(imgOut, imgOut.getWidth(),
-						img1.getHeight());
+				imgOut = imageoperations.increaseImageSize(imgOut,
+						imgOut.getWidth(), img1.getHeight());
 			}
 			if (imgOut.getHeight() > img1.getHeight()) {
-				copyImg1 = imageoperations.increaseImageSize(copyImg1, copyImg1.getWidth(),
-						img2.getHeight());
+				copyImg1 = imageoperations.increaseImageSize(copyImg1,
+						copyImg1.getWidth(), img2.getHeight());
 			}
 		}
 
@@ -190,8 +199,10 @@ public class ImageComparison {
 			}
 		}
 		// If the size changed, mark the differences
-		if (img2.getWidth() != imgOut.getWidth() || img2.getHeight() != imgOut.getHeight() ||
-				img1.getWidth() != imgOut.getWidth() || img1.getHeight() != imgOut.getHeight()) {
+		if (img2.getWidth() != imgOut.getWidth()
+				|| img2.getHeight() != imgOut.getHeight()
+				|| img1.getWidth() != imgOut.getWidth()
+				|| img1.getHeight() != imgOut.getHeight()) {
 			imgOut = markImageBorders(imgOut, img2.getWidth(), img2.getHeight());
 			isEqual = false;
 		}
@@ -206,14 +217,15 @@ public class ImageComparison {
 
 	/**
 	 * Method for the pixel based comparison with colTolerance. So it will
-	 * compare pixel by pixel, but it will have a certain tolerance for color differences.
+	 * compare pixel by pixel, but it will have a certain tolerance for color
+	 * differences.
 	 * 
 	 * @param img1
 	 *            the reference image
 	 * @param img2
 	 *            the image that will be compared with the reference image
-	 * @return an array with the coordinates of the pixels where there were differences,
-	 * 		   null if there were no differences
+	 * @return an array with the coordinates of the pixels where there were
+	 *         differences, null if there were no differences
 	 */
 	private int[][] pixelFuzzyEqual(BufferedImage img1, BufferedImage img2)
 			throws IOException {
@@ -263,14 +275,16 @@ public class ImageComparison {
 	}
 
 	/**
-	 * Method for the exact pixel based comparison . Zero tolerance. ColTolerance is not used.
+	 * Method for the exact pixel based comparison . Zero tolerance.
+	 * ColTolerance is not used.
 	 * <p>
+	 * 
 	 * @param img1
 	 *            the reference image
 	 * @param img2
 	 *            the image that will be compared with the reference image
-	 * @return an array with the coordinates of the pixels where there were differences,
-	 * 		   null if there were no differences
+	 * @return an array with the coordinates of the pixels where there were
+	 *         differences, null if there were no differences
 	 */
 	private int[][] exactlyEqual(BufferedImage img1, BufferedImage img2)
 			throws IOException {
@@ -321,18 +335,17 @@ public class ImageComparison {
 	}
 
 	/**
-	 * Compares the img2 image to the img1 image using the parameters defined in
-	 * the ImageComparison constructor. Scales the image with the pixelPerBlock 
-	 * parameter then gives it to pixelFuzzyEqual and scales back the return array.
+	 * Compares the img2 image to the img1 image using the fuzzyness parameters
+	 * defined in the ImageComparison constructor.
 	 * 
-	 * Uses both pixelPerBlockXY and colTolerance.
+	 * Uses pixelPerBlockXY, pixTolerance and colTolerance.
 	 * 
 	 * @param img1
 	 *            the reference image
 	 * @param img2
 	 *            the image that will be compared with the reference image
-	 * @return an array with the coordinates of the pixels where there were differences,
-	 * 		   null if there were no differences
+	 * @return an array with the coordinates of the pixels where there were
+	 *         differences, null if there were no differences
 	 * @throws IOException
 	 */
 	private int[][] fuzzyEqual(BufferedImage img1, BufferedImage img2)
@@ -340,53 +353,79 @@ public class ImageComparison {
 
 		/* Method for the regular fuzzy comparison */
 
-		// Shrink the image to create pseudo-blocks
-		ImageOperations imageoperations = new ImageOperations(pixelPerBlockXY,
-				0.2);
-		BufferedImage shrunkImg1 = imageoperations.shrinkImage(img1);
-		BufferedImage shrunkImg2 = imageoperations.shrinkImage(img2);
+		boolean equal = true;
+		ArrayList<Integer> xCoords = new ArrayList<Integer>();
+		ArrayList<Integer> yCoords = new ArrayList<Integer>();
+		ArrayList<Integer> xCoordsTemp = new ArrayList<Integer>();
+		ArrayList<Integer> yCoordsTemp = new ArrayList<Integer>();
+		int differencesAllowed;
+		
+		// Create blocks, go through every block
+		int xBlock = imageWidth / pixelPerBlockXY;
+		int yBlock = imageHeight / pixelPerBlockXY;
 
-		int[][] pixels = pixelFuzzyEqual(shrunkImg1, shrunkImg2);
+		for (int x = 0; x < xBlock; x++) {
+			for (int y = 0; y < yBlock; y++) {
+				subImageWidth = calcPixSpan(pixelPerBlockXY, x, imageWidth);
+				subImageHeight = calcPixSpan(pixelPerBlockXY, y,
+						imageHeight);
+				int differencesPerBlock = 0;
+				differencesAllowed = (int) Math.floor(subImageWidth * subImageHeight * pixTolerance);
 
-		// If there's a difference ...
-		if (pixels != null) {
-					
-			// Scale back the array ...
-			// For that, just mark every pixel in the block
-			// Created with pixelPerBlockXY
-			// Much room for performance increase here ...
-			// It could be just one pixel in every marking block
-			// And no pixels over the border, but that'd be complicated
+				// Go through every pixel in that block
+				for (int w = 0; w < subImageWidth; w++) {
+					for (int h = 0; h < subImageHeight; h++) {
 
-			int size = pixels.length * pixelPerBlockXY * pixelPerBlockXY;
-			int xCoordinates;
-			int yCoordinates;
+						int xCoord = x * pixelPerBlockXY + w;
+						int yCoord = y * pixelPerBlockXY + h;
 
-			int[][] scaledPixels = new int[size][2];
-			int indexScaledPixels = 0;
+						// If there is a notable difference
+						if (calculatePixelRgbDiff(xCoord, yCoord, img1, img2) > colTolerance) {
 
-			// Go through every non-scaled pixel difference
-			for (int i = 0; i < pixels.length; i++) {
-				xCoordinates = pixels[i][0];
-				yCoordinates = pixels[i][1];
-
-				// Go through every pixel in the block
-				for (int x = xCoordinates * pixelPerBlockXY; x < (xCoordinates + 1)
-						* pixelPerBlockXY; x++) {
-					for (int y = yCoordinates * pixelPerBlockXY; y < (yCoordinates + 1)
-							* pixelPerBlockXY; y++) {
-
-						scaledPixels[indexScaledPixels][0] = x;
-						scaledPixels[indexScaledPixels][1] = y;
-						indexScaledPixels++;
+							// Increment differencesPerBlock and add the
+							// coordinates to the
+							// temporary arraylists
+							differencesPerBlock++;
+							xCoordsTemp.add(xCoord);
+							yCoordsTemp.add(yCoord);
+						}
 					}
 				}
-			}
 
-			return scaledPixels;
+				// If differencesPerBlock is above pixTolerance
+				// Write the temporary coordinates to the permanent ones
+				// And set equal false
+				if (differencesPerBlock > differencesAllowed) {
+					xCoords.addAll(xCoordsTemp);
+					yCoords.addAll(yCoordsTemp);
+					xCoords.clear();
+					yCoords.clear();
+					equal = false;
+				}
+			}
 		}
 
-		else {
+		// Turn the ArrayLists into a single 2d array.
+		int s = xCoords.size();
+		int[] xArray = new int[s];
+		for (int i = 0; i < s; i++) {
+			xArray[i] = xCoords.get(i).intValue();
+		}
+
+		s = yCoords.size();
+		int[] yArray = new int[s];
+		for (int i = 0; i < s; i++) {
+			yArray[i] = yCoords.get(i).intValue();
+		}
+
+		int[][] pixels = new int[xArray.length][2];
+		for (int i = 0; i < xArray.length; i++) {
+			pixels[i][0] = xArray[i];
+			pixels[i][1] = yArray[i];
+		}
+		if (!equal) {
+			return pixels;
+		} else {
 			return null;
 		}
 	}
@@ -395,9 +434,12 @@ public class ImageComparison {
 	 * Calculates how many pixel there can be in the current block. Necessary in
 	 * case the block would go over the border.
 	 * 
-	 * @param pixelPerBlock	how many pixels every block has
-	 * @param n	the block we're currently in
-	 * @param overallSpan the width/ height that shoudn't be passed
+	 * @param pixelPerBlock
+	 *            how many pixels every block has
+	 * @param n
+	 *            the block we're currently in
+	 * @param overallSpan
+	 *            the width/ height that shoudn't be passed
 	 * @return
 	 */
 	private int calcPixSpan(int pixelPerBlock, int n, int overallSpan) {
@@ -415,8 +457,10 @@ public class ImageComparison {
 	 * http://www.compuphase.com/cmetric.htm . The algorithm is based on
 	 * experiments with people, not theoretics. It is thereby not certain.
 	 * 
-	 * @param x		the first color as an rgb value
-	 * @param y		the second color as an rgb value
+	 * @param x
+	 *            the first color as an rgb value
+	 * @param y
+	 *            the second color as an rgb value
 	 * @return the difference between the colors as an int value. Higher ->
 	 *         Bigger difference
 	 */
@@ -454,10 +498,10 @@ public class ImageComparison {
 	}
 
 	/**
-	 * Returns red unless the currentColor is mainly red. 
-	 * Used to determine the marking color. The names not really right.
+	 * Returns red unless the currentColor is mainly red. Used to determine the
+	 * marking color. The names not really right.
 	 * 
-	 * @param currentColor 
+	 * @param currentColor
 	 * @return the color with which to mark
 	 */
 	private Color getComplementary(Color currentColor) {
@@ -481,12 +525,13 @@ public class ImageComparison {
 	}
 
 	/**
-	 * Method to mark areas around the detected differences. 
-	 * Goes through every pixel that was different and marks the 
-	 * marking block it is in, unless it was marked already. <br>
+	 * Method to mark areas around the detected differences. Goes through every
+	 * pixel that was different and marks the marking block it is in, unless it
+	 * was marked already. <br>
 	 * Works directly on imgOut.
 	 * 
-	 * @param pixels the array with the differences.
+	 * @param pixels
+	 *            the array with the differences.
 	 */
 	private void markDifferences(int[][] pixels) {
 
@@ -509,12 +554,12 @@ public class ImageComparison {
 	}
 
 	/**
-	 * Very close to markDifferences. 
-	 * Goes through every pixel that was different and masks the 
-	 * marking block it is in, unless it was marked already.
-	 * Works directly on the mask image.
+	 * Very close to markDifferences. Goes through every pixel that was
+	 * different and masks the marking block it is in, unless it was marked
+	 * already. Works directly on the mask image.
 	 * 
-	 * @param pixels the array with the differences.
+	 * @param pixels
+	 *            the array with the differences.
 	 */
 	private void maskDifferences(int[][] pixels) {
 
@@ -575,11 +620,13 @@ public class ImageComparison {
 	}
 
 	/**
-	 * Colors a certain pixel using getComplementaryColor.
-	 * Works directly on imgOut.
+	 * Colors a certain pixel using getComplementaryColor. Works directly on
+	 * imgOut.
 	 * 
-	 * @param x the x coordinate of the pixel to color
-	 * @param y the y coordinate of the pixel to color
+	 * @param x
+	 *            the x coordinate of the pixel to color
+	 * @param y
+	 *            the y coordinate of the pixel to color
 	 */
 	private void colorPixel(int x, int y) {
 		int rgb, newRgb;
@@ -604,8 +651,8 @@ public class ImageComparison {
 	}
 
 	/**
-	 * Fully marks the bottom and left borders of an image red. Used in 
-	 * isEqual to mark the previously not existent parts of an image. 
+	 * Fully marks the bottom and left borders of an image red. Used in isEqual
+	 * to mark the previously not existent parts of an image.
 	 * 
 	 * @param img
 	 *            the image to mark

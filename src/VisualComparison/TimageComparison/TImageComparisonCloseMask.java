@@ -38,10 +38,10 @@ public class TImageComparisonCloseMask {
 	private static File fileMask = new File(directory, "/fileMask.png");
 	private static File fileOut = new File(directory, "/fileOut.png");
 
-	private final ImageComparison train = new ImageComparison(10, 0.0, true,
-			true, "PIXELFUZZY");
-	private final ImageComparison compare = new ImageComparison(10, 0.0, false,
-			false, "PIXELFUZZY");
+	private final ImageComparison train = new ImageComparison(10, 0.0, 0.01,
+			true, true, "PIXELFUZZY");
+	private final ImageComparison compare = new ImageComparison(10, 0.0, 0.01,
+			false, false, "PIXELFUZZY");
 
 	@BeforeClass
 	public static void initializeReference() {

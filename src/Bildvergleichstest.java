@@ -28,7 +28,7 @@ public class Bildvergleichstest {
 		BufferedImage reference = ImageIO.read(second);
 		final String algorithm = "EXACTLYEQUAL";
 		
-		ImageComparison imagecomparison = new ImageComparison(10, 0.1, false, false, algorithm);
+		ImageComparison imagecomparison = new ImageComparison(10, 0.1, 10, false, false, algorithm);
 		boolean result = imagecomparison.isEqual(screenshot, reference, fileMask, fileOut);
 		if (result) {
 			System.out.println("Images are equal!");

@@ -33,7 +33,8 @@ public class CompareScreenshots implements WebDriverCustomModule {
 	final String PPREFIX = "com.xceptance.xlt.imageComparison.";
 	final String DWAITTIME = "100";
 	final String DPIXELPBLOCKXY = "20";
-	final String TDIFFERENCES = "0.05";
+	final String DCOLTOLERANCE = "0.05";
+	final String DPIXTOLERANCE = "0.01";
 	final String DALGORITHM = "FUZZY";
 
 	/**
@@ -62,6 +63,8 @@ public class CompareScreenshots implements WebDriverCustomModule {
 	 * the corresponding areas in the mask image will be painted black. So
 	 * barring manual intervention, differences in these areas will not be
 	 * detected in later runs. <br>
+	 * If the closeImage property is true, small gaps in the maskImage will be
+	 * closed after the normal training. This can be very performance heavy.
 	 * <p>
 	 * Properties and their default values:
 	 * com.xceptance.xlt.imageComparison.directory: The directory in which the
@@ -73,12 +76,13 @@ public class CompareScreenshots implements WebDriverCustomModule {
 	 * Default: 100.
 	 * <p>
 	 * com.xceptance.xlt.imageComparison.pixelPerBlockXY: Fuzzyness parameter,
-	 * used if the specified algorithm is 'FUZZY'. <br>
-	 * Default: 20.
+	 * used if the specified algorithm is 'FUZZY'. That many different pixels
+	 * (in percent) will be tolerated.<br>
+	 * Default: 0.01
 	 * <p>
-	 * com.xceptance.xlt.imageComparison.tolerance: Fuzzyness parameter, used if
-	 * the specified algorithm is 'FUZZY' or 'PIXELFUZZYEQUAL'. If used, a color
-	 * difference of up to that much (in percent) will be ignored.<br>
+	 * com.xceptance.xlt.imageComparison.colTolerance: Fuzzyness parameter, used
+	 * if the specified algorithm is 'FUZZY' or 'PIXELFUZZYEQUAL'. If used, a
+	 * color difference of up to that much (in percent) will be ignored.<br>
 	 * Default: 0.05.
 	 * <p>
 	 * com.xceptance.xlt.imageComparison.trainingMode: If true, differences will
@@ -88,7 +92,8 @@ public class CompareScreenshots implements WebDriverCustomModule {
 	 * <p>
 	 * com.xceptance.xlt.imageComparison.closeMask: If true, small gaps in the
 	 * maskImage will be closed after a training run, making the masked parts
-	 * more cohesive. That is quite performance heavy at the moment.<br>
+	 * more cohesive. Since this is quite performance heavy, the maskImage will
+	 * be scaled down beforehand and scaled back up again afterwards.<br>
 	 * Default: false.
 	 * <p>
 	 * 
@@ -111,9 +116,13 @@ public class CompareScreenshots implements WebDriverCustomModule {
 				DPIXELPBLOCKXY);
 		int pixelPerBlockXY = Integer.parseInt(pixelPerBlockXYS);
 
-		// tolerance, fuzzyness parameter
-		String toleranceS = x.getProperty(PPREFIX + "tolerance", TDIFFERENCES);
-		double tolerance = Double.parseDouble(toleranceS);
+		// colTolerance, pixTolerance
+		String colToleranceS = x.getProperty(PPREFIX + "colTolerance",
+				DCOLTOLERANCE);
+		double colTolerance = Double.parseDouble(colToleranceS);
+		String pixToleranceS = x.getProperty(PPREFIX + "pixTolerance",
+				DCOLTOLERANCE);
+		double pixTolerance = Double.parseDouble(pixToleranceS);
 
 		// trainingMode
 		String trainingModeString = x.getProperty(PPREFIX + "trainingMode");
@@ -209,8 +218,8 @@ public class CompareScreenshots implements WebDriverCustomModule {
 
 				// Initializes ImageComparison and calls isEqual
 				ImageComparison imagecomparison = new ImageComparison(
-						pixelPerBlockXY, tolerance, trainingMode, closeMask,
-						algorithm);
+						pixelPerBlockXY, colTolerance, pixTolerance,
+						trainingMode, closeMask, algorithm);
 				boolean result = imagecomparison.isEqual(reference, screenshot,
 						maskImageFile, markedImageFile);
 
