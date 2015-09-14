@@ -5,6 +5,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -75,8 +77,13 @@ public class TImageComparisonTraining {
 				maskFile, outPutfile));
 		Assert.assertTrue(fuzzyTraining.isEqual(reference, newImage, maskFile,
 				outPutfile));
+		
+		ImageIO.write(reference, "PNG", new File("/home/daniel/Pictures/reference.png"));
+		ImageIO.write(newImage, "PNG", new File("/home/daniel/Pictures/newImage.png"));
+		BufferedImage maskImage = ImageIO.read(maskFile);
+		ImageIO.write(maskImage, "PNG", new File("/home/daniel/Pictures/mask.png"));
 		Assert.assertTrue(fuzzyImgCompare.isEqual(reference, newImage,
-				maskFile, outPutfile));
+				maskFile, new File("/home/daniel/Pictures/ouput.png")));
 	}
 
 	// two areas are colored different and should be recognized by the training

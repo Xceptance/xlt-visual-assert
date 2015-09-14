@@ -398,8 +398,8 @@ public class ImageComparison {
 				if (differencesPerBlock > differencesAllowed) {
 					xCoords.addAll(xCoordsTemp);
 					yCoords.addAll(yCoordsTemp);
-					xCoords.clear();
-					yCoords.clear();
+					xCoordsTemp.clear();
+					yCoordsTemp.clear();
 					equal = false;
 				}
 			}
