@@ -30,6 +30,7 @@ public class TImageComparisonPixTolerance {
 	private final static File directory = SystemUtils.getJavaIoTmpDir();
 	private static File fileMask = new File(directory, "/fileMask.png");
 	private static File fileOut = new File(directory, "/fileOut.png");
+	private static File differenceFile = new File(directory + "/difference.png");
 	
 	private static int rgbBlack = Color.BLACK.getRGB();
 	private static int rgbWhite = Color.WHITE.getRGB();
@@ -63,8 +64,8 @@ public class TImageComparisonPixTolerance {
 	 */
 	@Test
 	public void exactlyTen() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(10, 0.1, 0.1, false, false, "FUZZY");
-		boolean result = imagecomparison.isEqual(screenshot, reference, fileMask, fileOut);
+		ImageComparison imagecomparison = new ImageComparison(10, 0.1, 0.1, false, false, false, "FUZZY");
+		boolean result = imagecomparison.isEqual(screenshot, reference, fileMask, fileOut, differenceFile);
 		Assert.assertTrue(result);
 	}
 	
@@ -75,8 +76,8 @@ public class TImageComparisonPixTolerance {
 	 */
 	@Test
 	public void belowTen() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(10, 0.1, 0.0999999999999, false, false, "FUZZY");
-		boolean result = imagecomparison.isEqual(screenshot, reference, fileMask, fileOut);
+		ImageComparison imagecomparison = new ImageComparison(10, 0.1, 0.0999999999999, false, false, false, "FUZZY");
+		boolean result = imagecomparison.isEqual(screenshot, reference, fileMask, fileOut, differenceFile);
 		Assert.assertFalse(result);
 	}
 	
@@ -87,8 +88,8 @@ public class TImageComparisonPixTolerance {
 	 */
 	@Test
 	public void aboveTen() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(10, 0.1, 0.10000000000000001, false, false, "FUZZY");
-		boolean result = imagecomparison.isEqual(screenshot, reference, fileMask, fileOut);
+		ImageComparison imagecomparison = new ImageComparison(10, 0.1, 0.10000000000000001, false, false, false, "FUZZY");
+		boolean result = imagecomparison.isEqual(screenshot, reference, fileMask, fileOut, differenceFile);
 		Assert.assertTrue(result);
 	}
 	

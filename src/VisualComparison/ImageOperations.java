@@ -249,8 +249,8 @@ public class ImageOperations {
 				// The origin of the structuring element is it's middle pixel
 				for (int x = w - (structElementWidth / 2); x <= w
 						+ (structElementWidth / 2); x++) {
-					for (int y = h - (structElementWidth % 2); y <= h
-							+ (structElementHeight % 2); y++) {
+					for (int y = h - (structElementWidth / 2); y <= h
+							+ (structElementHeight / 2); y++) {
 
 						// As long as the pixels not over the border
 						if (x >= 0 && x < img.getWidth() && y >= 0
@@ -259,11 +259,11 @@ public class ImageOperations {
 							// Assumes all the pixels in the structureImage are
 							// 1. If the pixel does not have the right color
 							// black, set fits false, set the pixel in the
-							// erosionImage
-							// to the false color and break the loop
+							// erosionImage to the foreground color and break the loop
 							if (img.getRGB(x, y) != rgbForegroundColor) {
 								fits = false;
 								erosionedImage.setRGB(w, h, rgbBackgroundColor);
+								break;
 							}
 						}
 					}
@@ -349,8 +349,8 @@ public class ImageOperations {
 					}
 				}
 
-				// After every pixel was checked and if fits is true
-				// Set the pixel in the dilationImage to he negative color
+				// After every pixel was checked and if hits is false
+				// Set the pixel in the dilationImage to he background color
 				if (!hits) {
 					dilationImage.setRGB(w, h, rgbBackgroundColor);
 				}
