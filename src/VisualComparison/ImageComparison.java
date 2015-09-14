@@ -71,13 +71,14 @@ public class ImageComparison {
 	 *            tolerance.
 	 * @param pixTolerance
 	 *            how many differences per block will be tolerated, in percent.
-	 *            value between zero and one should be given. One: 100%. All 
+	 *            value between zero and one should be given. One: 100%. All
 	 *            pixels can be different.
 	 * @param pixTolerance
 	 * @param trainingMode
 	 *            whether or not the training mode should be used
 	 * @param closeMask
-	 * @param differenceImage TODO
+	 * @param differenceImage
+	 *            TODO
 	 * @param comparisonAlgorithm
 	 *            the algorithm the comparison should use. If the given string
 	 *            does not match any algorithm, it throws an
@@ -116,12 +117,14 @@ public class ImageComparison {
 	 * @param fileOut
 	 *            the file where the marked image should be saved if there are
 	 *            differences
-	 * @param fileDifference TODO
+	 * @param fileDifference
+	 *            TODO
 	 * @return false if there were changes, true otherwise
 	 * @throws IOException
 	 */
 	public boolean isEqual(BufferedImage img1, BufferedImage img2,
-			File fileMask, File fileOut, File fileDifference) throws IOException {
+			File fileMask, File fileOut, File fileDifference)
+			throws IOException {
 
 		boolean isEqual = true;
 
@@ -167,9 +170,10 @@ public class ImageComparison {
 		maskImage = initializeMaskImage(copyImg1, fileMask);
 		copyImg1 = imageoperations.overlayImage(copyImg1, maskImage);
 		imgOut = imageoperations.overlayImage(imgOut, maskImage);
-		
+
 		// initializes the differenceImage
-		difference = new BufferedImage (imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
+		difference = new BufferedImage(imageWidth, imageHeight,
+				BufferedImage.TYPE_INT_ARGB);
 
 		int[][] differentPixels = null;
 
@@ -252,12 +256,12 @@ public class ImageComparison {
 				// the relevant ArrayList if the difference is above the
 				// colTolerance
 				double difference = calculatePixelRgbDiff(x, y, img1, img2);
-				
-				//draws the differenceImage if needed
-				if(differenceImage) {
+
+				// draws the differenceImage if needed
+				if (differenceImage) {
 					drawDifferencePicture(difference, x, y);
 				}
-				
+
 				if (difference > colTolerance) {
 					xCoords.add(x);
 					yCoords.add(y);
@@ -315,8 +319,8 @@ public class ImageComparison {
 		int imageheight = img1.getHeight();
 		for (int x = 0; x < imagewidth; x++) {
 			for (int y = 0; y < imageheight; y++) {
-				
-				//draws the differenceImage if needed
+
+				// draws the differenceImage if needed
 				if (differenceImage) {
 					double difference = calculatePixelRgbDiff(x, y, img1, img2);
 					drawDifferencePicture(difference, x, y);
@@ -381,7 +385,7 @@ public class ImageComparison {
 		ArrayList<Integer> xCoordsTemp = new ArrayList<Integer>();
 		ArrayList<Integer> yCoordsTemp = new ArrayList<Integer>();
 		int differencesAllowed;
-		
+
 		// Create blocks, go through every block
 		int xBlock = imageWidth / pixelPerBlockXY;
 		int yBlock = imageHeight / pixelPerBlockXY;
@@ -389,10 +393,10 @@ public class ImageComparison {
 		for (int x = 0; x < xBlock; x++) {
 			for (int y = 0; y < yBlock; y++) {
 				subImageWidth = calcPixSpan(pixelPerBlockXY, x, imageWidth);
-				subImageHeight = calcPixSpan(pixelPerBlockXY, y,
-						imageHeight);
+				subImageHeight = calcPixSpan(pixelPerBlockXY, y, imageHeight);
 				int differencesPerBlock = 0;
-				differencesAllowed = (int) Math.floor(subImageWidth * subImageHeight * pixTolerance);
+				differencesAllowed = (int) Math.floor(subImageWidth
+						* subImageHeight * pixTolerance);
 
 				// Go through every pixel in that block
 				for (int w = 0; w < subImageWidth; w++) {
@@ -400,13 +404,15 @@ public class ImageComparison {
 
 						int xCoord = x * pixelPerBlockXY + w;
 						int yCoord = y * pixelPerBlockXY + h;
-						
-						//calculate the difference and draw the differenceImage if needed
-						double difference = calculatePixelRgbDiff(xCoord, yCoord, img1, img2);
-						if(differenceImage) {
+
+						// calculate the difference and draw the differenceImage
+						// if needed
+						double difference = calculatePixelRgbDiff(xCoord,
+								yCoord, img1, img2);
+						if (differenceImage) {
 							drawDifferencePicture(difference, xCoord, yCoord);
 						}
-						
+
 						// If there is a notable difference
 						if (difference > colTolerance) {
 
@@ -521,7 +527,7 @@ public class ImageComparison {
 				* gDiff + bWeight * bDiff * bDiff);
 
 		double cDiffInPercent = cDiff / MAXDIFF;
-		
+
 		return cDiffInPercent;
 	}
 
@@ -736,7 +742,18 @@ public class ImageComparison {
 		Arrays.fill(maskArray, rgbTransparentWhite);
 		return mask;
 	}
-	
+
+	/**
+	 * This method draws a greyscale image of the differences for a better
+	 * visibility
+	 * 
+	 * @param ratio
+	 *            difference ratio between the two pixels
+	 * @param x
+	 *            current x coordinate
+	 * @param y
+	 *            current y coordinate
+	 */
 	private void drawDifferencePicture(double ratio, int x, int y) {
 		double grey = 255 * ratio;
 		int diffColor = (int) Math.round(grey);
