@@ -31,8 +31,7 @@ public class TImageComparisonCloseMask {
 
 	private final static int rgbBlack = Color.BLACK.getRGB();
 	private final static int rgbWhite = Color.WHITE.getRGB();
-	private final static int rgbTransparentWhite = new Color(255, 255, 255, 0)
-			.getRGB();
+	private final static int rgbTransparentWhite = 0;
 
 	private final static File directory = SystemUtils.getJavaIoTmpDir();
 	private static File fileMask = new File(directory, "/fileMask.png");
@@ -46,7 +45,7 @@ public class TImageComparisonCloseMask {
 
 	@BeforeClass
 	public static void initializeReference() {
-		reference = new BufferedImage(200, 200, BufferedImage.TYPE_INT_RGB);
+		reference = new BufferedImage(200, 200, BufferedImage.TYPE_INT_ARGB);
 		for (int w = 0; w < reference.getWidth(); w++) {
 			for (int h = 0; h < reference.getHeight(); h++) {
 				reference.setRGB(w, h, rgbBlack);
@@ -56,7 +55,7 @@ public class TImageComparisonCloseMask {
 
 	@Before
 	public void initializeScreenshot() throws IOException {
-		screenshot = new BufferedImage(200, 200, BufferedImage.TYPE_INT_RGB);
+		screenshot = new BufferedImage(200, 200, BufferedImage.TYPE_INT_ARGB);
 		for (int w = 0; w < reference.getWidth(); w++) {
 			for (int h = 0; h < reference.getHeight(); h++) {
 				screenshot.setRGB(w, h, rgbWhite);
@@ -228,6 +227,79 @@ public class TImageComparisonCloseMask {
 		Assert.assertFalse(isCorrectlyNotMasked);	
 	}
 
+	/**
+	 * Tests what happens if a single pixel is different.
+	 * Expected result: The marking block of that pixel is masked,
+	 * nothing was closed. Works with markingX/ -Y = 10.
+	 * 
+	 * @throws IOException 
+	 */
+	@Test
+	public void singlePixel() throws IOException {
+		for (int w = 0; w < reference.getWidth(); w++) {
+			for (int h = 0; h < reference.getHeight(); h++) {
+				screenshot.setRGB(w, h, rgbBlack);
+			}
+		}
+		screenshot.setRGB(55, 55, rgbWhite);
+
+		train.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
+		BufferedImage maskImage = ImageIO.read(fileMask);
+
+		for (int w = 0; w < maskImage.getWidth(); w++) {
+			for (int h = 0; h < maskImage.getHeight(); h++) {
+				if ( 50 <= w && w < 60 && 50 <= h && h < 60) {
+					Assert.assertEquals(rgbBlack, maskImage.getRGB(w, h));
+				}
+				else {
+					Assert.assertEquals(rgbTransparentWhite, maskImage.getRGB(w, h));
+				}
+			}
+		}
+	}
+	
+	/**
+	 * Tests what happens if there is a difference on every corner 
+	 * of the structure element. 
+	 * Calculation: MarkingX/ -Y = 10 -> Every block of ten pixels 
+	 * corresponds to one pixel while closing.
+	 * With an image width of 200 pixels, the image to close will have 
+	 * a width of 20 pixels and the structure element a width of 3 pixels.
+	 * Analogous for the height.
+	 * 
+	 * That means one difference in 40-50, none in 50-60, one in 60-70
+	 * None in the row below that.
+	 * And again the same in the row below that.
+	 * @throws IOException 
+	 * 
+	 */
+	@Test
+	public void everyCorner() throws IOException {
+		for (int h = 0; h < screenshot.getHeight(); h++) {
+			for (int w = 0; w < screenshot.getWidth(); w++) {
+				screenshot.setRGB(w, h, rgbBlack);
+			}
+		}
+		screenshot.setRGB(44, 44, rgbWhite);
+		screenshot.setRGB(44, 66, rgbWhite);
+		screenshot.setRGB(66, 44, rgbWhite);
+		screenshot.setRGB(66, 66, rgbWhite);
+		
+		train.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
+		BufferedImage maskImage = ImageIO.read(fileMask);
+		
+		for (int w = 0; w < maskImage.getWidth(); w++) {
+			for (int h = 0; h < maskImage.getHeight(); h++) {
+				if ( 40 <= w && w < 70 && 40 <= h && h < 70) {
+					Assert.assertEquals(rgbBlack, maskImage.getRGB(w, h));
+				}
+				else {
+					Assert.assertEquals(rgbTransparentWhite, maskImage.getRGB(w, h));
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Deletes the temporary files which were created for this test
 	 */

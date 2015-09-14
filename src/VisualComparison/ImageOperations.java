@@ -128,6 +128,11 @@ public class ImageOperations {
 	 * Scales an image up (or down) to the given size. Does not innately
 	 * preserve Width/ Height ratio. Used in closeImage.
 	 * 
+	 * All transparent pixels will be set to rgb = 0 during the scaling. That
+	 * means the transparent parts of the mask image from ImageComparison will
+	 * be transparent black instead of transparent white, but that doesn't
+	 * actually matter.
+	 * 
 	 * @param img
 	 * @param newWidth
 	 * @param newHeight
@@ -259,7 +264,8 @@ public class ImageOperations {
 							// Assumes all the pixels in the structureImage are
 							// 1. If the pixel does not have the right color
 							// black, set fits false, set the pixel in the
-							// erosionImage to the foreground color and break the loop
+							// erosionImage to the foreground color and break
+							// the loop
 							if (img.getRGB(x, y) != rgbForegroundColor) {
 								fits = false;
 								erosionedImage.setRGB(w, h, rgbBackgroundColor);
@@ -397,6 +403,7 @@ public class ImageOperations {
 
 		// Scale the image back
 		img = scaleImage(shrunkImg, img.getWidth(), img.getHeight());
+
 		return img;
 	}
 }
