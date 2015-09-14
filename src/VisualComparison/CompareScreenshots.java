@@ -96,6 +96,27 @@ public class CompareScreenshots implements WebDriverCustomModule {
 	 * be scaled down beforehand and scaled back up again afterwards.<br>
 	 * Default: false.
 	 * <p>
+	 * com.xceptance.xlt.imageComparison.differenceImage: If true, a greyscale
+	 * image will be created in addition to the marked image. The image is
+	 * lighter the higher the difference between the screenshot and the
+	 * reference image. Default: false.
+	 * <p>
+	 * com.xceptance.xlt.imageComparison.algorithm: Decides which comparison
+	 * algorithm should be used. <p>
+	 * Options: <br>
+	 * EXACTLY: A pixel wise comparison without any tolerance. If there are any
+	 * difference, the exact comparison will return false. <br>
+	 * PIXELFUZZY: A pixel
+	 * wise comparison with tolerance (using the colTolerance property).
+	 * Differences between two pixels will be ignored if they are under the
+	 * defined tolerance level. <br>
+	 * FUZZY: A more fuzzy comparison using the
+	 * pixelPerBlockXY property, the colTolerance parameter and the pixTolerance
+	 * property. The images are divided into blocks. Minor differences in color
+	 * are ignored like in PIXELFUZZY. Additionally, the images are divided into
+	 * squares with a width and height of pixelPerBlockXY. Whithin these blocks, 
+	 * differences will be ignored as long as there are less different pixels then
+	 * pixTolerance.
 	 * 
 	 * ImageComparison. {@inheritDoc}
 	 */
@@ -131,6 +152,10 @@ public class CompareScreenshots implements WebDriverCustomModule {
 		// closeMask
 		String closeMaskString = x.getProperty(PPREFIX + "closeMask");
 		Boolean closeMask = Boolean.parseBoolean(closeMaskString);
+
+		// closeMask
+		String differenceImageS = x.getProperty(PPREFIX + "differenceImage");
+		Boolean differenceImage = Boolean.parseBoolean(differenceImageS);
 
 		// algorithm
 		String algorithm = x.getProperty(PPREFIX + "algorithm", DALGORITHM);
@@ -215,16 +240,16 @@ public class CompareScreenshots implements WebDriverCustomModule {
 				String maskImagePath = directory + "/mask/" + screenshotName
 						+ "-mask" + ".png";
 				File maskImageFile = new File(maskImagePath);
-				
+
 				new File(directory + "/difference/").mkdirs();
-				String differenceImagePath = directory + "/difference/" + screenshotName
-						+ "-difference" + ".png";
+				String differenceImagePath = directory + "/difference/"
+						+ screenshotName + "-difference" + ".png";
 				File differenceImageFile = new File(differenceImagePath);
 
 				// Initializes ImageComparison and calls isEqual
 				ImageComparison imagecomparison = new ImageComparison(
 						pixelPerBlockXY, colTolerance, pixTolerance,
-						trainingMode, closeMask, false, algorithm);
+						trainingMode, closeMask, differenceImage, algorithm);
 				boolean result = imagecomparison.isEqual(reference, screenshot,
 						maskImageFile, markedImageFile, differenceImageFile);
 
