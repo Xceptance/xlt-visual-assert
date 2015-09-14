@@ -72,7 +72,6 @@ public class TImageComparisonCloseMask {
 				maskImage.setRGB(w, h, rgbTransparentWhite);
 			}
 		}
-		ImageIO.write(maskImage, "PNG", fileMask);
 	}
 
 	/**

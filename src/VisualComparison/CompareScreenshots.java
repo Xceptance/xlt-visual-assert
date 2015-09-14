@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.jetty.io.RuntimeIOException;
 import org.junit.Assert;
 import org.openqa.selenium.Capabilities;
@@ -36,6 +37,7 @@ public class CompareScreenshots implements WebDriverCustomModule {
 	final String DCOLTOLERANCE = "0.05";
 	final String DPIXTOLERANCE = "0.01";
 	final String DALGORITHM = "FUZZY";
+	private final File tempDirectory = SystemUtils.getJavaIoTmpDir();
 
 	/**
 	 * No parameters beyond the webdriver are required. Necessary and possible
@@ -215,7 +217,7 @@ public class CompareScreenshots implements WebDriverCustomModule {
 		// If there is another screenshot ...
 		else {
 			// Create temporary file for the new screenshot
-			File screenshotFile = new File(directory + "new-screenshot"
+			File screenshotFile = new File(tempDirectory + "new-screenshot"
 					+ screenshotName + ".png");
 			try {
 				takeScreenshot(webDriver, screenshotFile);
