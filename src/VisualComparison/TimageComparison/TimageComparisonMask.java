@@ -41,6 +41,7 @@ public class TimageComparisonMask {
 	private final static File directory = SystemUtils.getJavaIoTmpDir();
 	private static File fileMask = new File(directory, "/fileMask.png");
 	private static File fileOut = new File(directory, "/fileOut.png");
+	private static File differenceFile = new File(directory + "/difference.png");
 
 	private final static int rgbBlack = Color.BLACK.getRGB();
 	private final static int rgbWhite = Color.WHITE.getRGB();
@@ -93,10 +94,10 @@ public class TimageComparisonMask {
 	@Test
 	public void changesCorrectlyMarked() throws IOException {
 		ImageComparison imagecomparison = new ImageComparison(10, 0.1, 0.01,
-				false, false, "PIXELFUZZY");
+				false, false, false, "PIXELFUZZY");
 
 		boolean result = imagecomparison.isEqual(reference, screenshot,
-				fileMask, fileOut);
+				fileMask, fileOut, differenceFile);
 		Assert.assertFalse("A difference that wasn't masked went undetected",
 				result);
 
@@ -129,8 +130,8 @@ public class TimageComparisonMask {
 	@Test
 	public void changesCorrectlyHidden() throws IOException {
 		ImageComparison imagecomparison = new ImageComparison(10, 0.1, 0.01,
-				false, false, "FUZZY");
-		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
+				false, false, false, "FUZZY");
+		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		BufferedImage output = ImageIO.read(fileOut);
 
 		for (int w = 0; w < reference.getWidth(); w++) {

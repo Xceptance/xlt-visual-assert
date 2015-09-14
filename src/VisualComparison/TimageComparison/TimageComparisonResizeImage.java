@@ -36,6 +36,7 @@ public class TimageComparisonResizeImage {
 	private final static File directory = SystemUtils.getJavaIoTmpDir();
 	private static File fileMask = new File(directory, "/fileMask.png");
 	private static File fileOut = new File(directory, "/fileOut.png");
+	private static File differenceFile = new File(directory + "/difference.png");
 	
 	private final static int rgbWhite = Color.WHITE.getRGB();
 	private final static int rgbMarked = Color.RED.getRGB();
@@ -62,8 +63,8 @@ public class TimageComparisonResizeImage {
 	 */
 	@Test
 	public void correctSizePixelFuzzyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 0.01, 0.01, false, false, "PIXELFUZZY");
-		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
+		ImageComparison imagecomparison = new ImageComparison(1, 0.01, 0.01, false, false, false, "PIXELFUZZY");
+		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		BufferedImage img = ImageIO.read(fileOut);
 		
 		Assert.assertEquals(reference.getWidth(), img.getWidth());
@@ -79,8 +80,8 @@ public class TimageComparisonResizeImage {
 	 */
 	@Test
 	public void correctBreakPointPixelFuzzyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 0.01, 0.01, false, false, "PIXELFUZZY");
-		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
+		ImageComparison imagecomparison = new ImageComparison(1, 0.01, 0.01, false, false, false, "PIXELFUZZY");
+		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		BufferedImage img = ImageIO.read(fileOut);
 		
 		for (int w = 0; w < img.getWidth(); w++) {

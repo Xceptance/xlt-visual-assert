@@ -31,6 +31,7 @@ public class TImageComparisonResizeWithActiveMask {
 	private final static File directory = SystemUtils.getJavaIoTmpDir();
 	private static File fileMask = new File(directory, "/fileMask.png");
 	private static File fileOut = new File(directory, "/fileOut.png");
+	private static File differenceFile = new File(directory + "/difference.png");
 
 	private final static int rgbBlack = Color.BLACK.getRGB();
 	private final static int rgbWhite = Color.WHITE.getRGB();
@@ -69,9 +70,9 @@ public class TImageComparisonResizeWithActiveMask {
 	@Test
 	public void biggerScreenshotImage() throws IOException {
 		ImageComparison imagecomparison1 = new ImageComparison(10, 0.1, 0.01,
-				false, false, "PIXELFUZZY");
+				false, false, false, "PIXELFUZZY");
 		boolean result = imagecomparison1.isEqual(smallBlackImg, bigWhiteImg,
-				fileMask, fileOut);
+				fileMask, fileOut, differenceFile);
 		Assert.assertFalse("Former maskImage shouldn't be used if the "
 				+ "screenshot has a bigger size - result: " + result, result);
 	}
@@ -84,9 +85,9 @@ public class TImageComparisonResizeWithActiveMask {
 	@Test
 	public void smallerScreenshotImage() throws IOException {
 		ImageComparison imagecomparison1 = new ImageComparison(10, 0.1, 0.01,
-				false, false, "PIXELFUZZY");
+				false, false, false, "PIXELFUZZY");
 		boolean result = imagecomparison1.isEqual(bigWhiteImg, smallBlackImg,
-				fileMask, fileOut);
+				fileMask, fileOut, differenceFile);
 		Assert.assertFalse("Former maskImage shouldn't be used if the "
 				+ "screenshot has a smaller size - result: " + result, result);
 	}

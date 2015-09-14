@@ -39,10 +39,11 @@ public class TimageComparisonChooseAlgorithm {
 		private final static File directory = SystemUtils.getJavaIoTmpDir();
 		private static File fileMask = new File(directory, "/fileMask.png");
 		private static File fileOut = new File(directory, "/fileOut.png");
+		private static File differenceFile = new File(directory + "/difference.png");
 		
-		private ImageComparison exactComp = new ImageComparison(50, 0.2, 0.01, false, false, "EXACTLY");
-		private final ImageComparison pixelFuzzyComp = new ImageComparison(50, 0.2, 0.01, false, false, "PIXELFUZZY");
-		private final ImageComparison fuzzyComp = new ImageComparison(50, 0.2, 0.01, false, false, "FUZZY");
+		private ImageComparison exactComp = new ImageComparison(50, 0.2, 0.01, false, false, false, "EXACTLY");
+		private final ImageComparison pixelFuzzyComp = new ImageComparison(50, 0.2, 0.01, false, false, false, "PIXELFUZZY");
+		private final ImageComparison fuzzyComp = new ImageComparison(50, 0.2, 0.01, false, false, false, "FUZZY");
 
 
 		@BeforeClass
@@ -64,14 +65,14 @@ public class TimageComparisonChooseAlgorithm {
 			//Change the screenshot image so one pixel differs a tiny bit.
 			screenshot.setRGB(0, 0, rgbAlmostBlack);
 			
-			Assert.assertFalse(exactComp.isEqual(screenshot, reference, fileMask, fileOut));
-			Assert.assertTrue(pixelFuzzyComp.isEqual(screenshot, reference, fileMask, fileOut));
-			Assert.assertTrue(fuzzyComp.isEqual(screenshot, reference, fileMask, fileOut));
+			Assert.assertFalse(exactComp.isEqual(screenshot, reference, fileMask, fileOut, differenceFile));
+			Assert.assertTrue(pixelFuzzyComp.isEqual(screenshot, reference, fileMask, fileOut, differenceFile));
+			Assert.assertTrue(fuzzyComp.isEqual(screenshot, reference, fileMask, fileOut, differenceFile));
 			
 			//Change the screenshot image so one pixel differs a lot.
 			screenshot.setRGB(0, 0, rgbWhite);
-			Assert.assertFalse(pixelFuzzyComp.isEqual(screenshot, reference, fileMask, fileOut));
-			Assert.assertTrue(fuzzyComp.isEqual(screenshot, reference, fileMask, fileOut));
+			Assert.assertFalse(pixelFuzzyComp.isEqual(screenshot, reference, fileMask, fileOut, differenceFile));
+			Assert.assertTrue(fuzzyComp.isEqual(screenshot, reference, fileMask, fileOut, differenceFile));
 			
 			//For completions sake, change the screenshot so many pixels differ a lot, then try fuzzyEqual
 			for (int x = 0; x < 26; x++) {
@@ -79,13 +80,13 @@ public class TimageComparisonChooseAlgorithm {
 					screenshot.setRGB(x, y, rgbWhite);
 				}
 			}
-			Assert.assertFalse(fuzzyComp.isEqual(screenshot, reference, fileMask, fileOut));
+			Assert.assertFalse(fuzzyComp.isEqual(screenshot, reference, fileMask, fileOut, differenceFile));
 		}
 		
 		@Test (expected = IllegalArgumentException.class)
 		public void noAlgorithmFound() {
 			initializeImages();
-			exactComp = new ImageComparison(20, 0.2, 10, false, false, "exactlyEQUAL");
+			exactComp = new ImageComparison(20, 0.2, 10, false, false, false, "exactlyEQUAL");
 		
 		}
 		

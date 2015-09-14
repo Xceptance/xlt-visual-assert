@@ -29,6 +29,7 @@ public class TImageComparisonBlocks {
 	private final static File directory = SystemUtils.getJavaIoTmpDir();
 	private static File fileMask = new File(directory, "/fileMask.png");
 	private static File fileOut = new File(directory, "/fileOut.png");
+	private static File differenceFile = new File(directory + "/difference.png");
 	
 	@BeforeClass
 	public static void initializeImages() {
@@ -61,8 +62,8 @@ public class TImageComparisonBlocks {
 		
 //		This test tests what happens if the borders go over the edge
 //		It should also check the drawBorders method, since the treshold is so low, it should find differences everywhere
-		ImageComparison imagecomparison2 = new ImageComparison(20, 0.0, 0.01, false, false, "FUZZY");
-		boolean result = imagecomparison2.isEqual(reference, screenshot, fileMask, fileOut);
+		ImageComparison imagecomparison2 = new ImageComparison(20, 0.0, 0.01, false, false, false, "FUZZY");
+		boolean result = imagecomparison2.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		Assert.assertFalse("This wasn't what the test is for, but it's still wrong", result);
 	}
 	

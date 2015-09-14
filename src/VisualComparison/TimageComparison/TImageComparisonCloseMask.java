@@ -37,11 +37,12 @@ public class TImageComparisonCloseMask {
 	private final static File directory = SystemUtils.getJavaIoTmpDir();
 	private static File fileMask = new File(directory, "/fileMask.png");
 	private static File fileOut = new File(directory, "/fileOut.png");
+	private static File differenceFile = new File(directory + "/difference.png");
 
 	private final ImageComparison train = new ImageComparison(10, 0.0, 0.01,
-			true, true, "PIXELFUZZY");
+			true, true, false, "PIXELFUZZY");
 	private final ImageComparison compare = new ImageComparison(10, 0.0, 0.01,
-			false, false, "PIXELFUZZY");
+			false, false, false, "PIXELFUZZY");
 
 	@BeforeClass
 	public static void initializeReference() {
@@ -96,7 +97,7 @@ public class TImageComparisonCloseMask {
 			}
 		}
 
-		train.isEqual(reference, screenshot, fileMask, fileOut);
+		train.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		boolean isCorrectlyMasked = true;
 		BufferedImage maskImage = ImageIO.read(fileMask);
 
@@ -118,7 +119,7 @@ public class TImageComparisonCloseMask {
 			}
 		}
 		Assert.assertTrue(compare.isEqual(reference, screenshot, fileMask,
-				fileOut));
+				fileOut, differenceFile));
 	}
 
 	/**
@@ -142,7 +143,7 @@ public class TImageComparisonCloseMask {
 			}
 		}
 
-		train.isEqual(reference, screenshot, fileMask, fileOut);
+		train.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		boolean isCorrectlyNotMasked = true;
 		BufferedImage maskImage = ImageIO.read(fileMask);
 
@@ -164,7 +165,7 @@ public class TImageComparisonCloseMask {
 			}
 		}
 		Assert.assertFalse(compare.isEqual(reference, screenshot, fileMask,
-				fileOut));
+				fileOut, differenceFile));
 	}
 
 	/**
@@ -182,7 +183,7 @@ public class TImageComparisonCloseMask {
 			}
 		}
 		
-		train.isEqual(reference, screenshot, fileMask, fileOut);
+		train.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		boolean isCorrectlyMasked = true;
 		BufferedImage maskImage = ImageIO.read(fileMask);
 
@@ -212,7 +213,7 @@ public class TImageComparisonCloseMask {
 			}
 		}
 		
-		train.isEqual(reference, screenshot, fileMask, fileOut);
+		train.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		boolean isCorrectlyNotMasked = true;
 		BufferedImage maskImage = ImageIO.read(fileMask);
 

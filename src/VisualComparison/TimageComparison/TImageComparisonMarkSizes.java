@@ -22,11 +22,12 @@ import VisualComparison.ImageComparison;
 public class TImageComparisonMarkSizes {
 	static BufferedImage reference, slim, wide, low, high, slimAndLow,
 			wideAndHigh, switched;
-	ImageComparison imgCompare = new ImageComparison(2, 0.00, 0.01, false, false, "FUZZY");
+	ImageComparison imgCompare = new ImageComparison(2, 0.00, 0.01, false, false, false, "FUZZY");
 	static File directory = org.apache.commons.lang3.SystemUtils
 			.getJavaIoTmpDir();
 	static File outPutfile = new File(directory + "/test.png");
 	static File maskFile = new File(directory + "/mask.png");
+	private static File differenceFile = new File(directory + "/difference.png");
 
 	/**
 	 * Sets up the images for the test
@@ -59,7 +60,7 @@ public class TImageComparisonMarkSizes {
 	@Test
 	public void referenceMoreWidth() throws IOException {
 		Assert.assertFalse(imgCompare.isEqual(reference, slim, maskFile,
-				outPutfile));
+				outPutfile, differenceFile));
 	}
 
 	/**
@@ -70,7 +71,7 @@ public class TImageComparisonMarkSizes {
 	@Test
 	public void referenceLessWidth() throws IOException {
 		Assert.assertFalse(imgCompare.isEqual(reference, wide, maskFile,
-				outPutfile));
+				outPutfile, differenceFile));
 	}
 
 	/**
@@ -81,7 +82,7 @@ public class TImageComparisonMarkSizes {
 	@Test
 	public void referenceMoreHeight() throws IOException {
 		Assert.assertFalse(imgCompare.isEqual(reference, low, maskFile,
-				outPutfile));
+				outPutfile, differenceFile));
 	}
 
 	/**
@@ -92,7 +93,7 @@ public class TImageComparisonMarkSizes {
 	@Test
 	public void referenceLessHeight() throws IOException {
 		Assert.assertFalse(imgCompare.isEqual(reference, high, maskFile,
-				outPutfile));
+				outPutfile, differenceFile));
 	}
 
 	/**
@@ -103,7 +104,7 @@ public class TImageComparisonMarkSizes {
 	@Test
 	public void referenceBothMore() throws IOException {
 		Assert.assertFalse(imgCompare.isEqual(reference, slimAndLow,
-				maskFile, outPutfile));
+				maskFile, outPutfile, differenceFile));
 	}
 
 	/**
@@ -114,7 +115,7 @@ public class TImageComparisonMarkSizes {
 	@Test
 	public void referenceBothLess() throws IOException {
 		Assert.assertFalse(imgCompare.isEqual(reference, wideAndHigh,
-				maskFile, outPutfile));
+				maskFile, outPutfile, differenceFile));
 	}
 
 	/**
@@ -125,7 +126,7 @@ public class TImageComparisonMarkSizes {
 	@Test
 	public void referenceBroadFormat() throws IOException {
 		Assert.assertFalse(imgCompare.isEqual(reference, switched, maskFile,
-				outPutfile));
+				outPutfile, differenceFile));
 	}
 
 	@AfterClass

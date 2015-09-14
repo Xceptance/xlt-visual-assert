@@ -23,6 +23,7 @@ import javax.imageio.ImageIO;
  * @author lucas & damian
  */
 public class ImageComparison {
+	private BufferedImage difference = null;
 	private BufferedImage imgOut = null;
 	private BufferedImage maskImage = null;
 	private int pixelPerBlockXY, imageWidth, imageHeight, subImageWidth,
@@ -33,6 +34,7 @@ public class ImageComparison {
 	private double pixTolerance;
 	private boolean trainingMode;
 	private boolean closeMask;
+	private boolean differenceImage;
 
 	protected enum ComparisonAlgorithm {
 		EXACTLY, PIXELFUZZY, FUZZY
@@ -71,10 +73,11 @@ public class ImageComparison {
 	 *            how many differences per block will be tolerated, in percent.
 	 *            value between zero and one should be given. One: 100%. All 
 	 *            pixels can be different.
+	 * @param pixTolerance
 	 * @param trainingMode
 	 *            whether or not the training mode should be used
 	 * @param closeMask
-	 * @param pixTolerance
+	 * @param differenceImage TODO
 	 * @param comparisonAlgorithm
 	 *            the algorithm the comparison should use. If the given string
 	 *            does not match any algorithm, it throws an
@@ -82,12 +85,13 @@ public class ImageComparison {
 	 */
 	public ImageComparison(int pixelPerBlockXY, double colTolerance,
 			double pixTolerance, boolean trainingMode, boolean closeMask,
-			String algorithm) {
+			boolean differenceImage, String algorithm) {
 		this.pixelPerBlockXY = pixelPerBlockXY;
 		this.colTolerance = colTolerance;
 		this.pixTolerance = pixTolerance;
 		this.trainingMode = trainingMode;
 		this.closeMask = closeMask;
+		this.differenceImage = differenceImage;
 
 		try {
 			this.algorithm = ComparisonAlgorithm.valueOf(algorithm);
@@ -112,11 +116,12 @@ public class ImageComparison {
 	 * @param fileOut
 	 *            the file where the marked image should be saved if there are
 	 *            differences
+	 * @param fileDifference TODO
 	 * @return false if there were changes, true otherwise
 	 * @throws IOException
 	 */
 	public boolean isEqual(BufferedImage img1, BufferedImage img2,
-			File fileMask, File fileOut) throws IOException {
+			File fileMask, File fileOut, File fileDifference) throws IOException {
 
 		boolean isEqual = true;
 
@@ -162,6 +167,9 @@ public class ImageComparison {
 		maskImage = initializeMaskImage(copyImg1, fileMask);
 		copyImg1 = imageoperations.overlayImage(copyImg1, maskImage);
 		imgOut = imageoperations.overlayImage(imgOut, maskImage);
+		
+		// initializes the differenceImage
+		difference = new BufferedImage (imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
 
 		int[][] differentPixels = null;
 
@@ -211,6 +219,7 @@ public class ImageComparison {
 			return true;
 		} else {
 			ImageIO.write(imgOut, "PNG", fileOut);
+			ImageIO.write(difference, "png", fileDifference);
 			return false;
 		}
 	}
@@ -493,6 +502,11 @@ public class ImageComparison {
 				* gDiff + bWeight * bDiff * bDiff);
 
 		double cDiffInPercent = cDiff / MAXDIFF;
+		
+		// draws the differenceImage if needed
+		if(differenceImage) {
+			drawDifferencePicture(cDiffInPercent, x, y);
+		}
 
 		return cDiffInPercent;
 	}
@@ -707,5 +721,12 @@ public class ImageComparison {
 				.getData();
 		Arrays.fill(maskArray, rgbTransparentWhite);
 		return mask;
+	}
+	
+	private void drawDifferencePicture(double ratio, int x, int y) {
+		double grey = 255 * ratio;
+		int diffColor = (int) Math.round(grey);
+		Color greyscale = new Color(diffColor, diffColor, diffColor, 255);
+		difference.setRGB(x, y, greyscale.getRGB());
 	}
 }

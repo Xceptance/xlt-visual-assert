@@ -36,6 +36,7 @@ public class TImageComparisonInfluenceAlpha {
 	private final static File directory = SystemUtils.getJavaIoTmpDir();
 	private static File fileMask = new File(directory, "/fileMask.png");
 	private static File fileOut = new File(directory, "/fileOut.png");
+	private static File differenceFile = new File(directory + "/difference.png");
 
 	@BeforeClass
 	public static void initializeImages() {
@@ -69,15 +70,15 @@ public class TImageComparisonInfluenceAlpha {
 	@Test
 	public void influenceAlphaPixelFuzzyEqual() throws IOException {
 		ImageComparison imagecomparison = new ImageComparison(1, 0.01, 0.01,
-				false, false, "PIXELFUZZY");
+				false, false, false, "PIXELFUZZY");
 		boolean result = imagecomparison.isEqual(notTransparentImg,
-				transparentImg, fileMask, fileOut);
+				transparentImg, fileMask, fileOut, differenceFile);
 		Assert.assertTrue(
 				"A transparent screenshot was unexpectedly detected",
 				result);
 
 		result = imagecomparison.isEqual(transparentImg, notTransparentImg,
-				fileMask, fileOut);
+				fileMask, fileOut, differenceFile);
 		Assert.assertTrue(
 				"A transparent reference Image was detected unexpectedly",
 				result);
@@ -93,14 +94,14 @@ public class TImageComparisonInfluenceAlpha {
 	@Test
 	public void influenceAlphaExactlyEqual() throws IOException {
 		ImageComparison imagecomparison = new ImageComparison(1, 0.0, 0.01,
-				false, false, "EXACTLY");
+				false, false, false, "EXACTLY");
 		boolean result = imagecomparison.isEqual(notTransparentImg,
-				transparentImg, fileMask, fileOut);
+				transparentImg, fileMask, fileOut, differenceFile);
 		Assert.assertFalse(
 				"A transparent screenshot went undetected",
 				result);
 		result = imagecomparison.isEqual(transparentImg, notTransparentImg,
-				fileMask, fileOut);
+				fileMask, fileOut, differenceFile);
 		Assert.assertFalse(
 				"A transparent reference Image went undetected",
 				result);

@@ -31,6 +31,7 @@ public class TimageComparisonResizedImageColor {
 	private final static File directory = SystemUtils.getJavaIoTmpDir();
 	private static File fileMask = new File(directory, "/fileMask.png");
 	private static File fileOut = new File(directory, "/fileOut.png");
+	private static File differenceFile = new File(directory + "/difference.png");
 
 	private final static int rgbBlack = Color.BLACK.getRGB();
 
@@ -64,9 +65,9 @@ public class TimageComparisonResizedImageColor {
 	@Test
 	public void testDifferentSizeT() throws IOException {
 		ImageComparison imagecomparison = new ImageComparison(10,
-				10, 0.01, false, false, "PIXELFUZZY");
+				10, 0.01, false, false, false, "PIXELFUZZY");
 		boolean result = imagecomparison.isEqual(reference, screenshot,
-				fileMask, fileOut);
+				fileMask, fileOut, differenceFile);
 		Assert.assertFalse(
 				"Images of different size shoudn't be equal",
 				result);
@@ -80,9 +81,9 @@ public class TimageComparisonResizedImageColor {
 	 */
 	@Test
 	public void testDifferentSize() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 0.00, 0.01, false, false, "PIXELFUZZY");
+		ImageComparison imagecomparison = new ImageComparison(1, 0.00, 0.01, false, false, false, "PIXELFUZZY");
 		boolean result = imagecomparison.isEqual(reference, screenshot,
-				fileMask, fileOut);
+				fileMask, fileOut, differenceFile);
 		Assert.assertFalse(
 				"Images of different size shoudn't be equal",
 				result);

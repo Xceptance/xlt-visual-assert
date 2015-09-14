@@ -35,6 +35,7 @@ public class TImageComparisonMarks {
 	private final static File directory = SystemUtils.getJavaIoTmpDir();
 	private static File fileMask = new File(directory, "/fileMask.png");
 	private static File fileOut = new File(directory, "/fileOut.png");
+	private static File differenceFile = new File(directory + "/difference.png");
 	
 	private static int blackRgb = Color.BLACK.getRGB();
 	private static int whiteRgb = Color.WHITE.getRGB();
@@ -75,8 +76,8 @@ public class TImageComparisonMarks {
 	 */
 	@Test
 	public void correctlyMarkedRed() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 0.1, 0.01, false, false, "PIXELFUZZY");
-		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
+		ImageComparison imagecomparison = new ImageComparison(1, 0.1, 0.01, false, false, false, "PIXELFUZZY");
+		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		BufferedImage output = ImageIO.read(fileOut);
 		boolean hasRed = false;
 		int redRgb = Color.RED.getRGB();
@@ -100,8 +101,8 @@ public class TImageComparisonMarks {
 	 */
 	@Test
 	public void correctlyMarkedGreen() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 0.1, 0.01, false, false, "PIXELFUZZY");
-		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut);
+		ImageComparison imagecomparison = new ImageComparison(1, 0.1, 0.01, false, false, false, "PIXELFUZZY");
+		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		BufferedImage output = ImageIO.read(fileOut);
 		boolean hasGreen = false;
 		int greenRgb = Color.GREEN.getRGB();

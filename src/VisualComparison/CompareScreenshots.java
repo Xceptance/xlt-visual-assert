@@ -215,13 +215,18 @@ public class CompareScreenshots implements WebDriverCustomModule {
 				String maskImagePath = directory + "/mask/" + screenshotName
 						+ "-mask" + ".png";
 				File maskImageFile = new File(maskImagePath);
+				
+				new File(directory + "/difference/").mkdirs();
+				String differenceImagePath = directory + "/difference/" + screenshotName
+						+ "-difference" + ".png";
+				File differenceImageFile = new File(differenceImagePath);
 
 				// Initializes ImageComparison and calls isEqual
 				ImageComparison imagecomparison = new ImageComparison(
 						pixelPerBlockXY, colTolerance, pixTolerance,
-						trainingMode, closeMask, algorithm);
+						trainingMode, closeMask, false, algorithm);
 				boolean result = imagecomparison.isEqual(reference, screenshot,
-						maskImageFile, markedImageFile);
+						maskImageFile, markedImageFile, differenceImageFile);
 
 				String assertMessage = "Website does not match the reference screenshot: "
 						+ currentActionName;
