@@ -78,11 +78,6 @@ public class TImageComparisonTraining {
 				maskFile, outPutfile, differenceFile));
 		Assert.assertTrue(fuzzyTraining.isEqual(reference, newImage, maskFile,
 				outPutfile, differenceFile));
-		
-		ImageIO.write(reference, "PNG", new File("/home/daniel/Pictures/reference.png"));
-		ImageIO.write(newImage, "PNG", new File("/home/daniel/Pictures/newImage.png"));
-		BufferedImage maskImage = ImageIO.read(maskFile);
-		ImageIO.write(maskImage, "PNG", new File("/home/daniel/Pictures/mask.png"));
 		Assert.assertTrue(fuzzyImgCompare.isEqual(reference, newImage,
 				maskFile, new File("/home/daniel/Pictures/ouput.png"), differenceFile));
 	}
