@@ -70,7 +70,7 @@ public class TImageComparisonInfluenceAlpha {
 	@Test
 	public void influenceAlphaPixelFuzzyEqual() throws IOException {
 		ImageComparison imagecomparison = new ImageComparison(1, 0.01, 0.01,
-				false, false, false, "PIXELFUZZY");
+				false, false, 3, 3, false, "PIXELFUZZY");
 		boolean result = imagecomparison.isEqual(notTransparentImg,
 				transparentImg, fileMask, fileOut, differenceFile);
 		Assert.assertTrue(
@@ -94,7 +94,7 @@ public class TImageComparisonInfluenceAlpha {
 	@Test
 	public void influenceAlphaExactlyEqual() throws IOException {
 		ImageComparison imagecomparison = new ImageComparison(1, 0.0, 0.01,
-				false, false, false, "EXACTLY");
+				false, false, 3, 3, false, "EXACTLY");
 		boolean result = imagecomparison.isEqual(notTransparentImg,
 				transparentImg, fileMask, fileOut, differenceFile);
 		Assert.assertFalse(

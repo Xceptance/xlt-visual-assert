@@ -5,8 +5,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-import javax.imageio.ImageIO;
-
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -24,17 +22,17 @@ import VisualComparison.ImageComparison;
 public class TImageComparisonTraining {
 	static BufferedImage reference, newImage;
 	ImageComparison fuzzyTraining = new ImageComparison(10, 0.00, 0.01,
-			true, false, false, "FUZZY");
+			true, false, 3, 3, false, "FUZZY");
 	ImageComparison fuzzyImgCompare = new ImageComparison(10, 0.00, 0.01,
-			false, false, false, "FUZZY");
+			false, false, 3, 3, false, "FUZZY");
 	ImageComparison exactlyTraining = new ImageComparison(1, 0.00, 0.01,
-			true, false, false, "EXACTLY");
+			true, false, 3, 3, false, "EXACTLY");
 	ImageComparison exactlyCompare = new ImageComparison(1, 0.00, 0.01,
-			false, false, false, "EXACTLY");
+			false, false, 3, 3, false, "EXACTLY");
 	ImageComparison pixelFuzzyTraining = new ImageComparison(1, 0.01, 0.01,
-			true, false, false, "PIXELFUZZY");
+			true, false, 3, 3, false, "PIXELFUZZY");
 	ImageComparison pixelFuzzyCompare = new ImageComparison(1, 0.01, 0.01,
-			false, false, false, "PIXELFUZZY");
+			false, false, 3, 3, false, "PIXELFUZZY");
 	static File directory = org.apache.commons.lang3.SystemUtils
 			.getJavaIoTmpDir();
 	static File outPutfile = new File(directory + "/test.png");

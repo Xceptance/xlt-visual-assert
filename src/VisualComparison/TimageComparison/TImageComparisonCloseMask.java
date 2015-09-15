@@ -39,9 +39,9 @@ public class TImageComparisonCloseMask {
 	private static File differenceFile = new File(directory + "/difference.png");
 
 	private final ImageComparison train = new ImageComparison(10, 0.0, 0.01,
-			true, true, false, "PIXELFUZZY");
+			true, true, 3, 3, false, "PIXELFUZZY");
 	private final ImageComparison compare = new ImageComparison(10, 0.0, 0.01,
-			false, false, false, "PIXELFUZZY");
+			false, false, 3, 3, false, "PIXELFUZZY");
 
 	@BeforeClass
 	public static void initializeReference() {

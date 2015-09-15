@@ -23,22 +23,30 @@ import javax.imageio.ImageIO;
  * @author lucas & damian
  */
 public class ImageComparison {
+
+	private final int markingX = 10;
+	private final int markingY = 10;
+	private final int compression = 10;
+
+	protected enum ComparisonAlgorithm {
+		EXACTLY, PIXELFUZZY, FUZZY
+	}
+
 	private BufferedImage difference = null;
 	private BufferedImage imgOut = null;
 	private BufferedImage maskImage = null;
 	private int pixelPerBlockXY, imageWidth, imageHeight, subImageWidth,
 			subImageHeight;
-	private final int markingX = 10;
-	private final int markingY = 10;
+
 	private double colTolerance;
 	private double pixTolerance;
+
 	private boolean trainingMode;
 	private boolean closeMask;
-	private boolean differenceImage;
+	private int structElementWidth;
+	private int structElementHeight;
 
-	protected enum ComparisonAlgorithm {
-		EXACTLY, PIXELFUZZY, FUZZY
-	}
+	private boolean differenceImage;
 
 	private final ComparisonAlgorithm algorithm;
 
@@ -73,12 +81,22 @@ public class ImageComparison {
 	 *            how many differences per block will be tolerated, in percent.
 	 *            value between zero and one should be given. One: 100%. All
 	 *            pixels can be different.
-	 * @param pixTolerance
 	 * @param trainingMode
-	 *            whether or not the training mode should be used
+	 *            whether or not the training mode should be used. If true,
+	 *            differences will be masked for later tests, not marked. And
+	 *            the comparison will always return true.
 	 * @param closeMask
-	 * @param differenceImage
+	 *            decides if small gaps in the mask should be closed after a
+	 *            training run.
+	 * @param structElementWidth
 	 *            TODO
+	 * @param structElementHeight
+	 *            TODO
+	 * @param differenceImage
+	 *            decides if a difference image should be created in addition to
+	 *            the markedImage. The difference image is a greyscale image,
+	 *            the higher the difference between the compared images, the
+	 *            lighter the corresponding area in the difference image.
 	 * @param comparisonAlgorithm
 	 *            the algorithm the comparison should use. If the given string
 	 *            does not match any algorithm, it throws an
@@ -86,12 +104,15 @@ public class ImageComparison {
 	 */
 	public ImageComparison(int pixelPerBlockXY, double colTolerance,
 			double pixTolerance, boolean trainingMode, boolean closeMask,
+			int structElementWidth, int structElementHeight,
 			boolean differenceImage, String algorithm) {
 		this.pixelPerBlockXY = pixelPerBlockXY;
 		this.colTolerance = colTolerance;
 		this.pixTolerance = pixTolerance;
 		this.trainingMode = trainingMode;
 		this.closeMask = closeMask;
+		this.structElementWidth = structElementWidth;
+		this.structElementHeight = structElementHeight;
 		this.differenceImage = differenceImage;
 
 		try {
@@ -118,7 +139,8 @@ public class ImageComparison {
 	 *            the file where the marked image should be saved if there are
 	 *            differences
 	 * @param fileDifference
-	 *            TODO
+	 *            the file where the difference image should be saved if the
+	 *            instance variable difference image is true
 	 * @return false if there were changes, true otherwise
 	 * @throws IOException
 	 */
@@ -129,7 +151,7 @@ public class ImageComparison {
 		boolean isEqual = true;
 
 		// Initializes ImageOperations object to access it's methods later
-		ImageOperations imageoperations = new ImageOperations();
+		ImageOperations imageoperations = new ImageOperations(compression);
 
 		// copies the images, so it doesn't work directly on them
 		imgOut = imageoperations.copyImage(img2);
@@ -195,28 +217,32 @@ public class ImageComparison {
 			if (trainingMode) {
 
 				// Mask differences in the maskImage
-				// if closeMask is true, close the mask,
-				// save the mask and return true in any case
 				maskDifferences(differentPixels);
-				if (closeMask) {
-					imageoperations = new ImageOperations();
-					maskImage = imageoperations.closeImage(maskImage);
-				}
-				ImageIO.write(maskImage, "PNG", fileMask);
-				isEqual = true;
 			} else {
 				// Mark the differences
 				markDifferences(differentPixels);
 				isEqual = false;
 			}
 		}
-		// If the size changed, mark the differences
-		if (img2.getWidth() != imgOut.getWidth()
-				|| img2.getHeight() != imgOut.getHeight()
-				|| img1.getWidth() != imgOut.getWidth()
-				|| img1.getHeight() != imgOut.getHeight()) {
-			imgOut = markImageBorders(imgOut, img2.getWidth(), img2.getHeight());
-			isEqual = false;
+		
+		if (!trainingMode) {
+			// If the size changed, mark the differences
+			if (img2.getWidth() != imgOut.getWidth()
+					|| img2.getHeight() != imgOut.getHeight()
+					|| img1.getWidth() != imgOut.getWidth()
+					|| img1.getHeight() != imgOut.getHeight()) {
+				imgOut = markImageBorders(imgOut, img2.getWidth(),
+						img2.getHeight());
+				isEqual = false;
+			}
+		} else {
+			// Close the maskImage if closeMask = true
+			// Save it in any case
+			if (closeMask) {
+				maskImage = imageoperations.closeImage(maskImage,
+						structElementWidth, structElementHeight);
+			}
+			ImageIO.write(maskImage, "PNG", fileMask);
 		}
 
 		if (isEqual) {

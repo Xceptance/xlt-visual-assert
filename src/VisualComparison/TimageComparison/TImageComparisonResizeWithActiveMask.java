@@ -70,7 +70,7 @@ public class TImageComparisonResizeWithActiveMask {
 	@Test
 	public void biggerScreenshotImage() throws IOException {
 		ImageComparison imagecomparison1 = new ImageComparison(10, 0.1, 0.01,
-				false, false, false, "PIXELFUZZY");
+				false, false, 3, 3, false, "PIXELFUZZY");
 		boolean result = imagecomparison1.isEqual(smallBlackImg, bigWhiteImg,
 				fileMask, fileOut, differenceFile);
 		Assert.assertFalse("Former maskImage shouldn't be used if the "
@@ -85,7 +85,7 @@ public class TImageComparisonResizeWithActiveMask {
 	@Test
 	public void smallerScreenshotImage() throws IOException {
 		ImageComparison imagecomparison1 = new ImageComparison(10, 0.1, 0.01,
-				false, false, false, "PIXELFUZZY");
+				false, false, 3, 3, false, "PIXELFUZZY");
 		boolean result = imagecomparison1.isEqual(bigWhiteImg, smallBlackImg,
 				fileMask, fileOut, differenceFile);
 		Assert.assertFalse("Former maskImage shouldn't be used if the "

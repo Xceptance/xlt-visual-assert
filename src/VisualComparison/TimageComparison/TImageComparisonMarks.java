@@ -82,7 +82,7 @@ public class TImageComparisonMarks {
 	@Test
 	public void correctlyMarkedRed() throws IOException {
 		ImageComparison imagecomparison = new ImageComparison(1, 0.1, 0.01,
-				false, false, false, "PIXELFUZZY");
+				false, false, 3, 3, false, "PIXELFUZZY");
 		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut,
 				differenceFile);
 		BufferedImage output = ImageIO.read(fileOut);
@@ -110,7 +110,7 @@ public class TImageComparisonMarks {
 	@Test
 	public void correctlyMarkedGreen() throws IOException {
 		ImageComparison imagecomparison = new ImageComparison(1, 0.1, 0.01,
-				false, false, false, "PIXELFUZZY");
+				false, false, 3, 3, false, "PIXELFUZZY");
 		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut,
 				differenceFile);
 		BufferedImage output = ImageIO.read(fileOut);
@@ -135,7 +135,7 @@ public class TImageComparisonMarks {
 	@Test
 	public void correctShape() throws IOException {
 		ImageComparison imagecomparison = new ImageComparison(1, 0.1, 0.01,
-				false, false, false, "PIXELFUZZY");
+				false, false, 3, 3, false, "PIXELFUZZY");
 		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut,
 				differenceFile);
 		BufferedImage output = ImageIO.read(fileOut);

@@ -8,7 +8,6 @@ import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.jetty.io.RuntimeIOException;
 import org.junit.Assert;
 import org.openqa.selenium.Capabilities;
@@ -36,8 +35,9 @@ public class CompareScreenshots implements WebDriverCustomModule {
 	final String DPIXELPBLOCKXY = "20";
 	final String DCOLTOLERANCE = "0.05";
 	final String DPIXTOLERANCE = "0.01";
+	final String DCLOSEWIDTH = "3";
+	final String DCLOSEHEIGHT = "3";
 	final String DALGORITHM = "FUZZY";
-	private final File tempDirectory = SystemUtils.getJavaIoTmpDir();
 
 	/**
 	 * No parameters beyond the webdriver are required. Necessary and possible
@@ -57,7 +57,13 @@ public class CompareScreenshots implements WebDriverCustomModule {
 	 * <p>
 	 * If a difference between an image and it's reference image was detected,
 	 * the image will be marked and the resulting marked image will be saved in
-	 * the marked image folder; the method will fail due to an assertion.
+	 * the marked image folder; the method will fail due to an assertion. <br>
+	 * The change can be on the edge of the rectangle that was used to mark it.
+	 * If that was the only change, the pixel was unfortunately colored red and
+	 * it is impossible to make out what changed exactly. <br>
+	 * If the screenshot and the comparison image do not have the same size,
+	 * areas that were not existent in one or the other will be completely
+	 * painted red. <br>
 	 * Without manual intervention, reference images are never changed. The
 	 * taken screenshots are also never saved as such.
 	 * <p>
@@ -94,9 +100,30 @@ public class CompareScreenshots implements WebDriverCustomModule {
 	 * <p>
 	 * com.xceptance.xlt.imageComparison.closeMask: If true, small gaps in the
 	 * maskImage will be closed after a training run, making the masked parts
-	 * more cohesive. Since this is quite performance heavy, the maskImage will
-	 * be scaled down beforehand and scaled back up again afterwards.<br>
+	 * more cohesive. Since this is quite performance heavy for large images,
+	 * the maskImage will be scaled down beforehand and scaled back up again
+	 * afterwards. It will be scaled by a factor of ten.<br>
 	 * Default: false.
+	 * <p>
+	 * com.xceptance.xlt.imageComparison.closeWidth: <br>
+	 * Decides how much should be closed if closeMask is true. Specifically, it
+	 * decides the width of the structuring element. For example, if it's ten,
+	 * then gaps with a width of up to ten will be closed. Very performance
+	 * heavy if high. <br>
+	 * The image is scaled down by a factor of 10 before the closing and scaled
+	 * up again afterwards! Thus there will always be a certain fuzzyness and 
+	 * a width of ten translates close to 100 pixels on the image, not ten.
+	 * Default: 3
+	 * <p>
+	 *  com.xceptance.xlt.imageComparison.closeHeight: <br>
+	 * Decides how much should be closed if closeMask is true. Specifically, it
+	 * decides the height of the structuring element. For example, if it's ten,
+	 * then gaps with a height of up to ten will be closed. Very performance
+	 * heavy if high. <br>
+	 * The image is scaled down by a factor of 10 before the closing and scaled
+	 * up again afterwards! Thus there will always be a certain fuzzyness and 
+	 * a height of ten translates close to 100 pixels on the image, not ten.
+	 * Default: 3
 	 * <p>
 	 * com.xceptance.xlt.imageComparison.differenceImage: If true, a greyscale
 	 * image will be created in addition to the marked image. The image is
@@ -104,21 +131,22 @@ public class CompareScreenshots implements WebDriverCustomModule {
 	 * reference image. Default: false.
 	 * <p>
 	 * com.xceptance.xlt.imageComparison.algorithm: Decides which comparison
-	 * algorithm should be used. <p>
+	 * algorithm should be used.
+	 * <p>
 	 * Options: <br>
 	 * EXACTLY: A pixel wise comparison without any tolerance. If there are any
 	 * difference, the exact comparison will return false. <br>
-	 * PIXELFUZZY: A pixel
-	 * wise comparison with tolerance (using the colTolerance property).
-	 * Differences between two pixels will be ignored if they are under the
-	 * defined tolerance level. <br>
-	 * FUZZY: A more fuzzy comparison using the
-	 * pixelPerBlockXY property, the colTolerance parameter and the pixTolerance
-	 * property. The images are divided into blocks. Minor differences in color
-	 * are ignored like in PIXELFUZZY. Additionally, the images are divided into
-	 * squares with a width and height of pixelPerBlockXY. Whithin these blocks, 
-	 * differences will be ignored as long as there are less different pixels then
-	 * pixTolerance.
+	 * PIXELFUZZY: A pixel wise comparison with tolerance (using the
+	 * colTolerance property). Differences between two pixels will be ignored if
+	 * they are under the defined tolerance level. <br>
+	 * FUZZY: A more fuzzy comparison using the pixelPerBlockXY property, the
+	 * colTolerance parameter and the pixTolerance property. The images are
+	 * divided into blocks. Minor differences in color are ignored like in
+	 * PIXELFUZZY. Additionally, the images are divided into squares with a
+	 * width and height of pixelPerBlockXY. Whithin these blocks, differences
+	 * will be ignored as long as there are less different pixels then
+	 * pixTolerance.<br>
+	 * Default: FUZZY
 	 * 
 	 * ImageComparison. {@inheritDoc}
 	 */
@@ -139,10 +167,12 @@ public class CompareScreenshots implements WebDriverCustomModule {
 				DPIXELPBLOCKXY);
 		int pixelPerBlockXY = Integer.parseInt(pixelPerBlockXYS);
 
-		// colTolerance, pixTolerance
+		// colTolerance
 		String colToleranceS = x.getProperty(PPREFIX + "colTolerance",
 				DCOLTOLERANCE);
 		double colTolerance = Double.parseDouble(colToleranceS);
+
+		// pixTolerance
 		String pixToleranceS = x.getProperty(PPREFIX + "pixTolerance",
 				DCOLTOLERANCE);
 		double pixTolerance = Double.parseDouble(pixToleranceS);
@@ -155,7 +185,17 @@ public class CompareScreenshots implements WebDriverCustomModule {
 		String closeMaskString = x.getProperty(PPREFIX + "closeMask");
 		Boolean closeMask = Boolean.parseBoolean(closeMaskString);
 
-		// closeMask
+		// closeWidth
+		String closeWidthString = x.getProperty(PPREFIX + "closeWidth",
+				DCLOSEWIDTH);
+		int closeWidth = Integer.parseInt(closeWidthString);
+		
+		// closeHeight
+		String closeHeightString = x.getProperty(PPREFIX + "closeHeight",
+				DCLOSEHEIGHT);
+		int closeHeight = Integer.parseInt(closeHeightString);
+
+		// differenceImage
 		String differenceImageS = x.getProperty(PPREFIX + "differenceImage");
 		Boolean differenceImage = Boolean.parseBoolean(differenceImageS);
 
@@ -217,7 +257,7 @@ public class CompareScreenshots implements WebDriverCustomModule {
 		// If there is another screenshot ...
 		else {
 			// Create temporary file for the new screenshot
-			File screenshotFile = new File(tempDirectory + "new-screenshot"
+			File screenshotFile = new File(directory + "new-screenshot"
 					+ screenshotName + ".png");
 			try {
 				takeScreenshot(webDriver, screenshotFile);
@@ -251,7 +291,8 @@ public class CompareScreenshots implements WebDriverCustomModule {
 				// Initializes ImageComparison and calls isEqual
 				ImageComparison imagecomparison = new ImageComparison(
 						pixelPerBlockXY, colTolerance, pixTolerance,
-						trainingMode, closeMask, differenceImage, algorithm);
+						trainingMode, closeMask, closeWidth, closeHeight, differenceImage,
+						algorithm);
 				boolean result = imagecomparison.isEqual(reference, screenshot,
 						maskImageFile, markedImageFile, differenceImageFile);
 

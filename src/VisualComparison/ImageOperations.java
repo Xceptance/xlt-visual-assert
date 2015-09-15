@@ -18,19 +18,11 @@ import java.io.IOException;
  * <p>
  * Regarding erosion, dilation and closing: The background/ foreground colors
  * can be manually set, defaults are below. The structure element is always a
- * square filled with ones. It's width and height are relative to the image it
- * is performing an erosion or dilation on. The relative size can be set with
- * the structElementScale attribute, it's default value can be found below.
+ * square filled with ones.
  * <p>
  * For an example: If an image has a width and height of 1000 pixels and it is
  * shrinked with a compressionFactor of 10, the shrinked image will be 100
- * pixels wide and high. With strucxetElementScale = 0.1, the structure element
- * to that image will be 10 pixels wide and high.
- * <p>
- * A bigger structElementScale means a bigger structElement which means the
- * erosion, dilation and closing methods have more impact. So the erosion will
- * erode more, the dilation will dilate more and the closing method will close
- * wider gaps.
+ * pixels wide and high.
  * <p>
  * These methods were only made to work with binary images.
  * <p>
@@ -40,7 +32,6 @@ import java.io.IOException;
  * Background color: Transparent white with rgb values of 255, 255, 255 and
  * alpha = 0 <br>
  * CompressionFactor: 10 <br>
- * structElementScale: 0.1 <br>
  * 
  * @author damian
  * 
@@ -50,7 +41,6 @@ public class ImageOperations {
 	int rgbForegroundColor;
 	int rgbBackgroundColor;
 	int compressionFactor;
-	double structElementScale;
 
 	/**
 	 * Sets the background/ foreground colors for erosion/ dilation and the
@@ -63,25 +53,20 @@ public class ImageOperations {
 		this.rgbBackgroundColor = new Color(255, 255, 255, 0).getRGB();
 		this.rgbForegroundColor = Color.BLACK.getRGB();
 		this.compressionFactor = 10;
-		this.structElementScale = 0.1;
 	}
 
 	/**
 	 * Constructor for manually setting the compressionFactor/ the pixels per
-	 * block and the structure elements size in comparison to the image.
-	 * (Parameter structElementScale)
+	 * block.
 	 * 
 	 * @param compressionFactor
 	 *            the compressionFactor for shrinkImage
-	 * @param structElementScale
-	 *            to determine the size of the structuring element for erosion/
-	 *            dilation
+
 	 */
-	protected ImageOperations(int compressionFactor, double structElementScale) {
+	protected ImageOperations(int compressionFactor) {
 		this.rgbBackgroundColor = new Color(255, 255, 255, 0).getRGB();
 		this.rgbForegroundColor = Color.BLACK.getRGB();
 		this.compressionFactor = compressionFactor;
-		this.structElementScale = structElementScale;
 	}
 
 	/**
@@ -103,7 +88,6 @@ public class ImageOperations {
 		this.rgbBackgroundColor = rgbBackgroundColor;
 		this.rgbForegroundColor = rgbForegroundColor;
 		this.compressionFactor = compressionFactor;
-		this.structElementScale = structElementScale;
 	}
 
 	/**
@@ -254,7 +238,7 @@ public class ImageOperations {
 				// The origin of the structuring element is it's middle pixel
 				for (int x = w - (structElementWidth / 2); x <= w
 						+ (structElementWidth / 2); x++) {
-					for (int y = h - (structElementWidth / 2); y <= h
+					for (int y = h - (structElementHeight / 2); y <= h
 							+ (structElementHeight / 2); y++) {
 
 						// As long as the pixels not over the border
@@ -335,7 +319,7 @@ public class ImageOperations {
 				// The origin of the structuring element is it's middle pixel
 				for (int x = w - (structElementWidth / 2); x <= w
 						+ (structElementWidth / 2); x++) {
-					for (int y = h - (structElementWidth / 2); y <= h
+					for (int y = h - (structElementHeight / 2); y <= h
 							+ (structElementHeight / 2); y++) {
 
 						// As long as the pixels don't go over the border
@@ -370,32 +354,29 @@ public class ImageOperations {
 	 * back up again for performance reasons. Depending on the images size and
 	 * the compressionfactor, it may still be very performance heavy.
 	 * 
-	 * Closes an image using the dilation and erosion methods. It determines the
-	 * width and height of the structuring element using the instance variable
-	 * structElementScale. The width and height will be the the with and height
-	 * of the image multiplied by structElementScale.
+	 * Closes an image using the dilation and erosion methods.
 	 * 
 	 * @param img
 	 *            the image to close
+	 * @param structElementWidth
+	 *            the width of the structure element for dilation and erosion
+	 * @param structElementHeight
+	 *            the height of the structure element for dilation and erosion
 	 * @return the closed image
 	 * @throws IOException
 	 */
-	protected BufferedImage closeImage(BufferedImage img) throws IOException {
+	protected BufferedImage closeImage(BufferedImage img,
+			int structElementWidth, int structElementHeight) throws IOException {
 
 		// Scale the image for performance reasons.
 		BufferedImage shrunkImg = shrinkImage(img);
 
-		int structElementWidth = (int) Math.floor(shrunkImg.getWidth()
-				* structElementScale);
-		int structElementHeight = (int) Math.floor(shrunkImg.getHeight()
-				* structElementScale);
-
-		if (structElementWidth == 1 || structElementHeight == 1) {
+		if (structElementWidth <= 1 && structElementHeight <= 1) {
 			throw new IllegalArgumentException(
-					"The comressionFactor and structElementScale lead to "
-							+ "to small a structure element. Increase at least one of them.");
+					"The structure element is to small. Increase width or height.");
 		}
 
+		// Close it
 		shrunkImg = dilateImage(shrunkImg, structElementWidth,
 				structElementHeight);
 		shrunkImg = erodeImage(shrunkImg, structElementWidth,
