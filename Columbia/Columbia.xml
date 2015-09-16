@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testcase xmlns="http://xlt.xceptance.com/xlt-script/2" version="6" baseURL="http://www.columbiasportswear.de">
+  <action name="OpenStartPage"/>
+  <command name="open" value="/"/>
+  <module name="CompareScreenshots"/>
+  <command name="clickAndWait" target="//*[@id='navigation']//a[@id='nav_men' and contains(@class,'level-1')][1]"/>
+  <module name="CompareScreenshots"/>
+  <action name="Columbia-0"/>
+  <command name="clickAndWait" target="//*[@id='navigation']//a[@id='nav_women' and contains(@class,'level-1')][1]"/>
+  <module name="CompareScreenshots"/>
+  <action name="Columbia-1"/>
+  <command name="click" target="id=q"/>
+  <command name="type" target="id=q" value="lederschuhe"/>
+  <command name="clickAndWait" target="document.forms[1].elements[2]"/>
+  <module name="CompareScreenshots"/>
+  <action name="Columbia-2"/>
+  <command name="clickAndWait" target="//section[@id='footerWrapper']/div[2]/article[2]/div/div[3]/ul/a[2]/li"/>
+  <module name="CompareScreenshots"/>
+</testcase>
