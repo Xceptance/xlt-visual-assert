@@ -218,6 +218,14 @@ public class ImageComparison {
 
 				// Mask differences in the maskImage
 				maskDifferences(differentPixels);
+			
+				// Close the maskImage if closeMask = true
+				if (closeMask) {
+					maskImage = imageoperations.closeImage(maskImage,
+							structElementWidth, structElementHeight);
+					// Mask differences again since some might have gotten lost in the scaling
+					maskDifferences(differentPixels);
+				}
 			} else {
 				// Mark the differences
 				markDifferences(differentPixels);
@@ -235,13 +243,8 @@ public class ImageComparison {
 						img2.getHeight());
 				isEqual = false;
 			}
-		} else {
-			// Close the maskImage if closeMask = true
-			// Save it in any case
-			if (closeMask) {
-				maskImage = imageoperations.closeImage(maskImage,
-						structElementWidth, structElementHeight);
-			}
+		}
+		else {
 			ImageIO.write(maskImage, "PNG", fileMask);
 		}
 
