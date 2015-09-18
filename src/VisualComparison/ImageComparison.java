@@ -249,7 +249,9 @@ public class ImageComparison {
 			return true;
 		} else {
 			ImageIO.write(imgOut, "PNG", fileOut);
-			ImageIO.write(difference, "png", fileDifference);
+			if (differenceImage) {
+							ImageIO.write(difference, "png", fileDifference);
+			}
 			return false;
 		}
 	}
