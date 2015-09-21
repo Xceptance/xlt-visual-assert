@@ -22,7 +22,7 @@ import VisualComparison.ImageComparison;
 public class TImageComparisonMarkSizes {
 	static BufferedImage reference, slim, wide, low, high, slimAndLow,
 			wideAndHigh, switched;
-	ImageComparison imgCompare = new ImageComparison(2, 0.00, 0.01, false, false, 3, 3, false, "FUZZY");
+	ImageComparison imgCompare = new ImageComparison(2, 0.00, 0.01, false, false, 3, 3, true, "FUZZY");
 	static File directory = org.apache.commons.lang3.SystemUtils
 			.getJavaIoTmpDir();
 	static File outPutfile = new File(directory + "/test.png");
