@@ -286,14 +286,20 @@ public class ImageComparison {
 				double difference = calculatePixelRgbDiff(x, y, img1, img2);
 
 				// draws the differenceImage if needed
-				if (differenceImage) {
-					drawDifferencePicture(difference, x, y);
-				}
+
 
 				if (difference > colTolerance) {
 					xCoords.add(x);
 					yCoords.add(y);
 					equal = false;
+					if (differenceImage) {
+						drawDifferencePicture(difference, x, y);
+					}
+				}
+				else {
+					if (differenceImage) {
+						drawDifferencePicture(0.0, x, y);
+					}
 				}
 			}
 		}
@@ -348,11 +354,6 @@ public class ImageComparison {
 		for (int x = 0; x < imagewidth; x++) {
 			for (int y = 0; y < imageheight; y++) {
 
-				// draws the differenceImage if needed
-				if (differenceImage) {
-					double difference = calculatePixelRgbDiff(x, y, img1, img2);
-					drawDifferencePicture(difference, x, y);
-				}
 
 				// if the RGB values of 2 pixels differ
 				// add the x- and y- coordinates to the corresponding ArrayLists
@@ -360,6 +361,17 @@ public class ImageComparison {
 					xCoords.add(x);
 					yCoords.add(y);
 					exactlyEqual = false;
+					
+					// draws the differenceImage if needed
+					if (differenceImage) {
+						double difference = calculatePixelRgbDiff(x, y, img1, img2);
+						drawDifferencePicture(difference, x, y);
+					}
+				}
+				else{
+					if (differenceImage) {
+						drawDifferencePicture(0.0, x, y);
+					}
 				}
 			}
 		}
@@ -437,9 +449,6 @@ public class ImageComparison {
 						// if needed
 						double difference = calculatePixelRgbDiff(xCoord,
 								yCoord, img1, img2);
-						if (differenceImage) {
-							drawDifferencePicture(difference, xCoord, yCoord);
-						}
 
 						// If there is a notable difference
 						if (difference > colTolerance) {
@@ -450,6 +459,14 @@ public class ImageComparison {
 							differencesPerBlock++;
 							xCoordsTemp.add(xCoord);
 							yCoordsTemp.add(yCoord);
+							if (differenceImage) {
+								drawDifferencePicture(difference, xCoord, yCoord);
+							}
+						}
+						else {
+							if (differenceImage) {
+								drawDifferencePicture(0.0, xCoord, yCoord);
+							}
 						}
 					}
 				}

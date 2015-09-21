@@ -5,6 +5,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import javax.imageio.ImageIO;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -25,14 +27,20 @@ public class TImageComparisonTraining {
 			true, false, 3, 3, false, "FUZZY");
 	ImageComparison fuzzyImgCompare = new ImageComparison(10, 0.00, 0.01,
 			false, false, 3, 3, false, "FUZZY");
+	ImageComparison fuzzyDifference = new ImageComparison(10, 0.00, 0.01,
+			false, false, 3, 3, true, "FUZZY");
 	ImageComparison exactlyTraining = new ImageComparison(1, 0.00, 0.01,
 			true, false, 3, 3, false, "EXACTLY");
 	ImageComparison exactlyCompare = new ImageComparison(1, 0.00, 0.01,
 			false, false, 3, 3, false, "EXACTLY");
+	ImageComparison exactlyDifference = new ImageComparison(1, 0.00, 0.01,
+			false, false, 3, 3, true, "EXACTLY");
 	ImageComparison pixelFuzzyTraining = new ImageComparison(1, 0.01, 0.01,
 			true, false, 3, 3, false, "PIXELFUZZY");
 	ImageComparison pixelFuzzyCompare = new ImageComparison(1, 0.01, 0.01,
 			false, false, 3, 3, false, "PIXELFUZZY");
+	ImageComparison pixelFuzzyDifference = new ImageComparison(1, 0.01, 0.01,
+			false, false, 3, 3, true, "PIXELFUZZY");
 	static File directory = org.apache.commons.lang3.SystemUtils
 			.getJavaIoTmpDir();
 	static File outPutfile = new File(directory + "/test.png");
@@ -118,6 +126,51 @@ public class TImageComparisonTraining {
 		paintArea(newImage, 48, 97, 10, 10);
 		pixelFuzzyAssertBlock();
 	}
+	
+	// test the interaction between training mode and difference image for EXACTLY
+	@Test
+	public void trainDifferenceExactly() throws IOException {
+		setUpFileAndPicture();
+		paintArea(newImage, 48, 97, 10, 10);
+		Assert.assertFalse(exactlyDifference.isEqual(reference, newImage, maskFile, outPutfile, differenceFile));
+		differenceDrawn();
+		differenceFile.delete();
+		Assert.assertTrue(exactlyTraining.isEqual(reference, newImage, maskFile, outPutfile, differenceFile));
+		Assert.assertTrue(exactlyDifference.isEqual(reference, newImage, maskFile, outPutfile, differenceFile));
+		paintArea(newImage, 0, 0, 9, 9);
+		Assert.assertFalse(exactlyDifference.isEqual(reference, newImage, maskFile, outPutfile, differenceFile));
+		differenceEmpty();
+	}
+	
+	// test the interaction between training mode and difference image for FUZZY
+	@Test
+	public void trainDifferenceFuzzy() throws IOException {
+		setUpFileAndPicture();
+		paintArea(newImage, 48, 97, 10, 10);
+		Assert.assertFalse(fuzzyDifference.isEqual(reference, newImage, maskFile, outPutfile, differenceFile));
+		differenceDrawn();
+		differenceFile.delete();
+		Assert.assertTrue(fuzzyTraining.isEqual(reference, newImage, maskFile, outPutfile, differenceFile));
+		Assert.assertTrue(fuzzyDifference.isEqual(reference, newImage, maskFile, outPutfile, differenceFile));
+		paintArea(newImage, 0, 0, 9, 9);
+		Assert.assertFalse(fuzzyDifference.isEqual(reference, newImage, maskFile, outPutfile, differenceFile));
+		differenceEmpty();
+	}
+	
+	// test the interaction between training mode and difference image for PIXELFUZZY
+	@Test
+	public void trainDifferencePixelFuzzy() throws IOException {
+		setUpFileAndPicture();
+		paintArea(newImage, 48, 97, 10, 10);
+		Assert.assertFalse(pixelFuzzyDifference.isEqual(reference, newImage, maskFile, outPutfile, differenceFile));
+		differenceDrawn();
+		differenceFile.delete();
+		Assert.assertTrue(pixelFuzzyTraining.isEqual(reference, newImage, maskFile, outPutfile, differenceFile));
+		Assert.assertTrue(pixelFuzzyDifference.isEqual(reference, newImage, maskFile, outPutfile, differenceFile));
+		paintArea(newImage, 0, 0, 9, 9);
+		Assert.assertFalse(pixelFuzzyDifference.isEqual(reference, newImage, maskFile, outPutfile, differenceFile));
+		differenceEmpty();
+	}
 
 	@AfterClass
 	public static void deleteFiles() {
@@ -177,5 +230,33 @@ public class TImageComparisonTraining {
 				maskFile, outPutfile, differenceFile));
 		Assert.assertTrue(pixelFuzzyCompare.isEqual(reference, newImage,
 				maskFile, outPutfile, differenceFile));
+	}
+	
+	//this assertion checks the correctness of the difference image
+	public void differenceDrawn() throws IOException {
+		boolean correct = false;
+		BufferedImage difference = ImageIO.read(differenceFile);
+		for (int i = 10; i<difference.getWidth(); i++){
+			for (int j = 10; j<difference.getHeight(); j++) {
+				if (difference.getRGB(i, j) != Color.BLACK.getRGB()) {
+					correct = true;
+				}
+			}
+		}
+		Assert.assertTrue(correct);
+	}
+	
+	// this assertion checks correctness of the difference image after a training run
+	public void differenceEmpty() throws IOException {
+		boolean correct = true;
+		BufferedImage difference = ImageIO.read(differenceFile);
+		for (int i = 10; i<difference.getWidth(); i++){
+			for (int j = 10; j<difference.getHeight(); j++) {
+				if (difference.getRGB(i, j) != Color.BLACK.getRGB()) {
+					correct = false;
+				}
+			}
+		}
+		Assert.assertTrue(correct);
 	}
 }
