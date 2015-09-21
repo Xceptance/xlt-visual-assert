@@ -252,7 +252,9 @@ public class ImageComparison {
 			return true;
 		} else {
 			ImageIO.write(imgOut, "PNG", fileOut);
-			ImageIO.write(difference, "png", fileDifference);
+			if (differenceImage) {
+							ImageIO.write(difference, "png", fileDifference);
+			}
 			return false;
 		}
 	}
@@ -737,40 +739,6 @@ public class ImageComparison {
 		return img;
 	}
 
-	/**
-	 * Initializes the mask Image. If there already is a mask Image in the file,
-	 * it will simply read that. If not, it will create a white Image of the
-	 * same height and width as the picture given.
-	 * 
-	 * @param img
-	 *            the image corresponding to the maskedImage
-	 * @param file
-	 *            the file where the maskedImage is/ where it will be
-	 * @return the maskedImage
-	 * @throws IOException
-	 */
-	private BufferedImage initializeMaskImage(BufferedImage img, File file)
-			throws IOException {
-		final Color transparentWhite = new Color(255, 255, 255, 0);
-		final int rgbTransparentWhite = transparentWhite.getRGB();
-
-		if (file.exists()) {
-			BufferedImage mask = ImageIO.read(file);
-			if ((mask.getWidth() == img.getWidth())
-					&& (mask.getHeight() == img.getHeight())) {
-				return mask;
-			}
-		}
-
-		int width = img.getWidth();
-		int height = img.getHeight();
-		BufferedImage mask = new BufferedImage(width, height,
-				BufferedImage.TYPE_INT_ARGB);
-		int[] maskArray = ((DataBufferInt) mask.getRaster().getDataBuffer())
-				.getData();
-		Arrays.fill(maskArray, rgbTransparentWhite);
-		return mask;
-	}
 
 	/**
 	 * This method draws a greyscale image of the differences for a better
@@ -789,4 +757,39 @@ public class ImageComparison {
 		Color greyscale = new Color(diffColor, diffColor, diffColor, 255);
 		difference.setRGB(x, y, greyscale.getRGB());
 	}
+}
+
+/**
+ * Initializes the mask Image. If there already is a mask Image in the file,
+ * it will simply read that. If not, it will create a white Image of the
+ * same height and width as the picture given.
+ * 
+ * @param img
+ *            the image corresponding to the maskedImage
+ * @param file
+ *            the file where the maskedImage is/ where it will be
+ * @return the maskedImage
+ * @throws IOException
+ */
+private BufferedImage initializeMaskImage(BufferedImage img, File file)
+		throws IOException {
+	final Color transparentWhite = new Color(255, 255, 255, 0);
+	final int rgbTransparentWhite = transparentWhite.getRGB();
+
+	if (file.exists()) {
+		BufferedImage mask = ImageIO.read(file);
+		if ((mask.getWidth() == img.getWidth())
+				&& (mask.getHeight() == img.getHeight())) {
+			return mask;
+		}
+	}
+
+	int width = img.getWidth();
+	int height = img.getHeight();
+	BufferedImage mask = new BufferedImage(width, height,
+			BufferedImage.TYPE_INT_ARGB);
+	int[] maskArray = ((DataBufferInt) mask.getRaster().getDataBuffer())
+			.getData();
+	Arrays.fill(maskArray, rgbTransparentWhite);
+	return mask;
 }
