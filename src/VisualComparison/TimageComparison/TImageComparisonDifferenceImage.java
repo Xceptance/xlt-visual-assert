@@ -194,7 +194,7 @@ public class TImageComparisonDifferenceImage {
 	 * Tests exactlyEqual.
 	 * @throws IOException 
 	 */
-	@Test
+	@Test(expected=IOException.class)
 	public void testFalseExactly() throws IOException {
 		differenceFile.delete();
 		ImageComparison imagecomparison2 = new ImageComparison(10, 0.1, 0.01,
@@ -202,14 +202,7 @@ public class TImageComparisonDifferenceImage {
 		imagecomparison2.isEqual(reference, screenshot, fileMask, fileOut,
 				differenceFile);
 		differenceImage = ImageIO.read(differenceFile);
-		
-		int rgb;
-		for (int w = 0; w < differenceImage.getWidth(); w++) {
-			for (int h = 0; h < 300; h++) {
-				rgb = differenceImage.getRGB(w, h);
-				Assert.assertEquals(0, rgb);
-			}
-		}
+
 	}
 	
 	/**
@@ -217,7 +210,7 @@ public class TImageComparisonDifferenceImage {
 	 * Tests pixelFuzzyEqual.
 	 * @throws IOException 
 	 */
-	@Test
+	@Test(expected=IOException.class)
 	public void testFalsePixelFuzzy() throws IOException {
 		differenceFile.delete();
 		ImageComparison imagecomparison2 = new ImageComparison(10, 0.1, 0.01,
@@ -225,14 +218,6 @@ public class TImageComparisonDifferenceImage {
 		imagecomparison2.isEqual(reference, screenshot, fileMask, fileOut,
 				differenceFile);
 		differenceImage = ImageIO.read(differenceFile);
-		
-		int rgb;
-		for (int w = 0; w < differenceImage.getWidth(); w++) {
-			for (int h = 0; h < 300; h++) {
-				rgb = differenceImage.getRGB(w, h);
-				Assert.assertEquals(0, rgb);
-			}
-		}
 	}
 	
 	/**
@@ -240,7 +225,7 @@ public class TImageComparisonDifferenceImage {
 	 * Tests fuzzyEqual.
 	 * @throws IOException 
 	 */
-	@Test
+	@Test(expected=IOException.class)
 	public void testFalseFuzzy() throws IOException {
 		differenceFile.delete();
 		ImageComparison imagecomparison2 = new ImageComparison(10, 0.1, 0.01,
@@ -248,14 +233,6 @@ public class TImageComparisonDifferenceImage {
 		imagecomparison2.isEqual(reference, screenshot, fileMask, fileOut,
 				differenceFile);
 		differenceImage = ImageIO.read(differenceFile);
-		
-		int rgb;
-		for (int w = 0; w < differenceImage.getWidth(); w++) {
-			for (int h = 0; h < 300; h++) {
-				rgb = differenceImage.getRGB(w, h);
-				Assert.assertEquals(0, rgb);
-			}
-		}
 	}
 	
 	/**
