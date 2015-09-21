@@ -24,7 +24,9 @@ import VisualComparison.ImageComparison;
  * <p>
  * Includes separate tests for exactlyEqual, pixelFuzzyEqual and fuzzyEqual,
  * sind it is implemented separately.
- * 
+ * <p>
+ * TEST
+ * <p>
  * @author damian
  */
 public class TImageComparisonDifferenceImage {
