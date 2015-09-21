@@ -3,6 +3,10 @@ package VisualComparison;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
@@ -256,7 +260,7 @@ public class CompareScreenshots implements WebDriverCustomModule {
 
 		// If there is another screenshot ...
 		else {
-			// Create temporary file for the new screenshot
+			// Create file for the new screenshot
 			File screenshotFile = new File(directory + "new-screenshot"
 					+ screenshotName + ".png");
 			try {
@@ -296,6 +300,19 @@ public class CompareScreenshots implements WebDriverCustomModule {
 				boolean result = imagecomparison.isEqual(reference, screenshot,
 						maskImageFile, markedImageFile, differenceImageFile);
 
+				// Delete the new screenshot if there was no difference
+				if (result) {
+					screenshotFile.delete();
+				}
+				// Place it into he markedImage folder otherwise
+				else {
+					Path source = screenshotFile.toPath();
+					String newScreenshotPath = directory + "/marked/" + screenshotName + "-new" + ".png";
+					Path destination = Paths.get(newScreenshotPath);
+					Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
+					screenshotFile.delete();
+				}
+				
 				String assertMessage = "Website does not match the reference screenshot: "
 						+ currentActionName;
 				Assert.assertTrue(assertMessage, result);
