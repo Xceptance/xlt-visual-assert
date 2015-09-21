@@ -26,7 +26,6 @@ public class ImageComparison {
 
 	private final int markingX = 10;
 	private final int markingY = 10;
-	private final int compression = 10;
 
 	protected enum ComparisonAlgorithm {
 		EXACTLY, PIXELFUZZY, FUZZY
@@ -89,9 +88,9 @@ public class ImageComparison {
 	 *            decides if small gaps in the mask should be closed after a
 	 *            training run.
 	 * @param structElementWidth
-	 *            TODO
+	 *            determines up to which width gaps should be closed
 	 * @param structElementHeight
-	 *            TODO
+	 *            determines up to which height gaps should be closed
 	 * @param differenceImage
 	 *            decides if a difference image should be created in addition to
 	 *            the markedImage. The difference image is a greyscale image,
@@ -151,7 +150,7 @@ public class ImageComparison {
 		boolean isEqual = true;
 
 		// Initializes ImageOperations object to access it's methods later
-		ImageOperations imageoperations = new ImageOperations(compression);
+		ImageOperations imageoperations = new ImageOperations();
 
 		// copies the images, so it doesn't work directly on them
 		imgOut = imageoperations.copyImage(img2);
@@ -190,8 +189,8 @@ public class ImageComparison {
 
 		// initializes maskImage and masks both images:
 		maskImage = initializeMaskImage(copyImg1, fileMask);
-		copyImg1 = imageoperations.overlayImage(copyImg1, maskImage);
-		imgOut = imageoperations.overlayImage(imgOut, maskImage);
+		copyImg1 = imageoperations.overlayMaskImage(copyImg1, maskImage);
+		imgOut = imageoperations.overlayMaskImage(imgOut, maskImage);
 
 		// initializes the differenceImage
 		difference = new BufferedImage(imageWidth, imageHeight,
@@ -223,8 +222,6 @@ public class ImageComparison {
 				if (closeMask) {
 					maskImage = imageoperations.closeImage(maskImage,
 							structElementWidth, structElementHeight);
-					// Mask differences again since some might have gotten lost in the scaling
-					maskDifferences(differentPixels);
 				}
 			} else {
 				// Mark the differences
@@ -757,39 +754,43 @@ public class ImageComparison {
 		Color greyscale = new Color(diffColor, diffColor, diffColor, 255);
 		difference.setRGB(x, y, greyscale.getRGB());
 	}
-}
 
-/**
- * Initializes the mask Image. If there already is a mask Image in the file,
- * it will simply read that. If not, it will create a white Image of the
- * same height and width as the picture given.
- * 
- * @param img
- *            the image corresponding to the maskedImage
- * @param file
- *            the file where the maskedImage is/ where it will be
- * @return the maskedImage
- * @throws IOException
- */
-private BufferedImage initializeMaskImage(BufferedImage img, File file)
+	/**
+	 * Initializes the mask Image. If there already is a mask Image in the file,
+	 * it will simply read that. If not, it will create a white Image of the
+	 * same height and width as the picture given.
+	 * 
+	 * @param img
+	 *            the image corresponding to the maskedImage
+	 * @param file
+	 *            the file where the maskedImage is/ where it will be
+	 * @return the maskedImage
+	 * @throws IOException
+	 */
+	private BufferedImage initializeMaskImage(BufferedImage img, File file)
 		throws IOException {
-	final Color transparentWhite = new Color(255, 255, 255, 0);
-	final int rgbTransparentWhite = transparentWhite.getRGB();
+		final Color transparentWhite = new Color(255, 255, 255, 0);
+		final int rgbTransparentWhite = transparentWhite.getRGB();
 
-	if (file.exists()) {
-		BufferedImage mask = ImageIO.read(file);
-		if ((mask.getWidth() == img.getWidth())
-				&& (mask.getHeight() == img.getHeight())) {
+		if (file.exists()) {
+			BufferedImage mask = ImageIO.read(file);
+			if ((mask.getWidth() == img.getWidth())
+					&& (mask.getHeight() == img.getHeight())) {
+			
+			// Change image type to TYPE_INT_ARGB
+			mask = new ImageOperations().copyImage(mask);	
+
 			return mask;
+			}
 		}
-	}
 
-	int width = img.getWidth();
-	int height = img.getHeight();
-	BufferedImage mask = new BufferedImage(width, height,
+		int width = img.getWidth();
+		int height = img.getHeight();
+		BufferedImage mask = new BufferedImage(width, height,
 			BufferedImage.TYPE_INT_ARGB);
-	int[] maskArray = ((DataBufferInt) mask.getRaster().getDataBuffer())
+		int[] maskArray = ((DataBufferInt) mask.getRaster().getDataBuffer())
 			.getData();
-	Arrays.fill(maskArray, rgbTransparentWhite);
-	return mask;
+		Arrays.fill(maskArray, rgbTransparentWhite);
+		return mask;
+	}
 }

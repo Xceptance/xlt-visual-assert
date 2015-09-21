@@ -7,40 +7,30 @@ import java.awt.image.DataBufferInt;
 import java.io.IOException;
 
 /**
- * Provides methods to perform operations on images. Methods are shrinking,
- * scaling, increasing, copying, overlay, erosion, dilation and closing. Written
- * for use in ImageComparison.
- * <p>
- * The scaling factor for the shrinkImage method can be set in the constructor;
- * with the compressionFactor parameter. The width and height of the image will
- * be divided by the compressionFactor to form the width and height of the new
- * image.
+ * Provides methods to perform operations on images. Methods are scaling,
+ * increasing, copying, overlay, erosion, dilation and closing. Written for use
+ * in ImageComparison. The methods were  made to work with binary images.
  * <p>
  * Regarding erosion, dilation and closing: The background/ foreground colors
  * can be manually set, defaults are below. The structure element is always a
- * square filled with ones.
- * <p>
- * For an example: If an image has a width and height of 1000 pixels and it is
- * shrinked with a compressionFactor of 10, the shrinked image will be 100
- * pixels wide and high.
- * <p>
- * These methods were only made to work with binary images.
+ * rectangle filled with ones.
  * <p>
  * The constructor without parameters initializes these defaults:
  * <p>
  * Foreground color: Black from the java.awt.Color class, Color.BLACK <br>
- * Background color: Transparent white with rgb values of 255, 255, 255 and
- * alpha = 0 <br>
- * CompressionFactor: 10 <br>
+ * Background color: Transparent white with rgb values of 255, 255, 255 and 0. <br>
+ * <p>
+ * The scaling, which is included in closeImage, is always done by a factor of 10.
+ * It should be analogous to the markingX/ markingY values in ImageComparison.
  * 
  * @author damian
  * 
  */
 public class ImageOperations {
 
-	int rgbForegroundColor;
-	int rgbBackgroundColor;
-	int compressionFactor;
+	private int rgbForegroundColor;
+	private int rgbBackgroundColor;
+	private int scalingFactor;
 
 	/**
 	 * Sets the background/ foreground colors for erosion/ dilation and the
@@ -52,21 +42,7 @@ public class ImageOperations {
 	protected ImageOperations() {
 		this.rgbBackgroundColor = new Color(255, 255, 255, 0).getRGB();
 		this.rgbForegroundColor = Color.BLACK.getRGB();
-		this.compressionFactor = 10;
-	}
-
-	/**
-	 * Constructor for manually setting the compressionFactor/ the pixels per
-	 * block.
-	 * 
-	 * @param compressionFactor
-	 *            the compressionFactor for shrinkImage
-
-	 */
-	protected ImageOperations(int compressionFactor) {
-		this.rgbBackgroundColor = new Color(255, 255, 255, 0).getRGB();
-		this.rgbForegroundColor = Color.BLACK.getRGB();
-		this.compressionFactor = compressionFactor;
+		this.scalingFactor = 10;
 	}
 
 	/**
@@ -77,59 +53,110 @@ public class ImageOperations {
 	 *            the rgb value of the background color for erosion/ dilation
 	 * @param rgbForegroundColor
 	 *            the rgb value of the foreground color erosion/ dilation
-	 * @param compressionFactor
-	 *            the compressionFactor for shrinkImage
-	 * @param structElementScale
-	 *            to determine the size of the structuring element for erosion/
-	 *            dilation
 	 */
 	protected ImageOperations(int rgbBackgroundColor, int rgbForegroundColor,
 			int compressionFactor, double structElementScale) {
 		this.rgbBackgroundColor = rgbBackgroundColor;
 		this.rgbForegroundColor = rgbForegroundColor;
-		this.compressionFactor = compressionFactor;
 	}
 
 	/**
-	 * Shrinks the given image by the given factor. Used in closeImage.
+	 * Scales a binary image up to the given size. Does not innately preserve
+	 * Width/ Height ratio. Used in closeImage.
 	 * 
-	 * @param img
-	 *            the image to shrink
-	 * @return the shrinked image
-	 */
-	protected BufferedImage shrinkImage(BufferedImage img) {
-		int newWidth = img.getWidth() / compressionFactor;
-		int newHeight = img.getHeight() / compressionFactor;
-		BufferedImage newImg = new BufferedImage(newWidth, newHeight,
-				BufferedImage.TYPE_INT_ARGB);
-		Graphics g = newImg.getGraphics();
-		g.drawImage(img, 0, 0, newImg.getWidth(), newImg.getHeight(), null);
-		g.dispose();
-		return newImg;
-	}
-
-	/**
-	 * Scales an image up (or down) to the given size. Does not innately
-	 * preserve Width/ Height ratio. Used in closeImage.
-	 * 
-	 * All transparent pixels will be set to rgb = 0 during the scaling. That
-	 * means the transparent parts of the mask image from ImageComparison will
-	 * be transparent black instead of transparent white, but that doesn't
-	 * actually matter.
+	 * Divides the bigger image into blocks. If there are some pixels leftover,
+	 * the last blocks gets them, no matter how many they are. It sets a pixel
+	 * to the foreground color if any any pixel in the corresponding block had
+	 * the foreground color.
 	 * 
 	 * @param img
 	 * @param newWidth
 	 * @param newHeight
 	 * @return the scaled image
 	 */
-	protected BufferedImage scaleImage(BufferedImage img, int newWidth,
+	protected BufferedImage scaleDownMaskImage(BufferedImage img, int newWidth,
 			int newHeight) {
-		BufferedImage newImg = new BufferedImage(newWidth, newHeight,
+
+		BufferedImage scaledImage = new BufferedImage(newWidth, newHeight,
 				BufferedImage.TYPE_INT_ARGB);
-		Graphics g = newImg.getGraphics();
-		g.drawImage(img, 0, 0, newImg.getWidth(), newImg.getHeight(), null);
-		g.dispose();
-		return newImg;
+		boolean hasForegroundColor;
+
+		// Go through every pixel of the scaled image
+		for (int w = 0; w < scaledImage.getWidth(); w++) {
+			for (int h = 0; h < scaledImage.getHeight(); h++) {
+				hasForegroundColor = false;
+
+				// Check if the corresponding block in the image to scale has a
+				// black pixel
+				for (int x = w * scalingFactor; x < (w + 1) * scalingFactor; x++) {
+					for (int y = h * scalingFactor; y < (h + 1) * scalingFactor; y++) {
+
+						// Check if it isn't over the border
+						if (x < img.getWidth() && y < img.getHeight()) {
+							if (img.getRGB(x, y) == rgbForegroundColor) {
+								hasForegroundColor = true;
+								break;
+							}
+						}
+					}
+				}
+
+				// And set the pixel of the scaled image black if the
+				// corresponding block had any black pixel
+				if (hasForegroundColor) {
+					scaledImage.setRGB(w, h, rgbForegroundColor);
+				}
+			}
+		}
+		return scaledImage;
+	}
+
+	/**
+	 * Scales a binary image up to the given size. Does not innately preserve
+	 * Width/ Height ratio. Used in closeImage.
+	 * 
+	 * Divides the bigger image into blocks. Sets all the pixels in the block to
+	 * the foreground color if the corresponding pixel has the foreground color.
+	 * If there are some pixels leftover, the last blocks gets them, no matter
+	 * how many there are.
+	 * 
+	 * @param img
+	 * @param newWidth
+	 * @param newHeight
+	 * @return the scaled image
+	 */
+	protected BufferedImage scaleUpMaskImage(BufferedImage img, int newWidth,
+			int newHeight) {
+
+		BufferedImage scaledImage = new BufferedImage(newWidth, newHeight,
+				BufferedImage.TYPE_INT_ARGB);
+
+		// Go through every pixel of the image to scale
+		for (int w = 0; w < img.getWidth(); w++) {
+			for (int h = 0; h < img.getHeight(); h++) {
+
+				// Check if it has the foreground color
+				if (img.getRGB(w, h) == rgbForegroundColor) {
+
+					// And set every pixel in the corresponding block true if it
+					// does
+					for (int x = w * scalingFactor; x < w * scalingFactor
+							+ scalingFactor; x++) {
+						for (int y = h * scalingFactor; y < h * scalingFactor
+								+ scalingFactor; y++) {
+
+							// So long as it doesn't go over the border
+							if (x < scaledImage.getWidth()
+									&& y < scaledImage.getHeight()) {
+								scaledImage.setRGB(x, y, rgbForegroundColor);
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return scaledImage;
 	}
 
 	/**
@@ -179,7 +206,8 @@ public class ImageOperations {
 	}
 
 	/**
-	 * Overlays one image over another. Uses transparency.
+	 * Overlays the black areas of one image over another image. Doesn't
+	 * actually use transparency.
 	 * 
 	 * @param image
 	 * 
@@ -187,11 +215,22 @@ public class ImageOperations {
 	 *            the image that will be layed over the other image
 	 * @return
 	 */
-	protected BufferedImage overlayImage(BufferedImage image,
+	protected BufferedImage overlayMaskImage(BufferedImage image,
 			BufferedImage overlay) {
-		Graphics gImageToMask = image.getGraphics();
-		gImageToMask.drawImage(overlay, 0, 0, null);
-		gImageToMask.dispose();
+		int[] imageArray = ((DataBufferInt) image.getRaster().getDataBuffer())
+				.getData();
+		int[] overlayArray = ((DataBufferInt) overlay.getRaster()
+				.getDataBuffer()).getData();
+
+		// Go through every pixel of the image
+
+		for (int i = 0; i < imageArray.length; i++) {
+
+			// And set it to black if the overlay image is black
+			if (overlayArray[i] == rgbForegroundColor) {
+				imageArray[i] = overlayArray[i];
+			}
+		}
 		return image;
 	}
 
@@ -368,22 +407,20 @@ public class ImageOperations {
 	protected BufferedImage closeImage(BufferedImage img,
 			int structElementWidth, int structElementHeight) throws IOException {
 
-		// Scale the image for performance reasons.
-		BufferedImage shrunkImg = shrinkImage(img);
+		int scaledWidth = (int) Math.ceil(img.getWidth() / scalingFactor);
+		int scaledHeight = (int) Math.ceil(img.getHeight() / scalingFactor);
 
-		if (structElementWidth <= 1 && structElementHeight <= 1) {
-			throw new IllegalArgumentException(
-					"The structure element is to small. Increase width or height.");
-		}
+		// Scale the image for performance reasons.
+		BufferedImage shrunkImg = scaleDownMaskImage(img, scaledWidth,
+				scaledHeight);
 
 		// Close it
 		shrunkImg = dilateImage(shrunkImg, structElementWidth,
 				structElementHeight);
 		shrunkImg = erodeImage(shrunkImg, structElementWidth,
 				structElementHeight);
-
 		// Scale the image back
-		img = scaleImage(shrunkImg, img.getWidth(), img.getHeight());
+		img = scaleUpMaskImage(shrunkImg, img.getWidth(), img.getHeight());
 
 		return img;
 	}
