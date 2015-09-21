@@ -274,7 +274,6 @@ public class CompareScreenshots implements WebDriverCustomModule {
 				// screenshotImageFile
 				BufferedImage screenshot = ImageIO.read(screenshotFile);
 				BufferedImage reference = ImageIO.read(referenceFile);
-				screenshotFile.delete();
 
 				// Initialize markedImageFile and maskImageFile
 				new File(directory + "/marked/").mkdirs();
