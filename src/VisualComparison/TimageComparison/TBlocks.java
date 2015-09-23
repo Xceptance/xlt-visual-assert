@@ -18,7 +18,7 @@ import VisualComparison.ImageComparison;
  *
  * @author damian
  */
-public class TImageComparisonBlocks {
+public class TBlocks {
 
 	private static BufferedImage reference;
 	private static BufferedImage screenshot;

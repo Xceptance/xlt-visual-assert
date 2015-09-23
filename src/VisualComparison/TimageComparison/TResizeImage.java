@@ -28,7 +28,7 @@ import VisualComparison.ImageComparison;
  * @author damian
  *
  */
-public class TimageComparisonResizeImage {
+public class TResizeImage {
 	
 	private static BufferedImage reference;
 	private static BufferedImage screenshot;

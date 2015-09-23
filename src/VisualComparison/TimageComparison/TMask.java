@@ -24,7 +24,7 @@ import VisualComparison.ImageComparison;
  * @author damian
  * 
  */
-public class TimageComparisonMask {
+public class TMask {
 
 	// The reference image is fully black while the screenshot image is black up
 	// to row 200, then white between

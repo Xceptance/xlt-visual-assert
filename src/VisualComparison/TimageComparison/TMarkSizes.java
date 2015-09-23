@@ -19,7 +19,7 @@ import VisualComparison.ImageComparison;
  * @author Lucas
  * 
  */
-public class TImageComparisonMarkSizes {
+public class TMarkSizes {
 	static BufferedImage reference, slim, wide, low, high, slimAndLow,
 			wideAndHigh, switched;
 	ImageComparison imgCompare = new ImageComparison(2, 0.00, 0.01, false, false, 3, 3, true, "FUZZY");

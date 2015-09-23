@@ -18,7 +18,7 @@ import VisualComparison.ImageComparison;
  * 
  * @author damian
  */
-public class TImageComparisonExactlyEqual {
+public class TExactlyEqual {
 	private static BufferedImage reference;
 	private static BufferedImage screenshot;
 

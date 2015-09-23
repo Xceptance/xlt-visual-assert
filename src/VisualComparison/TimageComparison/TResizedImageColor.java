@@ -23,7 +23,7 @@ import VisualComparison.ImageComparison;
  * @author damian
  * 
  */
-public class TimageComparisonResizedImageColor {
+public class TResizedImageColor {
 
 	private static BufferedImage reference;
 	private static BufferedImage screenshot;

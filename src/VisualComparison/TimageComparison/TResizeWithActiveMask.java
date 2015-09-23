@@ -23,7 +23,7 @@ import VisualComparison.ImageComparison;
  * 
  * @author damian
  */
-public class TImageComparisonResizeWithActiveMask {
+public class TResizeWithActiveMask {
 
 	private static BufferedImage smallBlackImg;
 	private static BufferedImage bigWhiteImg;

@@ -27,7 +27,7 @@ import VisualComparison.ImageComparison;
  * @author daniel
  *
  */
-public class TimageComparisonChooseAlgorithm {
+public class TChooseAlgorithm {
 
 		private static BufferedImage reference;
 		private static BufferedImage screenshot;

@@ -21,7 +21,7 @@ import VisualComparison.ImageComparison;
  * @author daniel
  *
  */
-public class TImageComparisonPixTolerance {
+public class TPixTolerance {
 	
 	private static BufferedImage reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
 	private static BufferedImage screenshot = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);

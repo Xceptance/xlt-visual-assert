@@ -29,7 +29,7 @@ import VisualComparison.ImageComparison;
  * <p>
  * @author damian
  */
-public class TImageComparisonDifferenceImage {
+public class TDifferenceImage {
 
 	private static BufferedImage reference;
 	private static BufferedImage screenshot;

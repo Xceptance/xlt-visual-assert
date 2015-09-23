@@ -24,7 +24,7 @@ import VisualComparison.ImageComparison;
  * @author daniel
  * 
  */
-public class TImageComparisonCloseMask {
+public class TCloseMask {
 
 	private static BufferedImage reference;
 	private static BufferedImage screenshot;

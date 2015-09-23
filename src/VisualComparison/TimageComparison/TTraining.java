@@ -21,7 +21,7 @@ import VisualComparison.ImageComparison;
  * @author daniel
  *
  */
-public class TImageComparisonTraining {
+public class TTraining {
 	static BufferedImage reference, newImage;
 	ImageComparison fuzzyTraining = new ImageComparison(10, 0.00, 0.01,
 			true, false, 3, 3, false, "FUZZY");
