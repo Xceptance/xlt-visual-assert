@@ -1,7 +1,9 @@
 package VisualComparison;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.io.File;
@@ -730,7 +732,7 @@ public class ImageComparison {
 	}
 
 	/**
-	 * Fully marks the bottom and left borders of an image red. Used in isEqual
+	 * Fully marks the bottom and left borders of an image transparent. Used in isEqual
 	 * to mark the previously not existent parts of an image.
 	 * 
 	 * @param img
@@ -743,9 +745,10 @@ public class ImageComparison {
 	 */
 	private BufferedImage markImageBorders(BufferedImage img, int startW,
 			int startH) {
-		final Color markColor = Color.RED;
-		Graphics g = img.getGraphics();
+		final Color markColor = new Color(0, 0, 0, 0);
+		Graphics2D g = img.createGraphics();
 		g.setColor(markColor);
+		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_IN, 1.0f));
 		g.fillRect(startW, 0, img.getWidth() - startW, img.getHeight());
 		g.fillRect(0, startH, img.getWidth(), img.getHeight() - startH);
 		g.dispose();

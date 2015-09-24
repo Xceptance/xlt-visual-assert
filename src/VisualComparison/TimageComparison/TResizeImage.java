@@ -39,7 +39,7 @@ public class TResizeImage {
 	private static File differenceFile = new File(directory + "/difference.png");
 	
 	private final static int rgbWhite = Color.WHITE.getRGB();
-	private final static int rgbMarked = Color.RED.getRGB();
+	private final static int rgbMarked = new Color(0, 0, 0, 0).getRGB();
 
 	
 	@BeforeClass
@@ -83,7 +83,6 @@ public class TResizeImage {
 		ImageComparison imagecomparison = new ImageComparison(1, 0.01, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
 		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		BufferedImage img = ImageIO.read(fileOut);
-		
 		for (int w = 0; w < img.getWidth(); w++) {
 			for (int h = 0; h < img.getHeight(); h++) {
 				if (w < 50 && h < 50) {
