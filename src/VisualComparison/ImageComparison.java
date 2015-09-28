@@ -26,9 +26,6 @@ import javax.imageio.ImageIO;
  */
 public class ImageComparison {
 
-	private final int markingX = 10;
-	private final int markingY = 10;
-
 	protected enum ComparisonAlgorithm {
 		EXACTLY, PIXELFUZZY, FUZZY
 	}
@@ -36,8 +33,8 @@ public class ImageComparison {
 	private BufferedImage difference = null;
 	private BufferedImage imgOut = null;
 	private BufferedImage maskImage = null;
-	private int pixelPerBlockXY, imageWidth, imageHeight, subImageWidth,
-			subImageHeight;
+	private int markingX, markingY, pixelPerBlockXY, imageWidth, imageHeight,
+			subImageWidth, subImageHeight;
 
 	private double colTolerance;
 	private double pixTolerance;
@@ -70,6 +67,12 @@ public class ImageComparison {
 	 * comparisons.
 	 * <p>
 	 * 
+	 * @param markingX
+	 *            determines the height of the blocks used for marking and
+	 *            masking
+	 * @param markingY
+	 *            determines the width of the blocks used for marking and
+	 *            masking
 	 * @param pixelPerBlockXY
 	 *            in the fuzzyEqual method, the images are divided into blocks
 	 *            for further fuzzyness. This parameter determines the width and
@@ -103,10 +106,13 @@ public class ImageComparison {
 	 *            does not match any algorithm, it throws an
 	 *            IllegalArgumentException.
 	 */
-	public ImageComparison(int pixelPerBlockXY, double colTolerance,
-			double pixTolerance, boolean trainingMode, boolean closeMask,
-			int structElementWidth, int structElementHeight,
+	public ImageComparison(int markingX, int markingY, int pixelPerBlockXY,
+			double colTolerance, double pixTolerance, boolean trainingMode,
+			boolean closeMask, int structElementWidth, int structElementHeight,
 			boolean differenceImage, String algorithm) {
+
+		this.markingX = markingX;
+		this.markingY = markingY;
 		this.pixelPerBlockXY = pixelPerBlockXY;
 		this.colTolerance = colTolerance;
 		this.pixTolerance = pixTolerance;
@@ -213,18 +219,13 @@ public class ImageComparison {
 			differentPixels = fuzzyEqual(copyImg1, imgOut);
 			break;
 		}
-
+		
+		// If there were differences ...
 		if (differentPixels != null) {
 			if (trainingMode) {
-
 				// Mask differences in the maskImage
 				maskDifferences(differentPixels);
-			
-				// Close the maskImage if closeMask = true
-				if (closeMask) {
-					maskImage = imageoperations.closeImage(maskImage,
-							structElementWidth, structElementHeight);
-				}
+
 			} else {
 				// Mark the differences
 				markDifferences(differentPixels);
@@ -232,8 +233,23 @@ public class ImageComparison {
 			}
 		}
 		
+		// Close the maskImage if closeMask = true
+		// Do it even if there were no differences or if 
+		// trainingmode was false
+		if (closeMask) {
+			maskImage = imageoperations.closeImage(maskImage,
+					structElementWidth, structElementHeight);
+		}
+		
+		// Save the maskImage if trainingMode was on or 
+		// The maskImage should be closed
+		if (trainingMode || closeMask) {
+			ImageIO.write(maskImage, "PNG", fileMask);
+		}
+
+		// If the size of the image changed, mark the 
+		// previously nonexistant areas and set isEqual false
 		if (!trainingMode) {
-			// If the size changed, mark the differences
 			if (img2.getWidth() != imgOut.getWidth()
 					|| img2.getHeight() != imgOut.getHeight()
 					|| img1.getWidth() != imgOut.getWidth()
@@ -243,19 +259,21 @@ public class ImageComparison {
 				isEqual = false;
 			}
 		}
-		else {
-			ImageIO.write(maskImage, "PNG", fileMask);
-		}
 
 		if (isEqual) {
 			return true;
-		} else {
+		} 
+		
+		else {
 			ImageIO.write(imgOut, "PNG", fileOut);
+			
+			// Save the differenceImage if it was asked for 
 			if (differenceImage) {
-							ImageIO.write(difference, "png", fileDifference);
+				ImageIO.write(difference, "png", fileDifference);
 			}
+			
 			return false;
-		}
+		} 
 	}
 
 	/**
@@ -289,7 +307,6 @@ public class ImageComparison {
 
 				// draws the differenceImage if needed
 
-
 				if (difference > colTolerance) {
 					xCoords.add(x);
 					yCoords.add(y);
@@ -297,8 +314,7 @@ public class ImageComparison {
 					if (differenceImage) {
 						drawDifferencePicture(difference, x, y);
 					}
-				}
-				else {
+				} else {
 					if (differenceImage) {
 						drawDifferencePicture(0.0, x, y);
 					}
@@ -356,21 +372,20 @@ public class ImageComparison {
 		for (int x = 0; x < imagewidth; x++) {
 			for (int y = 0; y < imageheight; y++) {
 
-
 				// if the RGB values of 2 pixels differ
 				// add the x- and y- coordinates to the corresponding ArrayLists
 				if (img1.getRGB(x, y) != img2.getRGB(x, y)) {
 					xCoords.add(x);
 					yCoords.add(y);
 					exactlyEqual = false;
-					
+
 					// draws the differenceImage if needed
 					if (differenceImage) {
-						double difference = calculatePixelRgbDiff(x, y, img1, img2);
+						double difference = calculatePixelRgbDiff(x, y, img1,
+								img2);
 						drawDifferencePicture(difference, x, y);
 					}
-				}
-				else{
+				} else {
 					if (differenceImage) {
 						drawDifferencePicture(0.0, x, y);
 					}
@@ -462,10 +477,10 @@ public class ImageComparison {
 							xCoordsTemp.add(xCoord);
 							yCoordsTemp.add(yCoord);
 							if (differenceImage) {
-								drawDifferencePicture(difference, xCoord, yCoord);
+								drawDifferencePicture(difference, xCoord,
+										yCoord);
 							}
-						}
-						else {
+						} else {
 							if (differenceImage) {
 								drawDifferencePicture(0.0, xCoord, yCoord);
 							}
@@ -732,8 +747,8 @@ public class ImageComparison {
 	}
 
 	/**
-	 * Fully marks the bottom and left borders of an image transparent. Used in isEqual
-	 * to mark the previously not existent parts of an image.
+	 * Fully marks the bottom and left borders of an image transparent. Used in
+	 * isEqual to mark the previously not existent parts of an image.
 	 * 
 	 * @param img
 	 *            the image to mark
@@ -755,7 +770,6 @@ public class ImageComparison {
 
 		return img;
 	}
-
 
 	/**
 	 * This method draws a greyscale image of the differences for a better
@@ -788,7 +802,7 @@ public class ImageComparison {
 	 * @throws IOException
 	 */
 	private BufferedImage initializeMaskImage(BufferedImage img, File file)
-		throws IOException {
+			throws IOException {
 		final Color transparentWhite = new Color(255, 255, 255, 0);
 		final int rgbTransparentWhite = transparentWhite.getRGB();
 
@@ -796,20 +810,20 @@ public class ImageComparison {
 			BufferedImage mask = ImageIO.read(file);
 			if ((mask.getWidth() == img.getWidth())
 					&& (mask.getHeight() == img.getHeight())) {
-			
-			// Change image type to TYPE_INT_ARGB
-			mask = new ImageOperations().copyImage(mask);	
 
-			return mask;
+				// Change image type to TYPE_INT_ARGB
+				mask = new ImageOperations().copyImage(mask);
+
+				return mask;
 			}
 		}
 
 		int width = img.getWidth();
 		int height = img.getHeight();
 		BufferedImage mask = new BufferedImage(width, height,
-			BufferedImage.TYPE_INT_ARGB);
+				BufferedImage.TYPE_INT_ARGB);
 		int[] maskArray = ((DataBufferInt) mask.getRaster().getDataBuffer())
-			.getData();
+				.getData();
 		Arrays.fill(maskArray, rgbTransparentWhite);
 		return mask;
 	}
