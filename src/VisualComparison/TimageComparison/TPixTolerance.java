@@ -64,7 +64,7 @@ public class TPixTolerance {
 	 */
 	@Test
 	public void exactlyTen() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(10, 0.1, 0.1, false, false, 3, 3, false, "FUZZY");
+		ImageComparison imagecomparison = new ImageComparison(10, 10, 10, 0.1, 0.1, false, false, 3, 3, false, "FUZZY");
 		boolean result = imagecomparison.isEqual(screenshot, reference, fileMask, fileOut, differenceFile);
 		Assert.assertTrue(result);
 	}
@@ -76,7 +76,7 @@ public class TPixTolerance {
 	 */
 	@Test
 	public void belowTen() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(10, 0.1, 0.0999999999999, false, false, 3, 3, false, "FUZZY");
+		ImageComparison imagecomparison = new ImageComparison(10, 10, 10, 0.1, 0.0999999999999, false, false, 3, 3, false, "FUZZY");
 		boolean result = imagecomparison.isEqual(screenshot, reference, fileMask, fileOut, differenceFile);
 		Assert.assertFalse(result);
 	}
@@ -88,7 +88,7 @@ public class TPixTolerance {
 	 */
 	@Test
 	public void aboveTen() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(10, 0.1, 0.10000000000000001, false, false, 3, 3, false, "FUZZY");
+		ImageComparison imagecomparison = new ImageComparison(10, 10, 10, 0.1, 0.10000000000000001, false, false, 3, 3, false, "FUZZY");
 		boolean result = imagecomparison.isEqual(screenshot, reference, fileMask, fileOut, differenceFile);
 		Assert.assertTrue(result);
 	}

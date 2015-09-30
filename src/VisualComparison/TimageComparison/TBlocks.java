@@ -62,7 +62,7 @@ public class TBlocks {
 		
 //		This test tests what happens if the borders go over the edge
 //		It should also check the drawBorders method, since the treshold is so low, it should find differences everywhere
-		ImageComparison imagecomparison2 = new ImageComparison(20, 0.0, 0.01, false, false, 3, 3, false, "FUZZY");
+		ImageComparison imagecomparison2 = new ImageComparison(10, 10, 20, 0.0, 0.01, false, false, 3, 3, false, "FUZZY");
 		boolean result = imagecomparison2.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		Assert.assertFalse("This wasn't what the test is for, but it's still wrong", result);
 	}

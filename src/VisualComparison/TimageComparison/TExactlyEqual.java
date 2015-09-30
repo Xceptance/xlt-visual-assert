@@ -58,7 +58,7 @@ public class TExactlyEqual {
 	 */
 	@Test
 	public void almostEqualButNotQuite() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 0.00, 0.01,false, false, 3, 3, false, "EXACTLY");
+		ImageComparison imagecomparison = new ImageComparison(10, 10, 1,0.00, 0.01, false, false, 3, 3, false, "EXACTLY");
 		boolean result = imagecomparison.isEqual(reference, screenshot,
 				fileMask, fileOut, differenceFile);
 		Assert.assertFalse(

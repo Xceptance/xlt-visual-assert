@@ -35,13 +35,16 @@ import com.xceptance.xlt.api.util.XltProperties;
  */
 public class CompareScreenshots implements WebDriverCustomModule {
 	final String PPREFIX = "com.xceptance.xlt.imageComparison.";
-	final String DWAITTIME = "100";
+	final String DWAITTIME = "300";
+	final String DMARKBLOCKX = "10";
+	final String DMARKBLOCKY = "10";
 	final String DPIXELPBLOCKXY = "20";
-	final String DCOLTOLERANCE = "0.05";
-	final String DPIXTOLERANCE = "0.01";
-	final String DCLOSEWIDTH = "3";
-	final String DCLOSEHEIGHT = "3";
+	final String DCOLTOLERANCE = "0.1";
+	final String DPIXTOLERANCE = "0.2";
+	final String DCLOSEWIDTH = "5";
+	final String DCLOSEHEIGHT = "5";
 	final String DALGORITHM = "FUZZY";
+	final String DDIFFERENCEIMAGE = "true"; 
 
 	/**
 	 * No parameters beyond the webdriver are required. Necessary and possible
@@ -85,17 +88,30 @@ public class CompareScreenshots implements WebDriverCustomModule {
 	 * <p>
 	 * com.xceptance.xlt.imageComparison.waitTime: The program will wait that
 	 * many miliseconds for the website to load. <br>
-	 * Default: 100.
+	 * Default: 300.
+	 * <p>
+	 * com.xceptance.xlt.imageComparison.markBlockX: The height of the blocks
+	 * used for marking and masking. Has to be above 0.<br>
+	 * Default: 10.
+	 * <p>
+	 * com.xceptance.xlt.imageComparison.markBlockY: The width of the blocks
+	 * used for marking and masking <br>
+	 * Default: 10.
 	 * <p>
 	 * com.xceptance.xlt.imageComparison.pixelPerBlockXY: Fuzzyness parameter,
 	 * used if the specified algorithm is 'FUZZY'. That many different pixels
 	 * (in percent) will be tolerated.<br>
-	 * Default: 0.01
+	 * Default: 20
 	 * <p>
 	 * com.xceptance.xlt.imageComparison.colTolerance: Fuzzyness parameter, used
 	 * if the specified algorithm is 'FUZZY' or 'PIXELFUZZYEQUAL'. If used, a
 	 * color difference of up to that much (in percent) will be ignored.<br>
-	 * Default: 0.05.
+	 * Default: 0.1.
+	 * <p>
+	 * com.xceptance.xlt.imageComparison.pixTolerance: Fuzzyness parameter,
+	 * used if the specified algorithm is 'FUZZY'. That many different pixels
+	 * (in percent) will be tolerated.<br>
+	 * Default: 0.2
 	 * <p>
 	 * com.xceptance.xlt.imageComparison.trainingMode: If true, differences will
 	 * not be marked, but instead set black in the maskedImage and thereby
@@ -115,24 +131,24 @@ public class CompareScreenshots implements WebDriverCustomModule {
 	 * then gaps with a width of up to ten will be closed. Very performance
 	 * heavy if high. <br>
 	 * The image is scaled down by a factor of 10 before the closing and scaled
-	 * up again afterwards! Thus there will always be a certain fuzzyness and 
-	 * a width of ten translates close to 100 pixels on the image, not ten.
-	 * Default: 3
+	 * up again afterwards! Thus there will always be a certain fuzzyness and a
+	 * width of ten translates close to 100 pixels on the image, not ten.
+	 * Default: 5
 	 * <p>
-	 *  com.xceptance.xlt.imageComparison.closeHeight: <br>
+	 * com.xceptance.xlt.imageComparison.closeHeight: <br>
 	 * Decides how much should be closed if closeMask is true. Specifically, it
 	 * decides the height of the structuring element. For example, if it's ten,
 	 * then gaps with a height of up to ten will be closed. Very performance
 	 * heavy if high. <br>
 	 * The image is scaled down by a factor of 10 before the closing and scaled
-	 * up again afterwards! Thus there will always be a certain fuzzyness and 
-	 * a height of ten translates close to 100 pixels on the image, not ten.
-	 * Default: 3
+	 * up again afterwards! Thus there will always be a certain fuzzyness and a
+	 * height of ten translates close to 100 pixels on the image, not ten.
+	 * Default: 5
 	 * <p>
 	 * com.xceptance.xlt.imageComparison.differenceImage: If true, a greyscale
 	 * image will be created in addition to the marked image. The image is
 	 * lighter the higher the difference between the screenshot and the
-	 * reference image. Default: false.
+	 * reference image. Default: true.
 	 * <p>
 	 * com.xceptance.xlt.imageComparison.algorithm: Decides which comparison
 	 * algorithm should be used.
@@ -166,6 +182,12 @@ public class CompareScreenshots implements WebDriverCustomModule {
 		String waitTimeS = x.getProperty(PPREFIX + "waitTime", DWAITTIME);
 		int waitTime = Integer.parseInt(waitTimeS);
 
+		// markBlockX, markBlockY
+		String markBlockXS = x.getProperty(PPREFIX + "MARKBLOCKX", DMARKBLOCKX);
+		int markBlockX = Integer.parseInt(markBlockXS);
+		String markBlockYS = x.getProperty(PPREFIX + "MARKBLOCKX", DMARKBLOCKY);
+		int markBlockY = Integer.parseInt(markBlockYS);
+
 		// pixelPerBlockXY, fuzzyness parameter
 		String pixelPerBlockXYS = x.getProperty(PPREFIX + "pixelPerBlockXY",
 				DPIXELPBLOCKXY);
@@ -193,14 +215,14 @@ public class CompareScreenshots implements WebDriverCustomModule {
 		String closeWidthString = x.getProperty(PPREFIX + "closeWidth",
 				DCLOSEWIDTH);
 		int closeWidth = Integer.parseInt(closeWidthString);
-		
+
 		// closeHeight
 		String closeHeightString = x.getProperty(PPREFIX + "closeHeight",
 				DCLOSEHEIGHT);
 		int closeHeight = Integer.parseInt(closeHeightString);
 
 		// differenceImage
-		String differenceImageS = x.getProperty(PPREFIX + "differenceImage");
+		String differenceImageS = x.getProperty(PPREFIX + "differenceImage", DDIFFERENCEIMAGE);
 		Boolean differenceImage = Boolean.parseBoolean(differenceImageS);
 
 		// algorithm
@@ -293,9 +315,9 @@ public class CompareScreenshots implements WebDriverCustomModule {
 
 				// Initializes ImageComparison and calls isEqual
 				ImageComparison imagecomparison = new ImageComparison(
-						pixelPerBlockXY, colTolerance, pixTolerance,
-						trainingMode, closeMask, closeWidth, closeHeight, differenceImage,
-						algorithm);
+						markBlockX, markBlockY, pixelPerBlockXY, colTolerance,
+						pixTolerance, trainingMode, closeMask, closeWidth,
+						closeHeight, differenceImage, algorithm);
 				boolean result = imagecomparison.isEqual(reference, screenshot,
 						maskImageFile, markedImageFile, differenceImageFile);
 
@@ -306,12 +328,14 @@ public class CompareScreenshots implements WebDriverCustomModule {
 				// Place it into he markedImage folder otherwise
 				else {
 					Path source = screenshotFile.toPath();
-					String newScreenshotPath = directory + "/marked/" + screenshotName + "-new" + ".png";
+					String newScreenshotPath = directory + "/marked/"
+							+ screenshotName + "-new" + ".png";
 					Path destination = Paths.get(newScreenshotPath);
-					Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
+					Files.copy(source, destination,
+							StandardCopyOption.REPLACE_EXISTING);
 					screenshotFile.delete();
 				}
-				
+
 				String assertMessage = "Website does not match the reference screenshot: "
 						+ currentActionName;
 				Assert.assertTrue(assertMessage, result);

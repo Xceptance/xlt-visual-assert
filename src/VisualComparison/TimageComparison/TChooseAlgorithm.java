@@ -41,9 +41,9 @@ public class TChooseAlgorithm {
 		private static File fileOut = new File(directory, "/fileOut.png");
 		private static File differenceFile = new File(directory + "/difference.png");
 		
-		private ImageComparison exactComp = new ImageComparison(50, 0.2, 0.01, false, false, 3, 3, false, "EXACTLY");
-		private final ImageComparison pixelFuzzyComp = new ImageComparison(50, 0.2, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
-		private final ImageComparison fuzzyComp = new ImageComparison(50, 0.2, 0.01, false, false, 3, 3, false, "FUZZY");
+		private ImageComparison exactComp = new ImageComparison(10, 10, 50, 0.2, 0.01, false, false, 3, 3, false, "EXACTLY");
+		private final ImageComparison pixelFuzzyComp = new ImageComparison(10, 10, 50, 0.2, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
+		private final ImageComparison fuzzyComp = new ImageComparison(10, 10, 50, 0.2, 0.01, false, false, 3, 3, false, "FUZZY");
 
 
 		@BeforeClass
@@ -86,7 +86,7 @@ public class TChooseAlgorithm {
 		@Test (expected = IllegalArgumentException.class)
 		public void noAlgorithmFound() {
 			initializeImages();
-			exactComp = new ImageComparison(20, 0.2, 10, false, false, 3, 3, false, "exactlyEQUAL");
+			exactComp = new ImageComparison(10, 10, 20, 0.2, 10, false, false, 3, 3, false, "exactlyEQUAL");
 		
 		}
 		

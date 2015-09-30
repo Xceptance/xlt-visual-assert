@@ -34,6 +34,9 @@ public class TMask {
 	// and 300 (it shoudn't be)
 	// and if the resulting markedImage is marked between rows 200 and 250 (it
 	// should be)
+	
+	// Tests the same thing again, but with markingX and markingY = 1
+	
 
 	private static BufferedImage reference;
 	private static BufferedImage screenshot;
@@ -93,8 +96,8 @@ public class TMask {
 	 */
 	@Test
 	public void changesCorrectlyMarked() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(10, 0.1, 0.01,
-				false, false, 3, 3, false, "PIXELFUZZY");
+		ImageComparison imagecomparison = new ImageComparison(10, 10, 10,
+				0.1, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
 
 		boolean result = imagecomparison.isEqual(reference, screenshot,
 				fileMask, fileOut, differenceFile);
@@ -129,8 +132,8 @@ public class TMask {
 	 */
 	@Test
 	public void changesCorrectlyHidden() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(10, 0.1, 0.01,
-				false, false, 3, 3, false, "FUZZY");
+		ImageComparison imagecomparison = new ImageComparison(10, 10, 10,
+				0.1, 0.01, false, false, 3, 3, false, "FUZZY");
 		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		BufferedImage output = ImageIO.read(fileOut);
 

@@ -18,34 +18,42 @@ import VisualComparison.ImageComparison;
 /**
  * Tests if the training mode marks what it should.
  * 
+ * Includes one test for PIXELFUZZY in case markingX or markingY are 1.
+ * 
  * @author daniel
  *
  */
 public class TTraining {
 	static BufferedImage reference, newImage;
-	ImageComparison fuzzyTraining = new ImageComparison(10, 0.00, 0.01,
-			true, false, 3, 3, false, "FUZZY");
-	ImageComparison fuzzyImgCompare = new ImageComparison(10, 0.00, 0.01,
-			false, false, 3, 3, false, "FUZZY");
-	ImageComparison fuzzyDifference = new ImageComparison(10, 0.00, 0.01,
-			false, false, 3, 3, true, "FUZZY");
-	ImageComparison exactlyTraining = new ImageComparison(1, 0.00, 0.01,
-			true, false, 3, 3, false, "EXACTLY");
-	ImageComparison exactlyCompare = new ImageComparison(1, 0.00, 0.01,
-			false, false, 3, 3, false, "EXACTLY");
-	ImageComparison exactlyDifference = new ImageComparison(1, 0.00, 0.01,
-			false, false, 3, 3, true, "EXACTLY");
-	ImageComparison pixelFuzzyTraining = new ImageComparison(1, 0.01, 0.01,
-			true, false, 3, 3, false, "PIXELFUZZY");
-	ImageComparison pixelFuzzyCompare = new ImageComparison(1, 0.01, 0.01,
-			false, false, 3, 3, false, "PIXELFUZZY");
-	ImageComparison pixelFuzzyDifference = new ImageComparison(1, 0.01, 0.01,
-			false, false, 3, 3, true, "PIXELFUZZY");
+	ImageComparison fuzzyTraining = new ImageComparison(10, 10, 10,
+			0.00, 0.01, true, false, 3, 3, false, "FUZZY");
+	ImageComparison fuzzyImgCompare = new ImageComparison(10, 10, 10,
+			0.00, 0.01, false, false, 3, 3, false, "FUZZY");
+	ImageComparison fuzzyDifference = new ImageComparison(10, 10, 10,
+			0.00, 0.01, false, false, 3, 3, true, "FUZZY");
+	ImageComparison exactlyTraining = new ImageComparison(10, 10, 1,
+			0.00, 0.01, true, false, 3, 3, false, "EXACTLY");
+	ImageComparison exactlyCompare = new ImageComparison(10, 10, 1,
+			0.00, 0.01, false, false, 3, 3, false, "EXACTLY");
+	ImageComparison exactlyDifference = new ImageComparison(10, 10, 1,
+			0.00, 0.01, false, false, 3, 3, true, "EXACTLY");
+	ImageComparison pixelFuzzyTraining = new ImageComparison(10, 10, 1,
+			0.01, 0.01, true, false, 3, 3, false, "PIXELFUZZY");
+	ImageComparison pixelFuzzyTrainingMarkingXYOne = new ImageComparison(1, 1, 1,
+			0.01, 0.01, true, false, 3, 3, false, "PIXELFUZZY");
+	ImageComparison pixelFuzzyCompare = new ImageComparison(10, 10, 1,
+			0.01, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
+	ImageComparison pixelFuzzyDifference = new ImageComparison(10, 10, 1,
+			0.01, 0.01, false, false, 3, 3, true, "PIXELFUZZY");
+	
 	static File directory = org.apache.commons.lang3.SystemUtils
 			.getJavaIoTmpDir();
 	static File outPutfile = new File(directory + "/test.png");
 	static File maskFile = new File(directory + "/mask.png");
 	static File differenceFile = new File(directory + "/difference.png");
+	
+	private static int rgbMasked = Color.BLACK.getRGB();
+	private static int rgbNotMasked = new Color(255, 255, 255, 0).getRGB();
 
 	@BeforeClass
 	public static void setUp() throws IOException {
@@ -155,6 +163,34 @@ public class TTraining {
 		paintArea(newImage, 0, 0, 9, 9);
 		Assert.assertFalse(fuzzyDifference.isEqual(reference, newImage, maskFile, outPutfile, differenceFile));
 		differenceEmpty();
+	}
+	
+	/**
+	 * Test is the trainingmode masks pixels, not blocks when markingX or markingY are 1.
+	 * Tests if differences are masked and nothing else is.
+	 * 
+	 * @throws IOException
+	 */
+	@Test
+	public void trainPixelFuzzyMarkingXYOne() throws IOException {
+		setUpFileAndPicture();
+		paintArea(newImage, 48, 97, 31, 31);
+		newImage.setRGB(0, 0, Color.CYAN.getRGB());
+		pixelFuzzyTrainingMarkingXYOne.isEqual(reference, newImage, maskFile, outPutfile, differenceFile);
+		
+		// Go through every pixel of the maskImage, check if the ones where there were differences
+		// are masked and the others are not.
+		BufferedImage maskImage = ImageIO.read(maskFile);
+		for (int w = 0; w < maskImage.getWidth(); w++) {
+			for (int h = 0; h < maskImage.getHeight(); h++) {
+				if (reference.getRGB(w, h) == newImage.getRGB(w, h)) {
+					Assert.assertEquals(rgbNotMasked, maskImage.getRGB(w, h));
+				}
+				else {
+					Assert.assertEquals(rgbMasked, maskImage.getRGB(w, h));
+				}
+			}
+		}
 	}
 	
 	// test the interaction between training mode and difference image for PIXELFUZZY

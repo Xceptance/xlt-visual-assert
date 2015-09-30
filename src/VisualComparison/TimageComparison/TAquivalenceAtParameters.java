@@ -40,12 +40,12 @@ public class TAquivalenceAtParameters {
 			"/difference.png");
 	private static File thrashFile = new File(directory, "/tempFile");
 
-	private static ImageComparison imgCompExact = new ImageComparison(0, 0, 0,
-			false, false, 0, 0, true, "EXACTLY");
-	private static ImageComparison imgCompPFuzzy = new ImageComparison(0, 0, 0,
-			false, false, 0, 0, true, "PIXELFUZZY");
-	private static ImageComparison imgCompFuzzy = new ImageComparison(1, 0, 0,
-			false, false, 0, 0, true, "FUZZY");
+	private static ImageComparison imgCompExact = new ImageComparison(10, 10, 0,
+			0, 0, false, false, 0, 0, true, "EXACTLY");
+	private static ImageComparison imgCompPFuzzy = new ImageComparison(10, 10, 0,
+			0, 0, false, false, 0, 0, true, "PIXELFUZZY");
+	private static ImageComparison imgCompFuzzy = new ImageComparison(10, 10, 1,
+			0, 0, false, false, 0, 0, true, "FUZZY");
 
 	/**
 	 * Initializes two 200 * 200 images, all pixels get a random number between

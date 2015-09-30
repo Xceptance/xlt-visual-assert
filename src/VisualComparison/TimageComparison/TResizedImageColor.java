@@ -65,7 +65,7 @@ public class TResizedImageColor {
 	@Test
 	public void testDifferentSizeT() throws IOException {
 		ImageComparison imagecomparison = new ImageComparison(10,
-				10, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
+				10, 10, 10, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
 		boolean result = imagecomparison.isEqual(reference, screenshot,
 				fileMask, fileOut, differenceFile);
 		Assert.assertFalse(
@@ -81,7 +81,7 @@ public class TResizedImageColor {
 	 */
 	@Test
 	public void testDifferentSize() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 0.00, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
+		ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.00, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
 		boolean result = imagecomparison.isEqual(reference, screenshot,
 				fileMask, fileOut, differenceFile);
 		Assert.assertFalse(

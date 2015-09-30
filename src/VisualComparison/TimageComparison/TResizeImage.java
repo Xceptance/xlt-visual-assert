@@ -63,7 +63,7 @@ public class TResizeImage {
 	 */
 	@Test
 	public void correctSizePixelFuzzyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 0.01, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
+		ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.01, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
 		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		BufferedImage img = ImageIO.read(fileOut);
 		
@@ -80,7 +80,7 @@ public class TResizeImage {
 	 */
 	@Test
 	public void correctBreakPointPixelFuzzyEqual() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(1, 0.01, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
+		ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.01, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
 		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		BufferedImage img = ImageIO.read(fileOut);
 		for (int w = 0; w < img.getWidth(); w++) {

@@ -69,10 +69,10 @@ public class ImageComparison {
 	 * 
 	 * @param markingX
 	 *            determines the height of the blocks used for marking and
-	 *            masking
+	 *            masking. Has to be above 0
 	 * @param markingY
 	 *            determines the width of the blocks used for marking and
-	 *            masking
+	 *            masking. Has to be above 0.
 	 * @param pixelPerBlockXY
 	 *            in the fuzzyEqual method, the images are divided into blocks
 	 *            for further fuzzyness. This parameter determines the width and
@@ -111,6 +111,12 @@ public class ImageComparison {
 			boolean closeMask, int structElementWidth, int structElementHeight,
 			boolean differenceImage, String algorithm) {
 
+		// Check if markingX or markingY are below 1, which would make no sense
+		// and woudn't work. If they are, just throw an Exception
+		if (markingX < 0 || markingY < 0) {
+			throw new IllegalArgumentException(
+					"Can't draw rectangles with a width or height below one");
+		}
 		this.markingX = markingX;
 		this.markingY = markingY;
 		this.pixelPerBlockXY = pixelPerBlockXY;
@@ -132,8 +138,8 @@ public class ImageComparison {
 	/**
 	 * Wrapper method for the different comparison methods. Handles resizing,
 	 * masking, calls the comparison method and marks the differences or masks
-	 * them if trainingMode is true. Also saves the marked image/ the mask
-	 * image.
+	 * them if trainingMode is true. Also draws the differenceImage if asked
+	 * for. And saves the marked image/ the mask image.
 	 * 
 	 * @param img1
 	 *            the reference image
@@ -200,10 +206,9 @@ public class ImageComparison {
 		copyImg1 = imageoperations.overlayMaskImage(copyImg1, maskImage);
 		imgOut = imageoperations.overlayMaskImage(imgOut, maskImage);
 
-		// initializes the differenceImage
+		// Initialize the difference image and the differentPixels array
 		difference = new BufferedImage(imageWidth, imageHeight,
 				BufferedImage.TYPE_INT_ARGB);
-
 		int[][] differentPixels = null;
 
 		// Checks which imagecomparison method to call and calls it.
@@ -219,9 +224,16 @@ public class ImageComparison {
 			differentPixels = fuzzyEqual(copyImg1, imgOut);
 			break;
 		}
-		
+
 		// If there were differences ...
 		if (differentPixels != null) {
+
+			if (differenceImage) {
+				// Draw the difference image and save it too
+				drawDifferenceImage(copyImg1, imgOut, differentPixels);
+				ImageIO.write(difference, "PNG", fileDifference);
+			}
+
 			if (trainingMode) {
 				// Mask differences in the maskImage
 				maskDifferences(differentPixels);
@@ -232,22 +244,22 @@ public class ImageComparison {
 				isEqual = false;
 			}
 		}
-		
+
 		// Close the maskImage if closeMask = true
-		// Do it even if there were no differences or if 
+		// Do it even if there were no differences or if
 		// trainingmode was false
 		if (closeMask) {
 			maskImage = imageoperations.closeImage(maskImage,
 					structElementWidth, structElementHeight);
 		}
-		
-		// Save the maskImage if trainingMode was on or 
+
+		// Save the maskImage if trainingMode was on or
 		// The maskImage should be closed
 		if (trainingMode || closeMask) {
 			ImageIO.write(maskImage, "PNG", fileMask);
 		}
 
-		// If the size of the image changed, mark the 
+		// If the size of the image changed, mark the
 		// previously nonexistant areas and set isEqual false
 		if (!trainingMode) {
 			if (img2.getWidth() != imgOut.getWidth()
@@ -262,18 +274,12 @@ public class ImageComparison {
 
 		if (isEqual) {
 			return true;
-		} 
-		
+		}
+
 		else {
 			ImageIO.write(imgOut, "PNG", fileOut);
-			
-			// Save the differenceImage if it was asked for 
-			if (differenceImage) {
-				ImageIO.write(difference, "png", fileDifference);
-			}
-			
 			return false;
-		} 
+		}
 	}
 
 	/**
@@ -311,13 +317,6 @@ public class ImageComparison {
 					xCoords.add(x);
 					yCoords.add(y);
 					equal = false;
-					if (differenceImage) {
-						drawDifferencePicture(difference, x, y);
-					}
-				} else {
-					if (differenceImage) {
-						drawDifferencePicture(0.0, x, y);
-					}
 				}
 			}
 		}
@@ -378,17 +377,6 @@ public class ImageComparison {
 					xCoords.add(x);
 					yCoords.add(y);
 					exactlyEqual = false;
-
-					// draws the differenceImage if needed
-					if (differenceImage) {
-						double difference = calculatePixelRgbDiff(x, y, img1,
-								img2);
-						drawDifferencePicture(difference, x, y);
-					}
-				} else {
-					if (differenceImage) {
-						drawDifferencePicture(0.0, x, y);
-					}
 				}
 			}
 		}
@@ -476,14 +464,6 @@ public class ImageComparison {
 							differencesPerBlock++;
 							xCoordsTemp.add(xCoord);
 							yCoordsTemp.add(yCoord);
-							if (differenceImage) {
-								drawDifferencePicture(difference, xCoord,
-										yCoord);
-							}
-						} else {
-							if (differenceImage) {
-								drawDifferencePicture(0.0, xCoord, yCoord);
-							}
 						}
 					}
 				}
@@ -497,6 +477,11 @@ public class ImageComparison {
 					xCoordsTemp.clear();
 					yCoordsTemp.clear();
 					equal = false;
+				}
+				// Otherwise clear the temporary coordinates
+				else {
+					xCoordsTemp.clear();
+					yCoordsTemp.clear();
 				}
 			}
 		}
@@ -624,6 +609,9 @@ public class ImageComparison {
 	 * Method to mark areas around the detected differences. Goes through every
 	 * pixel that was different and marks the marking block it is in, unless it
 	 * was marked already. <br>
+	 * If markingX of markingY are 1, it will simply mark the detected
+	 * differences.
+	 * 
 	 * Works directly on imgOut.
 	 * 
 	 * @param pixels
@@ -631,20 +619,33 @@ public class ImageComparison {
 	 */
 	private void markDifferences(int[][] pixels) {
 
-		int blocksX = imageWidth / markingX;
-		int blocksY = imageHeight / markingY;
-		boolean[][] markedBlocks = new boolean[blocksX + 1][blocksY + 1];
-		for (boolean[] row : markedBlocks) {
-			Arrays.fill(row, false);
+		// Check if markingX or markingY are 1. If they are, just mark every
+		// different pixel,
+		// don't bother with rectangles
+		if (markingX == 1 || markingY == 1) {
+			for (int i = 0; i < pixels.length; i++) {
+				colorPixel(pixels[i][0], pixels[i][1]);
+			}
 		}
-		for (int x = 0; x < pixels.length; x++) {
-			int xBlock = pixels[x][0] / markingX;
-			int yBlock = pixels[x][1] / markingY;
-			if (!markedBlocks[xBlock][yBlock]) {
-				subImageWidth = calcPixSpan(markingX, xBlock, imageWidth);
-				subImageHeight = calcPixSpan(markingY, yBlock, imageHeight);
-				drawBorders(xBlock, yBlock, markingX, markingY);
-				markedBlocks[xBlock][yBlock] = true;
+
+		// And if markingX and markingY are above one, paint rectangles!
+		// Normal case
+		else {
+			int blocksX = imageWidth / markingX;
+			int blocksY = imageHeight / markingY;
+			boolean[][] markedBlocks = new boolean[blocksX + 1][blocksY + 1];
+			for (boolean[] row : markedBlocks) {
+				Arrays.fill(row, false);
+			}
+			for (int x = 0; x < pixels.length; x++) {
+				int xBlock = pixels[x][0] / markingX;
+				int yBlock = pixels[x][1] / markingY;
+				if (!markedBlocks[xBlock][yBlock]) {
+					subImageWidth = calcPixSpan(markingX, xBlock, imageWidth);
+					subImageHeight = calcPixSpan(markingY, yBlock, imageHeight);
+					drawBorders(xBlock, yBlock, markingX, markingY);
+					markedBlocks[xBlock][yBlock] = true;
+				}
 			}
 		}
 	}
@@ -658,6 +659,9 @@ public class ImageComparison {
 	 *            the array with the differences.
 	 */
 	private void maskDifferences(int[][] pixels) {
+
+		// This method doesn't need a separate if for markingX/ markingY = 1,
+		// the colorArea method works for them
 
 		int blocksX = imageWidth / markingX;
 		int blocksY = imageHeight / markingY;
@@ -675,6 +679,7 @@ public class ImageComparison {
 				maskedBlocks[xBlock][yBlock] = true;
 			}
 		}
+
 	}
 
 	/**
@@ -772,8 +777,34 @@ public class ImageComparison {
 	}
 
 	/**
-	 * This method draws a greyscale image of the differences for a better
-	 * visibility
+	 * Initializes the difference image, calculates the difference where there
+	 * was one and paints the pixel to the right color, Works on the
+	 * 
+	 * @param differentPixels
+	 */
+	private void drawDifferenceImage(BufferedImage reference,
+			BufferedImage toCompare, int[][] differentPixels) {
+
+		int[] differenceArray = ((DataBufferInt) difference.getRaster()
+				.getDataBuffer()).getData();
+
+		// If there are no differences, the rgb is zero. Set zero (=Black) as
+		// the default.
+		Arrays.fill(differenceArray, new Color(0).getRGB());
+		double difference;
+
+		// Go through the differentPixels array, get the difference and
+		// draw the pixel into
+		for (int i = 0; i < differentPixels.length; i++) {
+			difference = calculatePixelRgbDiff(differentPixels[i][0],
+					differentPixels[i][1], reference, toCompare);
+			drawDifferencePixel(difference, differentPixels[i][0],
+					differentPixels[i][1]);
+		}
+	}
+
+	/**
+	 * Draws a certain pixel with a certain grayness into the difference image.
 	 * 
 	 * @param ratio
 	 *            difference ratio between the two pixels
@@ -782,7 +813,7 @@ public class ImageComparison {
 	 * @param y
 	 *            current y coordinate
 	 */
-	private void drawDifferencePicture(double ratio, int x, int y) {
+	private void drawDifferencePixel(double ratio, int x, int y) {
 		double grey = 255 * ratio;
 		int diffColor = (int) Math.round(grey);
 		Color greyscale = new Color(diffColor, diffColor, diffColor, 255);
@@ -813,7 +844,6 @@ public class ImageComparison {
 
 				// Change image type to TYPE_INT_ARGB
 				mask = new ImageOperations().copyImage(mask);
-
 				return mask;
 			}
 		}
