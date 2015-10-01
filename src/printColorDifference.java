@@ -34,7 +34,7 @@ public class printColorDifference {
 	private static File outputFile = new File(
 			"/home/daniel/Pictures/output.png");
 
-	private static final Color colReference = new Color(200, 75, 230);
+	private static final Color colReference = Color.WHITE;
 	private static final int blockHeight = 200;
 	private static final int blockWidth = imgWidth / 7;
 
