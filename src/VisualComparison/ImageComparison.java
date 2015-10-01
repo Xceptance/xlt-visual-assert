@@ -167,37 +167,39 @@ public class ImageComparison {
 		ImageOperations imageoperations = new ImageOperations();
 
 		// copies the images, so it doesn't work directly on them
-		imgOut = imageoperations.copyImage(img2);
 		BufferedImage copyImg1 = imageoperations.copyImage(img1);
+		imgOut = imageoperations.copyImage(img2);
 
-		// Checks if one image is smaller then the other and if yes which.
-		// Increases width/ height so the images will have the same size.
-		// The original Images will be in the top left corner
+		// Resizes the images and saves the previous width and height ...
 
-		// Increases the smaller images width to match the larger one
-		while (copyImg1.getWidth() != imgOut.getWidth()) {
-			if (copyImg1.getWidth() > imgOut.getWidth()) {
-				imgOut = imageoperations.increaseImageSize(img2,
-						copyImg1.getWidth(), imgOut.getHeight());
-			}
-			if (imgOut.getWidth() > copyImg1.getWidth()) {
-				copyImg1 = imageoperations.increaseImageSize(copyImg1,
-						imgOut.getWidth(), copyImg1.getHeight());
-			}
+		// Initializes the variables for the previous width and height
+		int prevWidth = imgOut.getWidth();
+		int prevHeight = imgOut.getHeight();
+
+		if (imgOut.getWidth() > copyImg1.getWidth()) {
+			prevWidth = copyImg1.getWidth();
+			copyImg1 = imageoperations.increaseImageSize(copyImg1,
+					imgOut.getWidth(), copyImg1.getHeight());
+		}
+		if (imgOut.getHeight() > copyImg1.getHeight()) {
+			prevHeight = copyImg1.getHeight();
+			copyImg1 = imageoperations.increaseImageSize(copyImg1,
+					copyImg1.getWidth(), imgOut.getHeight());
+		}
+		if (imgOut.getWidth() < copyImg1.getWidth()) {
+			prevWidth = imgOut.getWidth();
+			imgOut = imageoperations.increaseImageSize(imgOut,
+					copyImg1.getWidth(), imgOut.getHeight());
+		}
+		if (imgOut.getHeight() < copyImg1.getHeight()) {
+			prevHeight = imgOut.getHeight();
+			imgOut = imageoperations.increaseImageSize(imgOut,
+					imgOut.getWidth(), copyImg1.getHeight());
 		}
 
-		// Increases the smaller images height to match the larger one
-		while (copyImg1.getHeight() != imgOut.getHeight()) {
-			if (copyImg1.getHeight() > imgOut.getHeight()) {
-				imgOut = imageoperations.increaseImageSize(imgOut,
-						imgOut.getWidth(), img1.getHeight());
-			}
-			if (imgOut.getHeight() > img1.getHeight()) {
-				copyImg1 = imageoperations.increaseImageSize(copyImg1,
-						copyImg1.getWidth(), img2.getHeight());
-			}
-		}
+		// end resizing
 
+		// initializes variables for imageHeight and imageWidth
 		imageWidth = imgOut.getWidth();
 		imageHeight = imgOut.getHeight();
 
@@ -206,10 +208,9 @@ public class ImageComparison {
 		copyImg1 = imageoperations.overlayMaskImage(copyImg1, maskImage);
 		imgOut = imageoperations.overlayMaskImage(imgOut, maskImage);
 
-		// Initialize the difference image and the differentPixels array
-		difference = new BufferedImage(imageWidth, imageHeight,
-				BufferedImage.TYPE_INT_ARGB);
+		// Initialize differentPixels array and the difference image
 		int[][] differentPixels = null;
+		initializeDifferenceImage();
 
 		// Checks which imagecomparison method to call and calls it.
 		// Sets the differentPixels array
@@ -228,17 +229,14 @@ public class ImageComparison {
 		// If there were differences ...
 		if (differentPixels != null) {
 
-			if (differenceImage) {
-				// Draw the difference image and save it too
-				drawDifferenceImage(copyImg1, imgOut, differentPixels);
-				ImageIO.write(difference, "PNG", fileDifference);
-			}
-
 			if (trainingMode) {
 				// Mask differences in the maskImage
 				maskDifferences(differentPixels);
 
 			} else {
+				// Draw the differences into the difference image
+				drawDifferencesToImage(copyImg1, imgOut, differentPixels);
+
 				// Mark the differences
 				markDifferences(differentPixels);
 				isEqual = false;
@@ -259,27 +257,30 @@ public class ImageComparison {
 			ImageIO.write(maskImage, "PNG", fileMask);
 		}
 
-		// If the size of the image changed, mark the
-		// previously nonexistant areas and set isEqual false
 		if (!trainingMode) {
-			if (img2.getWidth() != imgOut.getWidth()
-					|| img2.getHeight() != imgOut.getHeight()
-					|| img1.getWidth() != imgOut.getWidth()
-					|| img1.getHeight() != imgOut.getHeight()) {
-				imgOut = markImageBorders(imgOut, img2.getWidth(),
-						img2.getHeight());
+
+			// If the size of the image changed, mark the
+			// previously nonexistant areas and set isEqual false
+			if (imageWidth != prevWidth || imageHeight != prevHeight) {	
+				difference = markImageBorders(difference, prevWidth, prevHeight);
+				imgOut = markImageBorders(imgOut, prevWidth, prevHeight);				
 				isEqual = false;
 			}
 		}
 
 		if (isEqual) {
 			return true;
-		}
+		} else {
+			// Save the differenceImage if differenceImage is true
+			if (differenceImage) {
+				ImageIO.write(difference, "PNG", fileDifference);
+			}
 
-		else {
+			// Save the marked image
 			ImageIO.write(imgOut, "PNG", fileOut);
 			return false;
 		}
+
 	}
 
 	/**
@@ -752,8 +753,9 @@ public class ImageComparison {
 	}
 
 	/**
-	 * Fully marks the bottom and left borders of an image transparent. Used in
-	 * isEqual to mark the previously not existent parts of an image.
+	 * Fully marks the bottom and right borders of an image transparent
+	 * (transparent white). Used in isEqual to mark the previously not existent
+	 * parts of an image.
 	 * 
 	 * @param img
 	 *            the image to mark
@@ -765,40 +767,55 @@ public class ImageComparison {
 	 */
 	private BufferedImage markImageBorders(BufferedImage img, int startW,
 			int startH) {
-		final Color markColor = new Color(0, 0, 0, 0);
+
+		final Color markTransparentWhite = new Color(255, 255, 255, 0);
 		Graphics2D g = img.createGraphics();
-		g.setColor(markColor);
+		g.setColor(markTransparentWhite);
 		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_IN, 1.0f));
-		g.fillRect(startW, 0, img.getWidth() - startW, img.getHeight());
-		g.fillRect(0, startH, img.getWidth(), img.getHeight() - startH);
+
+		if (startW < imageWidth) {
+			g.fillRect(startW, 0, img.getWidth() - startW, img.getHeight());
+		}
+		if (startH < imageHeight) {
+			g.fillRect(0, startH, img.getWidth(), img.getHeight() - startH);
+		}
 		g.dispose();
 
 		return img;
 	}
 
 	/**
-	 * Initializes the difference image, calculates the difference where there
-	 * was one and paints the pixel to the right color, Works on the
+	 * Initializes the difference image. It is initialized fully black, since
+	 * black = no difference. Works directly on the difference image.
+	 */
+	private void initializeDifferenceImage() {
+
+		int rgbBlack = Color.BLACK.getRGB();
+		difference = new BufferedImage(imageWidth, imageHeight,
+				BufferedImage.TYPE_INT_ARGB);
+		int[] differenceArray = ((DataBufferInt) difference.getRaster()
+				.getDataBuffer()).getData();
+		Arrays.fill(differenceArray, rgbBlack);
+	}
+
+	/**
+	 * Draws the differences onto the difference image with the correct
+	 * grayness. Calculates the difference where there was one and paints the
+	 * pixel to the right color. Works directly on the difference image.
 	 * 
 	 * @param differentPixels
 	 */
-	private void drawDifferenceImage(BufferedImage reference,
+	private void drawDifferencesToImage(BufferedImage reference,
 			BufferedImage toCompare, int[][] differentPixels) {
 
-		int[] differenceArray = ((DataBufferInt) difference.getRaster()
-				.getDataBuffer()).getData();
-
-		// If there are no differences, the rgb is zero. Set zero (=Black) as
-		// the default.
-		Arrays.fill(differenceArray, new Color(0).getRGB());
-		double difference;
+		double rgbDifference;
 
 		// Go through the differentPixels array, get the difference and
 		// draw the pixel into
 		for (int i = 0; i < differentPixels.length; i++) {
-			difference = calculatePixelRgbDiff(differentPixels[i][0],
+			rgbDifference = calculatePixelRgbDiff(differentPixels[i][0],
 					differentPixels[i][1], reference, toCompare);
-			drawDifferencePixel(difference, differentPixels[i][0],
+			drawDifferencePixel(rgbDifference, differentPixels[i][0],
 					differentPixels[i][1]);
 		}
 	}
