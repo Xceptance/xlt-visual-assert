@@ -1,4 +1,4 @@
-package VisualComparison;
+package com.xceptance.visualassertion;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -172,66 +172,66 @@ public class CompareScreenshots implements WebDriverCustomModule {
 	 */
 
 	@Override
-	public void execute(WebDriver webDriver, String... args) {
+	public void execute(final WebDriver webDriver, final String... args) {
 
-		XltProperties x = XltProperties.getInstance();
+		final XltProperties x = XltProperties.getInstance();
 
 		// Get Properties and convert them from String if necessary
 
 		// waitTime
-		String waitTimeS = x.getProperty(PPREFIX + "waitTime", DWAITTIME);
-		int waitTime = Integer.parseInt(waitTimeS);
+		final String waitTimeS = x.getProperty(PPREFIX + "waitTime", DWAITTIME);
+		final int waitTime = Integer.parseInt(waitTimeS);
 
 		// markBlockX, markBlockY
-		String markBlockXS = x.getProperty(PPREFIX + "MARKBLOCKX", DMARKBLOCKX);
-		int markBlockX = Integer.parseInt(markBlockXS);
-		String markBlockYS = x.getProperty(PPREFIX + "MARKBLOCKX", DMARKBLOCKY);
-		int markBlockY = Integer.parseInt(markBlockYS);
+		final String markBlockXS = x.getProperty(PPREFIX + "MARKBLOCKX", DMARKBLOCKX);
+		final int markBlockX = Integer.parseInt(markBlockXS);
+		final String markBlockYS = x.getProperty(PPREFIX + "MARKBLOCKX", DMARKBLOCKY);
+		final int markBlockY = Integer.parseInt(markBlockYS);
 
 		// pixelPerBlockXY, fuzzyness parameter
-		String pixelPerBlockXYS = x.getProperty(PPREFIX + "pixelPerBlockXY",
+		final String pixelPerBlockXYS = x.getProperty(PPREFIX + "pixelPerBlockXY",
 				DPIXELPBLOCKXY);
-		int pixelPerBlockXY = Integer.parseInt(pixelPerBlockXYS);
+		final int pixelPerBlockXY = Integer.parseInt(pixelPerBlockXYS);
 
 		// colTolerance
-		String colToleranceS = x.getProperty(PPREFIX + "colTolerance",
+		final String colToleranceS = x.getProperty(PPREFIX + "colTolerance",
 				DCOLTOLERANCE);
-		double colTolerance = Double.parseDouble(colToleranceS);
+		final double colTolerance = Double.parseDouble(colToleranceS);
 
 		// pixTolerance
-		String pixToleranceS = x.getProperty(PPREFIX + "pixTolerance",
+		final String pixToleranceS = x.getProperty(PPREFIX + "pixTolerance",
 				DCOLTOLERANCE);
-		double pixTolerance = Double.parseDouble(pixToleranceS);
+		final double pixTolerance = Double.parseDouble(pixToleranceS);
 
 		// trainingMode
-		String trainingModeString = x.getProperty(PPREFIX + "trainingMode");
-		Boolean trainingMode = Boolean.parseBoolean(trainingModeString);
+		final String trainingModeString = x.getProperty(PPREFIX + "trainingMode");
+		final Boolean trainingMode = Boolean.parseBoolean(trainingModeString);
 
 		// closeMask
-		String closeMaskString = x.getProperty(PPREFIX + "closeMask");
-		Boolean closeMask = Boolean.parseBoolean(closeMaskString);
+		final String closeMaskString = x.getProperty(PPREFIX + "closeMask");
+		final Boolean closeMask = Boolean.parseBoolean(closeMaskString);
 
 		// closeWidth
-		String closeWidthString = x.getProperty(PPREFIX + "closeWidth",
+		final String closeWidthString = x.getProperty(PPREFIX + "closeWidth",
 				DCLOSEWIDTH);
-		int closeWidth = Integer.parseInt(closeWidthString);
+		final int closeWidth = Integer.parseInt(closeWidthString);
 
 		// closeHeight
-		String closeHeightString = x.getProperty(PPREFIX + "closeHeight",
+		final String closeHeightString = x.getProperty(PPREFIX + "closeHeight",
 				DCLOSEHEIGHT);
-		int closeHeight = Integer.parseInt(closeHeightString);
+		final int closeHeight = Integer.parseInt(closeHeightString);
 
 		// differenceImage
-		String differenceImageS = x.getProperty(PPREFIX + "differenceImage", DDIFFERENCEIMAGE);
-		Boolean differenceImage = Boolean.parseBoolean(differenceImageS);
+		final String differenceImageS = x.getProperty(PPREFIX + "differenceImage", DDIFFERENCEIMAGE);
+		final Boolean differenceImage = Boolean.parseBoolean(differenceImageS);
 
 		// algorithm
-		String algorithm = x.getProperty(PPREFIX + "algorithm", DALGORITHM);
+		final String algorithm = x.getProperty(PPREFIX + "algorithm", DALGORITHM);
 
 		// Wait a few miliseconds so the website is fully loaded
 		try {
 			TimeUnit.MILLISECONDS.sleep(waitTime);
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
 
@@ -247,35 +247,35 @@ public class CompareScreenshots implements WebDriverCustomModule {
 		}
 
 		else {
-			String currentID = Session.getCurrent().getID();
+			final String currentID = Session.getCurrent().getID();
 			x.setProperty(PPREFIX + "currentID", currentID);
 			x.setProperty(PPREFIX + "index", "1");
 		}
 
 		// Get testcasename for the correct folder
-		String currentTestCaseName = Session.getCurrent().getUserID();
+		final String currentTestCaseName = Session.getCurrent().getUserID();
 
 		// Get browsername for the correct subfolder
-		String currentActionName = Session.getCurrent()
+		final String currentActionName = Session.getCurrent()
 				.getWebDriverActionName();
-		String browserName = getBrowserName(webDriver);
+		final String browserName = getBrowserName(webDriver);
 
 		// Get path to the directory
 		String directory = x.getProperty(PPREFIX + "directory");
 		directory = directory + "/" + currentTestCaseName + "/" + browserName;
 
 		// Set name of the referenceImage
-		String indexS = x.getProperty(PPREFIX + "index");
-		String screenshotName = indexS + "-" + currentActionName;
-		String referencePath = directory + "/" + screenshotName;
+		final String indexS = x.getProperty(PPREFIX + "index");
+		final String screenshotName = indexS + "-" + currentActionName;
+		final String referencePath = directory + "/" + screenshotName;
 
-		File referenceFile = new File(referencePath + ".png");
+		final File referenceFile = new File(referencePath + ".png");
 
 		// If there's no other screenshot, just save the new one
 		if (!referenceFile.isFile()) {
 			try {
 				takeScreenshot(webDriver, referenceFile);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				throw new RuntimeIOException();
 			}
 		}
@@ -283,42 +283,42 @@ public class CompareScreenshots implements WebDriverCustomModule {
 		// If there is another screenshot ...
 		else {
 			// Create file for the new screenshot
-			File screenshotFile = new File(directory + "new-screenshot"
+			final File screenshotFile = new File(directory + "new-screenshot"
 					+ screenshotName + ".png");
 			try {
 				takeScreenshot(webDriver, screenshotFile);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				throw new RuntimeIOException();
 			}
 
 			try {
 				// Initialize referenceImage, screenshotImage, delete
 				// screenshotImageFile
-				BufferedImage screenshot = ImageIO.read(screenshotFile);
-				BufferedImage reference = ImageIO.read(referenceFile);
+				final BufferedImage screenshot = ImageIO.read(screenshotFile);
+				final BufferedImage reference = ImageIO.read(referenceFile);
 
 				// Initialize markedImageFile and maskImageFile
 				new File(directory + "/marked/").mkdirs();
-				String markedImagePath = directory + "/marked/"
+				final String markedImagePath = directory + "/marked/"
 						+ screenshotName + "-marked" + ".png";
-				File markedImageFile = new File(markedImagePath);
+				final File markedImageFile = new File(markedImagePath);
 
 				new File(directory + "/mask/").mkdirs();
-				String maskImagePath = directory + "/mask/" + screenshotName
+				final String maskImagePath = directory + "/mask/" + screenshotName
 						+ "-mask" + ".png";
-				File maskImageFile = new File(maskImagePath);
+				final File maskImageFile = new File(maskImagePath);
 
 				new File(directory + "/difference/").mkdirs();
-				String differenceImagePath = directory + "/difference/"
+				final String differenceImagePath = directory + "/difference/"
 						+ screenshotName + "-difference" + ".png";
-				File differenceImageFile = new File(differenceImagePath);
+				final File differenceImageFile = new File(differenceImagePath);
 
 				// Initializes ImageComparison and calls isEqual
-				ImageComparison imagecomparison = new ImageComparison(
+				final ImageComparison imagecomparison = new ImageComparison(
 						markBlockX, markBlockY, pixelPerBlockXY, colTolerance,
 						pixTolerance, trainingMode, closeMask, closeWidth,
 						closeHeight, differenceImage, algorithm);
-				boolean result = imagecomparison.isEqual(reference, screenshot,
+				final boolean result = imagecomparison.isEqual(reference, screenshot,
 						maskImageFile, markedImageFile, differenceImageFile);
 
 				// Delete the new screenshot if there was no difference
@@ -327,20 +327,20 @@ public class CompareScreenshots implements WebDriverCustomModule {
 				}
 				// Place it into he markedImage folder otherwise
 				else {
-					Path source = screenshotFile.toPath();
-					String newScreenshotPath = directory + "/marked/"
+					final Path source = screenshotFile.toPath();
+					final String newScreenshotPath = directory + "/marked/"
 							+ screenshotName + "-new" + ".png";
-					Path destination = Paths.get(newScreenshotPath);
+					final Path destination = Paths.get(newScreenshotPath);
 					Files.copy(source, destination,
 							StandardCopyOption.REPLACE_EXISTING);
 					screenshotFile.delete();
 				}
 
-				String assertMessage = "Website does not match the reference screenshot: "
+				final String assertMessage = "Website does not match the reference screenshot: "
 						+ currentActionName;
 				Assert.assertTrue(assertMessage, result);
 
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				throw new RuntimeIOException();
 			}
 		}
@@ -355,7 +355,7 @@ public class CompareScreenshots implements WebDriverCustomModule {
 	private void takeScreenshot(final WebDriver webDriver, final File pngFile)
 			throws IOException {
 		if (webDriver instanceof TakesScreenshot) {
-			byte[] bytes = ((TakesScreenshot) webDriver)
+			final byte[] bytes = ((TakesScreenshot) webDriver)
 					.getScreenshotAs(OutputType.BYTES);
 			FileUtils.writeByteArrayToFile(pngFile, bytes);
 		} else {
@@ -370,10 +370,10 @@ public class CompareScreenshots implements WebDriverCustomModule {
 	 * @param webdriver
 	 * @return
 	 */
-	private String getBrowserName(WebDriver webdriver) {
-		Capabilities capabilities = ((RemoteWebDriver) webdriver)
+	private String getBrowserName(final WebDriver webdriver) {
+		final Capabilities capabilities = ((RemoteWebDriver) webdriver)
 				.getCapabilities();
-		String browserName = capabilities.getBrowserName();
+		final String browserName = capabilities.getBrowserName();
 		return browserName;
 	}
 }

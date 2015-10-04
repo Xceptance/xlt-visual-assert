@@ -1,4 +1,4 @@
-package VisualComparison.TimageComparison;
+package test.com.xceptance.visualassertion;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -13,7 +13,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import VisualComparison.ImageComparison;
+import com.xceptance.visualassertion.ImageComparison;
 
 /**
  * Tests if the FUZZY algorithm with both tolerance values = 0 and
@@ -53,7 +53,7 @@ public class TAquivalenceAtParameters {
 	 */
 	@BeforeClass
 	public static void initializeImages() {
-		Random random = new Random();
+		final Random random = new Random();
 
 		int rgb;
 		reference = new BufferedImage(200, 200, BufferedImage.TYPE_INT_RGB);
@@ -83,26 +83,26 @@ public class TAquivalenceAtParameters {
 	 */
 	@Test
 	public void test() throws IOException {
-		
+
 		// Compares FUZZY against EXACTLY 
 		imgCompExact.isEqual(reference, screenshot, fileMask, fileOutExactly,
 				differenceFileExactly);
 		imgCompFuzzy.isEqual(reference, screenshot, fileMask, fileOutFuzzy,
 				differenceFileFuzzy);
-		
+
 		BufferedImage reference = ImageIO.read(fileOutExactly);
 		BufferedImage screenshot = ImageIO.read(fileOutFuzzy);
 		Assert.assertTrue(imgCompExact.isEqual(reference, screenshot, fileMask, thrashFile, thrashFile));
 		reference = ImageIO.read(differenceFileExactly);
 		screenshot = ImageIO.read(differenceFileFuzzy);
 		Assert.assertTrue(imgCompExact.isEqual(reference, screenshot, fileMask, thrashFile, thrashFile));
-		
+
 		// Compares PIXELFUZZY against EXACTLY 
 		imgCompExact.isEqual(reference, screenshot, fileMask, fileOutExactly,
 				differenceFileExactly);
 		imgCompPFuzzy.isEqual(reference, screenshot, fileMask, fileOutFuzzy,
 				differenceFileFuzzy);
-		
+
 		reference = ImageIO.read(fileOutExactly);
 		screenshot = ImageIO.read(fileOutFuzzy);
 		Assert.assertTrue(imgCompExact.isEqual(reference, screenshot, fileMask, thrashFile, thrashFile));

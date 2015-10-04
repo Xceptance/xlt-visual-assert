@@ -1,4 +1,4 @@
-package VisualComparison;
+package com.xceptance.visualassertion;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -28,8 +28,8 @@ import java.io.IOException;
  */
 public class ImageOperations {
 
-	private int rgbForegroundColor;
-	private int rgbBackgroundColor;
+	private final int rgbForegroundColor;
+	private final int rgbBackgroundColor;
 	private int scalingFactor;
 
 	/**
@@ -54,8 +54,8 @@ public class ImageOperations {
 	 * @param rgbForegroundColor
 	 *            the rgb value of the foreground color erosion/ dilation
 	 */
-	protected ImageOperations(int rgbBackgroundColor, int rgbForegroundColor,
-			int compressionFactor, double structElementScale) {
+	protected ImageOperations(final int rgbBackgroundColor, final int rgbForegroundColor,
+			final int compressionFactor, final double structElementScale) {
 		this.rgbBackgroundColor = rgbBackgroundColor;
 		this.rgbForegroundColor = rgbForegroundColor;
 	}
@@ -74,10 +74,10 @@ public class ImageOperations {
 	 * @param newHeight
 	 * @return the scaled image
 	 */
-	protected BufferedImage scaleDownMaskImage(BufferedImage img, int newWidth,
-			int newHeight) {
+	protected BufferedImage scaleDownMaskImage(final BufferedImage img, final int newWidth,
+			final int newHeight) {
 
-		BufferedImage scaledImage = new BufferedImage(newWidth, newHeight,
+		final BufferedImage scaledImage = new BufferedImage(newWidth, newHeight,
 				BufferedImage.TYPE_INT_ARGB);
 		boolean hasForegroundColor;
 
@@ -125,10 +125,10 @@ public class ImageOperations {
 	 * @param newHeight
 	 * @return the scaled image
 	 */
-	protected BufferedImage scaleUpMaskImage(BufferedImage img, int newWidth,
-			int newHeight) {
+	protected BufferedImage scaleUpMaskImage(final BufferedImage img, final int newWidth,
+			final int newHeight) {
 
-		BufferedImage scaledImage = new BufferedImage(newWidth, newHeight,
+		final BufferedImage scaledImage = new BufferedImage(newWidth, newHeight,
 				BufferedImage.TYPE_INT_ARGB);
 
 		// Go through every pixel of the image to scale
@@ -168,11 +168,11 @@ public class ImageOperations {
 	 * @param height
 	 * @return the resulting image
 	 */
-	protected BufferedImage increaseImageSize(BufferedImage img, int width,
-			int height) {
-		BufferedImage newImg = new BufferedImage(width, height,
+	protected BufferedImage increaseImageSize(final BufferedImage img, final int width,
+			final int height) {
+		final BufferedImage newImg = new BufferedImage(width, height,
 				BufferedImage.TYPE_INT_ARGB);
-		int[] newImgArray = ((DataBufferInt) newImg.getRaster().getDataBuffer())
+		final int[] newImgArray = ((DataBufferInt) newImg.getRaster().getDataBuffer())
 				.getData();
 		int index;
 		for (int w = img.getWidth(); w <= width; w++) {
@@ -181,7 +181,7 @@ public class ImageOperations {
 				newImgArray[index] = 0;
 			}
 		}
-		Graphics g = newImg.createGraphics();
+		final Graphics g = newImg.createGraphics();
 		g.drawImage(img, 0, 0, null);
 		g.dispose();
 		return newImg;
@@ -194,12 +194,12 @@ public class ImageOperations {
 	 *            the image to copy
 	 * @return a copy of that image
 	 */
-	protected BufferedImage copyImage(BufferedImage source) {
+	protected BufferedImage copyImage(final BufferedImage source) {
 		// Creates a fresh BufferedImage that has the same size and content of
 		// the source image
-		BufferedImage copy = new BufferedImage(source.getWidth(),
+		final BufferedImage copy = new BufferedImage(source.getWidth(),
 				source.getHeight(), BufferedImage.TYPE_INT_ARGB);
-		Graphics g = copy.getGraphics();
+		final Graphics g = copy.getGraphics();
 		g.drawImage(source, 0, 0, null);
 		g.dispose();
 		return copy;
@@ -215,11 +215,11 @@ public class ImageOperations {
 	 *            the image that will be layed over the other image
 	 * @return
 	 */
-	protected BufferedImage overlayMaskImage(BufferedImage image,
-			BufferedImage overlay) {
-		int[] imageArray = ((DataBufferInt) image.getRaster().getDataBuffer())
+	protected BufferedImage overlayMaskImage(final BufferedImage image,
+			final BufferedImage overlay) {
+		final int[] imageArray = ((DataBufferInt) image.getRaster().getDataBuffer())
 				.getData();
-		int[] overlayArray = ((DataBufferInt) overlay.getRaster()
+		final int[] overlayArray = ((DataBufferInt) overlay.getRaster()
 				.getDataBuffer()).getData();
 
 		// Go through every pixel of the image
@@ -249,10 +249,10 @@ public class ImageOperations {
 	 * @param structElementHeight
 	 * @return the eroded image
 	 */
-	protected BufferedImage erodeImage(BufferedImage img,
+	protected BufferedImage erodeImage(final BufferedImage img,
 			int structElementWidth, int structElementHeight) {
 
-		BufferedImage erosionedImage = new BufferedImage(img.getWidth(),
+		final BufferedImage erosionedImage = new BufferedImage(img.getWidth(),
 				img.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
 		boolean fits;
@@ -328,10 +328,10 @@ public class ImageOperations {
 	 * @return the dilated image
 	 * @throws IOException
 	 */
-	protected BufferedImage dilateImage(BufferedImage img,
+	protected BufferedImage dilateImage(final BufferedImage img,
 			int structElementWidth, int structElementHeight) throws IOException {
 
-		BufferedImage dilationImage = new BufferedImage(img.getWidth(),
+		final BufferedImage dilationImage = new BufferedImage(img.getWidth(),
 				img.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		boolean hits;
 
@@ -405,10 +405,10 @@ public class ImageOperations {
 	 * @throws IOException
 	 */
 	protected BufferedImage closeImage(BufferedImage img,
-			int structElementWidth, int structElementHeight) throws IOException {
+			final int structElementWidth, final int structElementHeight) throws IOException {
 
-		int scaledWidth = (int) Math.ceil(img.getWidth() / scalingFactor);
-		int scaledHeight = (int) Math.ceil(img.getHeight() / scalingFactor);
+		final int scaledWidth = (int) Math.ceil(img.getWidth() / scalingFactor);
+		final int scaledHeight = (int) Math.ceil(img.getHeight() / scalingFactor);
 
 		// Scale the image for performance reasons.
 		BufferedImage shrunkImg = scaleDownMaskImage(img, scaledWidth,

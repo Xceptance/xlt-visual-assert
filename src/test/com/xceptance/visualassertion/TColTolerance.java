@@ -1,4 +1,4 @@
-package VisualComparison.TimageComparison;
+package test.com.xceptance.visualassertion;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -9,7 +9,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
 
-import VisualComparison.ImageComparison;
+import com.xceptance.visualassertion.ImageComparison;
 
 /**
  * Tests if the colTolerance is working as expected. 
@@ -41,12 +41,12 @@ public class TColTolerance {
 	private static BufferedImage reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
 	private static BufferedImage screenshot = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
 
-	
+
 	private final static File directory = SystemUtils.getJavaIoTmpDir();
 	private static File fileMask = new File(directory, "/fileMask.png");
 	private static File fileOut = new File(directory, "/fileOut.png");
 	private static File differenceFile = new File(directory + "/difference.png");
-	
+
 	/**
 	 * Tests a black image against a white image with a colTolerance value of 0
 	 * 
@@ -55,11 +55,11 @@ public class TColTolerance {
 	@Test	
 	public void backWhiteTZero() throws IOException {	
 		paintItBlackWhite();
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.0, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
-		boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
+		final ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.0, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
+		final boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		Assert.assertFalse(result);
 	}
-	
+
 	/**
 	 * Tests a black image against a white image with a colTolerance value of almost 1
 	 * 
@@ -68,11 +68,11 @@ public class TColTolerance {
 	@Test	
 	public void backWhiteTAlmostOne() throws IOException {
 		paintItBlackWhite();
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.9999999999999, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
-		boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
+		final ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.9999999999999, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
+		final boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		Assert.assertFalse(result);
 	}
-	
+
 	/**
 	 * Tests a black image against a white image with a colTolerance value of 1
 	 * 
@@ -81,11 +81,11 @@ public class TColTolerance {
 	@Test	
 	public void backWhiteTOne() throws IOException {	
 		paintItBlackWhite();
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 1, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
-		boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
+		final ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 1, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
+		final boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		Assert.assertTrue(result);
 	}
-	
+
 	/**
 	 * Tests a green image against a blue image with a colTolerance value of exactly the expected difference
 	 * 
@@ -94,11 +94,11 @@ public class TColTolerance {
 	@Test	
 	public void greenBlueTExactly() throws IOException {	
 		paintItGreenBlue();
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.8660254037844386, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
-		boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
+		final ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.8660254037844386, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
+		final boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		Assert.assertTrue(result);
 	}
-	
+
 	/**
 	 * Tests a green image against a blue image with a colTolerance value barely below the difference
 	 * 
@@ -107,11 +107,11 @@ public class TColTolerance {
 	@Test	
 	public void greenBlueTBelow() throws IOException {
 		paintItGreenBlue();
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.8660254037844385, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
-		boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
+		final ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.8660254037844385, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
+		final boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		Assert.assertFalse(result);
 	}
-	
+
 	/**
 	 * Tests a green image against a blue image with a colTolerance value barely above the difference
 	 * 
@@ -120,11 +120,11 @@ public class TColTolerance {
 	@Test	
 	public void greenBlueTAbove() throws IOException {		
 		paintItGreenBlue();
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.86602540378443861, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
-		boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
+		final ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.86602540378443861, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
+		final boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		Assert.assertTrue(result);
 	}
-	
+
 	/**
 	 * Tests an image with r, b, g = 100 against an image with r, b, g = 200 
 	 * with a colTolerance value of exactly the expected difference
@@ -134,11 +134,11 @@ public class TColTolerance {
 	@Test	
 	public void differentTExactly() throws IOException {	
 		paintItDifferent();
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.39215686274509803, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
-		boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
+		final ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.39215686274509803, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
+		final boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		Assert.assertTrue(result);
 	}
-	
+
 	/**
 	 * Tests an image with r, b, g = 100 against an image with r, b, g = 200 
 	 * with a colTolerance value barely below the difference
@@ -148,11 +148,11 @@ public class TColTolerance {
 	@Test	
 	public void differentTBelow() throws IOException {
 		paintItDifferent();
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.3921568627, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
-		boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
+		final ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.3921568627, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
+		final boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		Assert.assertFalse(result);
 	}
-	
+
 	/**
 	 * Tests an image with r, b, g = 100 against an image with r, b, g = 200 
 	 * with a colTolerance value barely above the difference
@@ -162,11 +162,11 @@ public class TColTolerance {
 	@Test	
 	public void differentTAbove() throws IOException {		
 		paintItDifferent();
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.3921568628, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
-		boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
+		final ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.3921568628, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
+		final boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		Assert.assertTrue(result);
 	}
-	
+
 	/**
 	 * Tests a black image against a white image with a colTolerance value of 0
 	 * 
@@ -175,11 +175,11 @@ public class TColTolerance {
 	@Test	
 	public void backWhiteTZeroFuzzy() throws IOException {	
 		paintItBlackWhite();
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.0, 0.01, false, false, 3, 3, false, "FUZZY");
-		boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
+		final ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.0, 0.01, false, false, 3, 3, false, "FUZZY");
+		final boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		Assert.assertFalse(result);
 	}
-	
+
 	/**
 	 * Tests a black image against a white image with a colTolerance value of almost 1
 	 * 
@@ -188,11 +188,11 @@ public class TColTolerance {
 	@Test	
 	public void backWhiteTAlmostOneFuzzy() throws IOException {
 		paintItBlackWhite();
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.9999999999999, 0.01, false, false, 3, 3, false, "FUZZY");
-		boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
+		final ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.9999999999999, 0.01, false, false, 3, 3, false, "FUZZY");
+		final boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		Assert.assertFalse(result);
 	}
-	
+
 	/**
 	 * Tests a black image against a white image with a colTolerance value of 1
 	 * 
@@ -201,11 +201,11 @@ public class TColTolerance {
 	@Test	
 	public void backWhiteTOneFuzzy() throws IOException {	
 		paintItBlackWhite();
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 1, 0.01, false, false, 3, 3, false, "FUZZY");
-		boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
+		final ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 1, 0.01, false, false, 3, 3, false, "FUZZY");
+		final boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		Assert.assertTrue(result);
 	}
-	
+
 	/**
 	 * Tests a green image against a blue image with a colTolerance value of exactly the expected difference
 	 * 
@@ -214,11 +214,11 @@ public class TColTolerance {
 	@Test	
 	public void greenBlueTExactlyFuzzy() throws IOException {	
 		paintItGreenBlue();
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.8660254037844386, 0.01, false, false, 3, 3, false, "FUZZY");
-		boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
+		final ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.8660254037844386, 0.01, false, false, 3, 3, false, "FUZZY");
+		final boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		Assert.assertTrue(result);
 	}
-	
+
 	/**
 	 * Tests a green image against a blue image with a colTolerance value barely below the difference
 	 * 
@@ -227,11 +227,11 @@ public class TColTolerance {
 	@Test	
 	public void greenBlueTBelowFuzzy() throws IOException {
 		paintItGreenBlue();
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.8660254037844385, 0.01, false, false, 3, 3, false, "FUZZY");
-		boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
+		final ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.8660254037844385, 0.01, false, false, 3, 3, false, "FUZZY");
+		final boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		Assert.assertFalse(result);
 	}
-	
+
 	/**
 	 * Tests a green image against a blue image with a colTolerance value barely above the difference
 	 * 
@@ -240,11 +240,11 @@ public class TColTolerance {
 	@Test	
 	public void greenBlueTAboveFuzzy() throws IOException {		
 		paintItGreenBlue();
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.86602540378443861, 0.01, false, false, 3, 3, false, "FUZZY");
-		boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
+		final ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.86602540378443861, 0.01, false, false, 3, 3, false, "FUZZY");
+		final boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		Assert.assertTrue(result);
 	}
-	
+
 	/**
 	 * Tests an image with r, b, g = 100 against an image with r, b, g = 200 
 	 * with a colTolerance value of exactly the expected difference
@@ -254,11 +254,11 @@ public class TColTolerance {
 	@Test	
 	public void differentTExactlyFuzzy() throws IOException {	
 		paintItDifferent();
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.39215686274509803, 0.01, false, false, 3, 3, false, "FUZZY");
-		boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
+		final ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.39215686274509803, 0.01, false, false, 3, 3, false, "FUZZY");
+		final boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		Assert.assertTrue(result);
 	}
-	
+
 	/**
 	 * Tests an image with r, b, g = 100 against an image with r, b, g = 200 
 	 * with a colTolerance value barely below the difference
@@ -268,11 +268,11 @@ public class TColTolerance {
 	@Test	
 	public void differentTBelowFuzzy() throws IOException {
 		paintItDifferent();
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.3921568627, 0.01, false, false, 3, 3, false, "FUZZY");
-		boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
+		final ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.3921568627, 0.01, false, false, 3, 3, false, "FUZZY");
+		final boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		Assert.assertFalse(result);
 	}
-	
+
 	/**
 	 * Tests an image with r, b, g = 100 against an image with r, b, g = 200 
 	 * with a colTolerance value barely above the difference
@@ -282,12 +282,12 @@ public class TColTolerance {
 	@Test	
 	public void differentTAboveFuzzy() throws IOException {		
 		paintItDifferent();
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.3921568628, 0.01, false, false, 3, 3, false, "FUZZY");
-		boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
+		final ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.3921568628, 0.01, false, false, 3, 3, false, "FUZZY");
+		final boolean result = imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		Assert.assertTrue(result);
 	}
 
-	
+
 	/**
 	 * Deletes the temporary files which were created for this test
 	 */
@@ -297,7 +297,7 @@ public class TColTolerance {
 		fileOut.delete();
 		differenceFile.delete();
 	}
-	
+
 	// Here come the setup methods
 	private void paintItDifferent() {
 		reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
@@ -305,71 +305,71 @@ public class TColTolerance {
 		int green = 100;
 		int blue = 100;
 		int rgb = (red << 16) | (green << 8) | blue;
-		
+
 		for (int w=0; w<reference.getWidth(); w++) { 
 			for (int h=0; h<reference.getHeight(); h++) {
 				reference.setRGB(w, h, rgb);
 			}
 		}
-		
+
 		screenshot = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
 		red = 200;
 		green = 200;
 		blue = 200;
 		rgb = (red << 16) | (green << 8) | blue;
-		
+
 		for (int w=0; w<screenshot.getWidth(); w++) { 
 			for (int h=0; h<screenshot.getHeight(); h++) {
 				screenshot.setRGB(w, h, rgb);
 			}
 		}
 	}
-	
+
 	private void paintItGreenBlue() {
 		reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
 		int red = 0;
 		int green = 255;
 		int blue = 0;
 		int rgb = (red << 16) | (green << 8) | blue;
-		
+
 		for (int w=0; w<reference.getWidth(); w++) { 
 			for (int h=0; h<reference.getHeight(); h++) {
 				reference.setRGB(w, h, rgb);
 			}
 		}
-		
+
 		screenshot = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
 		red = 0;
 		green = 0;
 		blue = 255;
 		rgb = (red << 16) | (green << 8) | blue;
-		
+
 		for (int w=0; w<screenshot.getWidth(); w++) { 
 			for (int h=0; h<screenshot.getHeight(); h++) {
 				screenshot.setRGB(w, h, rgb);
 			}
 		}
 	}
-	
+
 	public void paintItBlackWhite() {
 		reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
 		int red = 255;
 		int green = 255;
 		int blue = 255;
 		int rgb = (red << 16) | (green << 8) | blue;
-		
+
 		for (int w=0; w<reference.getWidth(); w++) { 
 			for (int h=0; h<reference.getHeight(); h++) {
 				reference.setRGB(w, h, rgb);
 			}
 		}
-		
+
 		screenshot = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
 		red = 0;
 		green = 0;
 		blue = 0;
 		rgb = (red << 16) | (green << 8) | blue;
-		
+
 		for (int w=0; w<screenshot.getWidth(); w++) { 
 			for (int h=0; h<screenshot.getHeight(); h++) {
 				screenshot.setRGB(w, h, rgb);

@@ -1,4 +1,4 @@
-package VisualComparison.TimageComparison;
+package test.com.xceptance.visualassertion;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -15,7 +15,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import VisualComparison.ImageComparison;
+import com.xceptance.visualassertion.ImageComparison;
 
 /**
  * Tests whether an existent mask would be used if the screenshot image is
@@ -58,7 +58,7 @@ public class TResizeWithActiveMask {
 		}
 
 		//The mask image has the same size as the smallBlackImg
-		BufferedImage img = initializeBlackMaskImage(smallBlackImg);
+		final BufferedImage img = initializeBlackMaskImage(smallBlackImg);
 		ImageIO.write(img, "PNG", fileMask);
 	}
 
@@ -69,9 +69,9 @@ public class TResizeWithActiveMask {
 	 */
 	@Test
 	public void biggerScreenshotImage() throws IOException {
-		ImageComparison imagecomparison1 = new ImageComparison(10, 10, 10,
+		final ImageComparison imagecomparison1 = new ImageComparison(10, 10, 10,
 				0.1, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
-		boolean result = imagecomparison1.isEqual(smallBlackImg, bigWhiteImg,
+		final boolean result = imagecomparison1.isEqual(smallBlackImg, bigWhiteImg,
 				fileMask, fileOut, differenceFile);
 		Assert.assertFalse("Former maskImage shouldn't be used if the "
 				+ "screenshot has a bigger size - result: " + result, result);
@@ -84,9 +84,9 @@ public class TResizeWithActiveMask {
 	 */
 	@Test
 	public void smallerScreenshotImage() throws IOException {
-		ImageComparison imagecomparison1 = new ImageComparison(10, 10, 10,
+		final ImageComparison imagecomparison1 = new ImageComparison(10, 10, 10,
 				0.1, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
-		boolean result = imagecomparison1.isEqual(bigWhiteImg, smallBlackImg,
+		final boolean result = imagecomparison1.isEqual(bigWhiteImg, smallBlackImg,
 				fileMask, fileOut, differenceFile);
 		Assert.assertFalse("Former maskImage shouldn't be used if the "
 				+ "screenshot has a smaller size - result: " + result, result);
@@ -102,14 +102,14 @@ public class TResizeWithActiveMask {
 		differenceFile.delete();
 	}
 
-	private static BufferedImage initializeBlackMaskImage(BufferedImage img) {
-		
+	private static BufferedImage initializeBlackMaskImage(final BufferedImage img) {
+
 		// No relation to the code in ImageComparison
 		// Creates the maskImage image, creates the array with its pixels and
 		// fills the array with the rgb value of black
-		BufferedImage maskImg = new BufferedImage(img.getWidth(),
+		final BufferedImage maskImg = new BufferedImage(img.getWidth(),
 				img.getHeight(), BufferedImage.TYPE_INT_ARGB);
-		int[] maskImgArray = ((DataBufferInt) maskImg.getRaster()
+		final int[] maskImgArray = ((DataBufferInt) maskImg.getRaster()
 				.getDataBuffer()).getData();
 		Arrays.fill(maskImgArray, Color.BLACK.getRGB());
 		return maskImg;

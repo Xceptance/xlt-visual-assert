@@ -1,4 +1,4 @@
-package VisualComparison.TimageComparison;
+package test.com.xceptance.visualassertion;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -11,7 +11,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import VisualComparison.ImageComparison;
+import com.xceptance.visualassertion.ImageComparison;
 
 /**
  * Tests if the smallest possible difference would be detected
@@ -58,8 +58,8 @@ public class TExactlyEqual {
 	 */
 	@Test
 	public void almostEqualButNotQuite() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 1,0.00, 0.01, false, false, 3, 3, false, "EXACTLY");
-		boolean result = imagecomparison.isEqual(reference, screenshot,
+		final ImageComparison imagecomparison = new ImageComparison(10, 10, 1,0.00, 0.01, false, false, 3, 3, false, "EXACTLY");
+		final boolean result = imagecomparison.isEqual(reference, screenshot,
 				fileMask, fileOut, differenceFile);
 		Assert.assertFalse(
 				"The images arn't quite equal,  he apparently missed something "

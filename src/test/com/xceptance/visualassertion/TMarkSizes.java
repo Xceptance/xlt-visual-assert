@@ -1,4 +1,4 @@
-package VisualComparison.TimageComparison;
+package test.com.xceptance.visualassertion;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -14,7 +14,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import VisualComparison.ImageComparison;
+import com.xceptance.visualassertion.ImageComparison;
 
 /**
  * Tests the return value of ImageComparison for differently sized images. It
@@ -31,7 +31,7 @@ import VisualComparison.ImageComparison;
  */
 public class TMarkSizes {
 	static BufferedImage reference, slim, wide, low, high, slimAndLow,
-			wideAndHigh, switched;
+	wideAndHigh, switched;
 	ImageComparison imgCompare = new ImageComparison(10, 10, 2, 0.00, 0.01,
 			false, false, 3, 3, true, "FUZZY");
 	ImageComparison imgCompareTrain = new ImageComparison(10, 10, 2, 0.00,
@@ -167,10 +167,10 @@ public class TMarkSizes {
 	@Test
 	public void checkMarkedAreaBroadFormat() throws IOException {
 
-		int minWidth = Math.min(reference.getHeight(), switched.getHeight());
-		int minHeight = Math.min(reference.getHeight(), switched.getHeight());
-		int maxWidth = Math.max(reference.getHeight(), switched.getHeight());
-		int maxHeight = Math.max(reference.getHeight(), switched.getHeight());
+		final int minWidth = Math.min(reference.getHeight(), switched.getHeight());
+		final int minHeight = Math.min(reference.getHeight(), switched.getHeight());
+		final int maxWidth = Math.max(reference.getHeight(), switched.getHeight());
+		final int maxHeight = Math.max(reference.getHeight(), switched.getHeight());
 
 		Assert.assertFalse(imgCompare.isEqual(reference, switched, maskFile,
 				outPutfile, differenceFile));
@@ -218,14 +218,14 @@ public class TMarkSizes {
 	@Test
 	public void checkMaskAreaBroadFormat() throws IOException {
 
-		int minWidth = Math.min(reference.getHeight(), switched.getHeight());
-		int minHeight = Math.min(reference.getHeight(), switched.getHeight());
-		int maxWidth = Math.max(reference.getHeight(), switched.getHeight());
-		int maxHeight = Math.max(reference.getHeight(), switched.getHeight());
+		final int minWidth = Math.min(reference.getHeight(), switched.getHeight());
+		final int minHeight = Math.min(reference.getHeight(), switched.getHeight());
+		final int maxWidth = Math.max(reference.getHeight(), switched.getHeight());
+		final int maxHeight = Math.max(reference.getHeight(), switched.getHeight());
 
 		BufferedImage mask = new BufferedImage(10, 10,
 				BufferedImage.TYPE_INT_ARGB);
-		int[] maskArray = ((DataBufferInt) mask.getRaster().getDataBuffer())
+		final int[] maskArray = ((DataBufferInt) mask.getRaster().getDataBuffer())
 				.getData();
 		Arrays.fill(maskArray, transparentBlack.getRGB());
 
@@ -272,7 +272,7 @@ public class TMarkSizes {
 	public void checkMarkedAreaSameSize() throws IOException {
 
 		differenceFile.delete();
-		BufferedImage imgSameSize = new BufferedImage(reference.getWidth(),
+		final BufferedImage imgSameSize = new BufferedImage(reference.getWidth(),
 				reference.getHeight(), BufferedImage.TYPE_INT_ARGB);
 		paintBlack(imgSameSize);
 
@@ -288,17 +288,17 @@ public class TMarkSizes {
 						imgSameSize.getRGB(w, h));
 			}
 		}
-		
+
 		Assert.assertTrue(imgCompare.isEqual(reference, imgSameSize, maskFile,
-						outPutfile, differenceFile));
-	
+				outPutfile, differenceFile));
+
 		// Check if a difference file was made. It shoudn't have been
 		Assert.assertFalse(differenceFile.exists());
-		
+
 		imgCompareTrain.isEqual(reference, imgSameSize, maskFile, outPutfile,
 				differenceFile);
-		
-		BufferedImage mask = ImageIO.read(maskFile);
+
+		final BufferedImage mask = ImageIO.read(maskFile);
 		for (int w = 0; w < mask.getWidth(); w++) {
 			for (int h = 0; h < mask.getHeight(); h++) {
 				Assert.assertEquals(transparentWhite.getRGB(),
@@ -319,8 +319,8 @@ public class TMarkSizes {
 	 * 
 	 * @param img
 	 */
-	public static void paintBlack(BufferedImage img) {
-		int rgb = Color.BLACK.getRGB();
+	public static void paintBlack(final BufferedImage img) {
+		final int rgb = Color.BLACK.getRGB();
 		for (int x = 0; x < img.getWidth(); x++) {
 			for (int y = 0; y < img.getHeight(); y++) {
 				img.setRGB(x, y, rgb);
@@ -333,8 +333,8 @@ public class TMarkSizes {
 	 * 
 	 * @param img
 	 */
-	public static void paintWhite(BufferedImage img) {
-		int rgb = Color.WHITE.getRGB();
+	public static void paintWhite(final BufferedImage img) {
+		final int rgb = Color.WHITE.getRGB();
 		for (int x = 0; x < img.getWidth(); x++) {
 			for (int y = 0; y < img.getHeight(); y++) {
 				img.setRGB(x, y, rgb);

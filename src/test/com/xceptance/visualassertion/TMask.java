@@ -1,4 +1,4 @@
-package VisualComparison.TimageComparison;
+package test.com.xceptance.visualassertion;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -13,7 +13,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import VisualComparison.ImageComparison;
+import com.xceptance.visualassertion.ImageComparison;
 
 /**
  * Tests if the mask is working as expected. Specifically, it tests if a
@@ -34,9 +34,9 @@ public class TMask {
 	// and 300 (it shoudn't be)
 	// and if the resulting markedImage is marked between rows 200 and 250 (it
 	// should be)
-	
+
 	// Tests the same thing again, but with markingX and markingY = 1
-	
+
 
 	private static BufferedImage reference;
 	private static BufferedImage screenshot;
@@ -49,7 +49,7 @@ public class TMask {
 	private final static int rgbBlack = Color.BLACK.getRGB();
 	private final static int rgbWhite = Color.WHITE.getRGB();
 	private final static int rgbTransparentWhite = new Color(255, 255, 255, 0)
-			.getRGB();
+	.getRGB();
 	private final int rgbMarked = Color.RED.getRGB();
 
 	@BeforeClass
@@ -74,7 +74,7 @@ public class TMask {
 			}
 		}
 
-		BufferedImage maskImage = new BufferedImage(300, 300,
+		final BufferedImage maskImage = new BufferedImage(300, 300,
 				BufferedImage.TYPE_INT_ARGB);
 		for (int w = 0; w < screenshot.getWidth(); w++) {
 			for (int h = 0; h < screenshot.getHeight(); h++) {
@@ -96,15 +96,15 @@ public class TMask {
 	 */
 	@Test
 	public void changesCorrectlyMarked() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 10,
+		final ImageComparison imagecomparison = new ImageComparison(10, 10, 10,
 				0.1, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
 
-		boolean result = imagecomparison.isEqual(reference, screenshot,
+		final boolean result = imagecomparison.isEqual(reference, screenshot,
 				fileMask, fileOut, differenceFile);
 		Assert.assertFalse("A difference that wasn't masked went undetected",
 				result);
 
-		BufferedImage output = ImageIO.read(fileOut);
+		final BufferedImage output = ImageIO.read(fileOut);
 
 		// Checks if the unmarked parts have both white and red in them
 		boolean hasWhite = false;
@@ -132,10 +132,10 @@ public class TMask {
 	 */
 	@Test
 	public void changesCorrectlyHidden() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 10,
+		final ImageComparison imagecomparison = new ImageComparison(10, 10, 10,
 				0.1, 0.01, false, false, 3, 3, false, "FUZZY");
 		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
-		BufferedImage output = ImageIO.read(fileOut);
+		final BufferedImage output = ImageIO.read(fileOut);
 
 		for (int w = 0; w < reference.getWidth(); w++) {
 			for (int h = 250; h < output.getHeight(); h++) {

@@ -1,4 +1,4 @@
-package VisualComparison.TimageComparison;
+package test.com.xceptance.visualassertion;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -15,7 +15,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import VisualComparison.ImageComparison;
+import com.xceptance.visualassertion.ImageComparison;
 
 /**
  * Tests if differences are marked correctly. Tests if differences in a white
@@ -53,12 +53,12 @@ public class TMarks {
 		// The red rectangle should be marked green, the white rectangle should
 		// be marked red
 		reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_ARGB);
-		int[] referenceArray = ((DataBufferInt) reference.getRaster()
+		final int[] referenceArray = ((DataBufferInt) reference.getRaster()
 				.getDataBuffer()).getData();
 		Arrays.fill(referenceArray, blackRgb);
 
 		screenshot = new BufferedImage(300, 300, BufferedImage.TYPE_INT_ARGB);
-		int[] screenshotArray = ((DataBufferInt) screenshot.getRaster()
+		final int[] screenshotArray = ((DataBufferInt) screenshot.getRaster()
 				.getDataBuffer()).getData();
 		Arrays.fill(screenshotArray, blackRgb);
 
@@ -82,13 +82,13 @@ public class TMarks {
 	 */
 	@Test
 	public void correctlyMarkedRed() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 1,
+		final ImageComparison imagecomparison = new ImageComparison(10, 10, 1,
 				0.1, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
 		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut,
 				differenceFile);
-		BufferedImage output = ImageIO.read(fileOut);
+		final BufferedImage output = ImageIO.read(fileOut);
 		boolean hasRed = false;
-		int redRgb = Color.RED.getRGB();
+		final int redRgb = Color.RED.getRGB();
 		for (int w = 100; w <= 200; w++) {
 			for (int h = 100; h <= 125; h++) {
 				if (output.getRGB(w, h) == redRgb) {
@@ -110,11 +110,11 @@ public class TMarks {
 	 */
 	@Test
 	public void correctlyMarkedGreen() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 1,
+		final ImageComparison imagecomparison = new ImageComparison(10, 10, 1,
 				0.1, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
 		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut,
 				differenceFile);
-		BufferedImage output = ImageIO.read(fileOut);
+		final BufferedImage output = ImageIO.read(fileOut);
 		boolean hasGreen = false;
 		for (int w = 100; w <= 200; w++) {
 			for (int h = 125; h <= 149; h++) {
@@ -135,17 +135,17 @@ public class TMarks {
 	 */
 	@Test
 	public void correctShapeTenTen() throws IOException {
-		int markingX = 10;
-		int markingY = 10;
-		ImageComparison imagecomparison = new ImageComparison(markingX, markingY, 1,
+		final int markingX = 10;
+		final int markingY = 10;
+		final ImageComparison imagecomparison = new ImageComparison(markingX, markingY, 1,
 				0.1, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
 		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut,
 				differenceFile);
-		BufferedImage output = ImageIO.read(fileOut);
+		final BufferedImage output = ImageIO.read(fileOut);
 
 		// Create temporary BufferedImage, where the markings that were found
 		// are saved
-		BufferedImage marking = new BufferedImage(output.getWidth(),
+		final BufferedImage marking = new BufferedImage(output.getWidth(),
 				output.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
 		// go through every pixel
@@ -163,7 +163,7 @@ public class TMarks {
 						// Also paint the corresponding rectangle red,
 						// Without going over the border.
 						marking.setRGB(w, h, redRgb);
-						
+
 						if (w < 300) {
 							for (int x = 1; x < markingY; x++) {
 								marking.setRGB(w + x, h, redRgb);
@@ -180,7 +180,7 @@ public class TMarks {
 				}
 			}
 		}
-		
+
 		//Check that everywhere where the marking image was not marked is black
 		for (int w = 0; w < output.getWidth(); w++) {
 			for (int h = 0; h < output.getHeight(); h++) {
@@ -189,7 +189,7 @@ public class TMarks {
 				}
 			}
 		}
-		
+
 		//Check that everywhere where it's not black, the marking image marked
 		for (int w = 0; w < output.getWidth(); w++) {
 			for (int h = 0; h < output.getHeight(); h++) {
@@ -199,7 +199,7 @@ public class TMarks {
 			}
 		}
 	}
-	
+
 	/**
 	 * Tests the markingX and the markingY parameter.
 	 * Tests if parameters of 5, 10 result in a rectangle with
@@ -209,18 +209,18 @@ public class TMarks {
 	 */
 	@Test
 	public void correctShapeFiveTen() throws IOException {
-		int markingX = 5;
-		int markingY = 10;
-		
-		ImageComparison imagecomparison = new ImageComparison(markingX, markingY, 1,
+		final int markingX = 5;
+		final int markingY = 10;
+
+		final ImageComparison imagecomparison = new ImageComparison(markingX, markingY, 1,
 				0.1, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
 		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut,
 				differenceFile);
-		BufferedImage output = ImageIO.read(fileOut);
+		final BufferedImage output = ImageIO.read(fileOut);
 
 		// Create temporary BufferedImage, where the markings that were found
 		// are saved
-		BufferedImage marking = new BufferedImage(output.getWidth(),
+		final BufferedImage marking = new BufferedImage(output.getWidth(),
 				output.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
 		// go through every pixel
@@ -238,7 +238,7 @@ public class TMarks {
 						// Also paint the corresponding rectangle red,
 						// Without going over the border.
 						marking.setRGB(w, h, redRgb);
-						
+
 						if (w < 300) {
 							for (int x = 1; x < markingY; x++) {
 								marking.setRGB(w + x, h, redRgb);
@@ -255,7 +255,7 @@ public class TMarks {
 				}
 			}
 		}
-		
+
 		//Check that everywhere where the marking image was not marked is black
 		for (int w = 0; w < output.getWidth(); w++) {
 			for (int h = 0; h < output.getHeight(); h++) {
@@ -264,7 +264,7 @@ public class TMarks {
 				}
 			}
 		}
-		
+
 		//Check that everywhere where it's not black, the marking image marked
 		for (int w = 0; w < output.getWidth(); w++) {
 			for (int h = 0; h < output.getHeight(); h++) {
@@ -274,7 +274,7 @@ public class TMarks {
 			}
 		}
 	}
-	
+
 	/**
 	 * Tests the markingX and the markingY parameter.
 	 * Checks if everything gets marked with parameters 
@@ -294,13 +294,13 @@ public class TMarks {
 	public void correctShapeOneOne() throws IOException {
 		int markingX = 1;
 		int markingY = 1;
-		
+
 		ImageComparison imagecomparison = new ImageComparison(markingX, markingY, 1,
 				0.1, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
 		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut,
 				differenceFile);
 		BufferedImage output = ImageIO.read(fileOut);
-		
+
 		for (int w = 100; w <= 200; w++) {
 			for (int h = 100; h <= 150; h++) {
 				if (h <= 125) {
@@ -310,17 +310,17 @@ public class TMarks {
 				}
 			}
 		}
-		
+
 		//And the same except with markingX = 10
 		markingX = 10;
 		markingY = 1;
-		
+
 		imagecomparison = new ImageComparison(markingX, markingY, 1,
 				0.1, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
 		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut,
 				differenceFile);
 		output = ImageIO.read(fileOut);
-		
+
 		for (int w = 100; w <= 200; w++) {
 			for (int h = 100; h <= 150; h++) {
 				if (h <= 125) {
@@ -330,17 +330,17 @@ public class TMarks {
 				}
 			}
 		}
-		
+
 		//And the same except with markingY = 10
 		markingX = 1;
 		markingY = 10;
-		
+
 		imagecomparison = new ImageComparison(markingX, markingY, 1,
 				0.1, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
 		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut,
 				differenceFile);
 		output = ImageIO.read(fileOut);
-		
+
 		for (int w = 100; w <= 200; w++) {
 			for (int h = 100; h <= 150; h++) {
 				if (h <= 125) {

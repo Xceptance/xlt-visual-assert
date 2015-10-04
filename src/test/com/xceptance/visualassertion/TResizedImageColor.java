@@ -1,4 +1,4 @@
-package VisualComparison.TimageComparison;
+package test.com.xceptance.visualassertion;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -11,7 +11,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import VisualComparison.ImageComparison;
+import com.xceptance.visualassertion.ImageComparison;
 
 /**
  * If one image is smaller then the other, the resizeImage method will adapt
@@ -37,7 +37,7 @@ public class TResizedImageColor {
 
 	@BeforeClass
 	public static void initializeImages() throws IOException {
-		
+
 		// Initializes two black images, one with a size of 300*300px, the other
 		// with a size of 30*30
 		reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_ARGB);
@@ -64,9 +64,9 @@ public class TResizedImageColor {
 	 */
 	@Test
 	public void testDifferentSizeT() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(10,
+		final ImageComparison imagecomparison = new ImageComparison(10,
 				10, 10, 10, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
-		boolean result = imagecomparison.isEqual(reference, screenshot,
+		final boolean result = imagecomparison.isEqual(reference, screenshot,
 				fileMask, fileOut, differenceFile);
 		Assert.assertFalse(
 				"Images of different size shoudn't be equal",
@@ -81,8 +81,8 @@ public class TResizedImageColor {
 	 */
 	@Test
 	public void testDifferentSize() throws IOException {
-		ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.00, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
-		boolean result = imagecomparison.isEqual(reference, screenshot,
+		final ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.00, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
+		final boolean result = imagecomparison.isEqual(reference, screenshot,
 				fileMask, fileOut, differenceFile);
 		Assert.assertFalse(
 				"Images of different size shoudn't be equal",

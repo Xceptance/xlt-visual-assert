@@ -8,7 +8,7 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.lang3.SystemUtils;
 
-import VisualComparison.ImageComparison;
+import com.xceptance.visualassertion.ImageComparison;
 
 public class printPixelPerBlockXY {
 
@@ -47,14 +47,14 @@ public class printPixelPerBlockXY {
 	 * @param args
 	 * @throws IOException
 	 */
-	public static void main(String[] args) throws IOException {
+	public static void main(final String[] args) throws IOException {
 
-		BufferedImage outputImage = new BufferedImage(blockWidthAndHeight
+		final BufferedImage outputImage = new BufferedImage(blockWidthAndHeight
 				* blockPerImage, blockWidthAndHeight * blockPerImage,
 				BufferedImage.TYPE_INT_ARGB);
-		BufferedImage[] imagesInARow = new BufferedImage[blockPerImage];
-		BufferedImage[] rows = new BufferedImage[blockPerImage];
-		BufferedImage referenceImage = initializeReferenceImage();
+		final BufferedImage[] imagesInARow = new BufferedImage[blockPerImage];
+		final BufferedImage[] rows = new BufferedImage[blockPerImage];
+		final BufferedImage referenceImage = initializeReferenceImage();
 
 		// Do your thing
 		for (int iRow = 0; iRow < blockPerImage; iRow++) {
@@ -62,14 +62,14 @@ public class printPixelPerBlockXY {
 			for (int iColumn = 0; iColumn < blockPerImage; iColumn++) {
 
 				// create the image to compare
-				BufferedImage imgToComp = initializeImgToCompare(iColumn);
+				final BufferedImage imgToComp = initializeImgToCompare(iColumn);
 
 				// Get the marked image and save it to the right position
-				int pixelPerBlockXY = shiftPixelPerBlock * iRow + 1;
-				ImageComparison imagecomparison = new ImageComparison(markingX,
+				final int pixelPerBlockXY = shiftPixelPerBlock * iRow + 1;
+				final ImageComparison imagecomparison = new ImageComparison(markingX,
 						markingX, pixelPerBlockXY, 0.00, pixTolerance, false,
 						false, 3, 3, false, "FUZZY");
-				boolean result = imagecomparison.isEqual(referenceImage,
+				final boolean result = imagecomparison.isEqual(referenceImage,
 						imgToComp, fileTrash, fileMarked, fileTrash);
 				if (!result) {
 					imagesInARow[iColumn] = ImageIO.read(fileMarked);
@@ -88,7 +88,7 @@ public class printPixelPerBlockXY {
 			rows[iRow] = new BufferedImage(blockWidthAndHeight * blockPerImage,
 					100, BufferedImage.TYPE_INT_ARGB);
 			for (int i = 0; i < imagesInARow.length; i++) {
-				Graphics graphicsRow = rows[iRow].getGraphics();
+				final Graphics graphicsRow = rows[iRow].getGraphics();
 				graphicsRow.drawImage(imagesInARow[i], blockWidthAndHeight * i,
 						0, null);
 				graphicsRow.dispose();
@@ -96,7 +96,7 @@ public class printPixelPerBlockXY {
 		}
 
 		// merge the rows
-		Graphics graphicsOutputImage = outputImage.getGraphics();
+		final Graphics graphicsOutputImage = outputImage.getGraphics();
 		for (int i = 0; i < rows.length; i++) {
 			graphicsOutputImage.drawImage(rows[i], 0, blockWidthAndHeight * i,
 					null);
@@ -109,9 +109,9 @@ public class printPixelPerBlockXY {
 
 	}
 
-	private static BufferedImage drawPixelPerBlockRect(BufferedImage img,
-			int pixelPerBlockXY) {
-		Graphics graphics = img.getGraphics();
+	private static BufferedImage drawPixelPerBlockRect(final BufferedImage img,
+			final int pixelPerBlockXY) {
+		final Graphics graphics = img.getGraphics();
 		graphics.setColor(Color.GREEN);
 
 		for (int h = 0; h < img.getHeight(); h = h + pixelPerBlockXY) {
@@ -125,10 +125,10 @@ public class printPixelPerBlockXY {
 		return img;
 	}
 
-	private static BufferedImage drawBlockBorders(BufferedImage img) {
+	private static BufferedImage drawBlockBorders(final BufferedImage img) {
 
 		// Paint a rectangle around the block to make it easier to read
-		Graphics graphics = img.getGraphics();
+		final Graphics graphics = img.getGraphics();
 		graphics.setColor(Color.BLUE);
 		graphics.drawRect(0, 0, img.getWidth() - 1, img.getHeight() - 1);
 		graphics.dispose();
@@ -137,7 +137,7 @@ public class printPixelPerBlockXY {
 	}
 
 	private static BufferedImage initializeReferenceImage() {
-		BufferedImage reference = new BufferedImage(blockWidthAndHeight,
+		final BufferedImage reference = new BufferedImage(blockWidthAndHeight,
 				blockWidthAndHeight, BufferedImage.TYPE_INT_ARGB);
 
 		for (int w = 0; w < reference.getWidth(); w++) {
@@ -153,8 +153,8 @@ public class printPixelPerBlockXY {
 		return reference;
 	}
 
-	private static BufferedImage initializeImgToCompare(int iColumn) {
-		BufferedImage imageToCompare = new BufferedImage(blockWidthAndHeight,
+	private static BufferedImage initializeImgToCompare(final int iColumn) {
+		final BufferedImage imageToCompare = new BufferedImage(blockWidthAndHeight,
 				blockWidthAndHeight, BufferedImage.TYPE_INT_ARGB);
 
 		for (int w = 0; w < imageToCompare.getWidth(); w++) {

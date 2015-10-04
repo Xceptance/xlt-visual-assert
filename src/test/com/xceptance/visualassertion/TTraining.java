@@ -1,4 +1,4 @@
-package VisualComparison.TimageComparison;
+package test.com.xceptance.visualassertion;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -13,7 +13,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import VisualComparison.ImageComparison;
+import com.xceptance.visualassertion.ImageComparison;
 
 /**
  * Tests if the training mode marks what it should.
@@ -45,13 +45,13 @@ public class TTraining {
 			0.01, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
 	ImageComparison pixelFuzzyDifference = new ImageComparison(10, 10, 1,
 			0.01, 0.01, false, false, 3, 3, true, "PIXELFUZZY");
-	
+
 	static File directory = org.apache.commons.lang3.SystemUtils
 			.getJavaIoTmpDir();
 	static File outPutfile = new File(directory + "/test.png");
 	static File maskFile = new File(directory + "/mask.png");
 	static File differenceFile = new File(directory + "/difference.png");
-	
+
 	private static int rgbMasked = Color.BLACK.getRGB();
 	private static int rgbNotMasked = new Color(255, 255, 255, 0).getRGB();
 
@@ -134,7 +134,7 @@ public class TTraining {
 		paintArea(newImage, 48, 97, 10, 10);
 		pixelFuzzyAssertBlock();
 	}
-	
+
 	// test the interaction between training mode and difference image for EXACTLY
 	@Test
 	public void trainDifferenceExactly() throws IOException {
@@ -149,7 +149,7 @@ public class TTraining {
 		Assert.assertFalse(exactlyDifference.isEqual(reference, newImage, maskFile, outPutfile, differenceFile));
 		differenceEmpty();
 	}
-	
+
 	// test the interaction between training mode and difference image for FUZZY
 	@Test
 	public void trainDifferenceFuzzy() throws IOException {
@@ -164,7 +164,7 @@ public class TTraining {
 		Assert.assertFalse(fuzzyDifference.isEqual(reference, newImage, maskFile, outPutfile, differenceFile));
 		differenceEmpty();
 	}
-	
+
 	/**
 	 * Test is the trainingmode masks pixels, not blocks when markingX or markingY are 1.
 	 * Tests if differences are masked and nothing else is.
@@ -177,10 +177,10 @@ public class TTraining {
 		paintArea(newImage, 48, 97, 31, 31);
 		newImage.setRGB(0, 0, Color.CYAN.getRGB());
 		pixelFuzzyTrainingMarkingXYOne.isEqual(reference, newImage, maskFile, outPutfile, differenceFile);
-		
+
 		// Go through every pixel of the maskImage, check if the ones where there were differences
 		// are masked and the others are not.
-		BufferedImage maskImage = ImageIO.read(maskFile);
+		final BufferedImage maskImage = ImageIO.read(maskFile);
 		for (int w = 0; w < maskImage.getWidth(); w++) {
 			for (int h = 0; h < maskImage.getHeight(); h++) {
 				if (reference.getRGB(w, h) == newImage.getRGB(w, h)) {
@@ -192,7 +192,7 @@ public class TTraining {
 			}
 		}
 	}
-	
+
 	// test the interaction between training mode and difference image for PIXELFUZZY
 	@Test
 	public void trainDifferencePixelFuzzy() throws IOException {
@@ -216,8 +216,8 @@ public class TTraining {
 	}
 
 	// method for painting the images white
-	public static void paintWhite(BufferedImage img) {
-		int rgb = Color.WHITE.getRGB();
+	public static void paintWhite(final BufferedImage img) {
+		final int rgb = Color.WHITE.getRGB();
 		for (int x = 0; x < img.getWidth(); x++) {
 			for (int y = 0; y < img.getHeight(); y++) {
 				img.setRGB(x, y, rgb);
@@ -226,8 +226,8 @@ public class TTraining {
 	}
 
 	// method for coloring specific areas of an image to create differences
-	public void paintArea(BufferedImage img, int x, int y, int width, int height) {
-		int rgb = Color.BLUE.getRGB();
+	public void paintArea(final BufferedImage img, final int x, final int y, final int width, final int height) {
+		final int rgb = Color.BLUE.getRGB();
 		for (int a = 0; a < width; a++) {
 			for (int b = 0; b < height; b++) {
 				img.setRGB(x + a, y + b, rgb);
@@ -267,11 +267,11 @@ public class TTraining {
 		Assert.assertTrue(pixelFuzzyCompare.isEqual(reference, newImage,
 				maskFile, outPutfile, differenceFile));
 	}
-	
+
 	//this assertion checks the correctness of the difference image
 	public void differenceDrawn() throws IOException {
 		boolean correct = false;
-		BufferedImage difference = ImageIO.read(differenceFile);
+		final BufferedImage difference = ImageIO.read(differenceFile);
 		for (int i = 10; i<difference.getWidth(); i++){
 			for (int j = 10; j<difference.getHeight(); j++) {
 				if (difference.getRGB(i, j) != Color.BLACK.getRGB()) {
@@ -281,11 +281,11 @@ public class TTraining {
 		}
 		Assert.assertTrue(correct);
 	}
-	
+
 	// this assertion checks correctness of the difference image after a training run
 	public void differenceEmpty() throws IOException {
 		boolean correct = true;
-		BufferedImage difference = ImageIO.read(differenceFile);
+		final BufferedImage difference = ImageIO.read(differenceFile);
 		for (int i = 10; i<difference.getWidth(); i++){
 			for (int j = 10; j<difference.getHeight(); j++) {
 				if (difference.getRGB(i, j) != Color.BLACK.getRGB()) {

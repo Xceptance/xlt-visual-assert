@@ -1,4 +1,4 @@
-package VisualComparison.TimageComparison;
+package test.com.xceptance.visualassertion;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -15,7 +15,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import VisualComparison.ImageComparison;
+import com.xceptance.visualassertion.ImageComparison;
 
 /**
  * Tests if small non-marked gaps in the maskImage are closed. Also tests if the
@@ -65,7 +65,7 @@ public class TCloseMask {
 
 	@Before
 	public void initializeMaskImage() throws IOException {
-		BufferedImage maskImage = new BufferedImage(200, 200,
+		final BufferedImage maskImage = new BufferedImage(200, 200,
 				BufferedImage.TYPE_INT_ARGB);
 		for (int w = 0; w < reference.getWidth(); w++) {
 			for (int h = 0; h < reference.getHeight(); h++) {
@@ -97,7 +97,7 @@ public class TCloseMask {
 
 		train.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		boolean isCorrectlyMasked = true;
-		BufferedImage maskImage = ImageIO.read(fileMask);
+		final BufferedImage maskImage = ImageIO.read(fileMask);
 
 		// Checks if the black line remained unmasked
 		for (int w = 90; w < 110; w++) {
@@ -143,7 +143,7 @@ public class TCloseMask {
 
 		train.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		boolean isCorrectlyNotMasked = true;
-		BufferedImage maskImage = ImageIO.read(fileMask);
+		final BufferedImage maskImage = ImageIO.read(fileMask);
 
 		// Checks if black line remained unmasked
 		for (int w = 89; w < 121; w++) {
@@ -173,17 +173,17 @@ public class TCloseMask {
 	 */
 	@Test
 	public void smallerCorner() throws IOException {
-		
+
 		//Set everything except the corner black
 		for (int w = 0; w < 10; w++) {
 			for (int h = 0; h < 10; h++) {
 				screenshot.setRGB(w, h, rgbBlack);
 			}
 		}
-		
+
 		train.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		boolean isCorrectlyMasked = true;
-		BufferedImage maskImage = ImageIO.read(fileMask);
+		final BufferedImage maskImage = ImageIO.read(fileMask);
 
 		// Checks if the corner was masked
 		for (int w = 0; w < 10; w++) {
@@ -195,7 +195,7 @@ public class TCloseMask {
 		}
 		Assert.assertTrue(isCorrectlyMasked);	
 	}
-	
+
 	/**
 	 * Tests if a gap in the corner will be closed if it is bigger then the
 	 * structuring element. It shoudn't be.
@@ -203,17 +203,17 @@ public class TCloseMask {
 	 */
 	@Test
 	public void biggerCorner() throws IOException {
-		
+
 		//Set everything except the corner black
 		for (int w = 0; w < 25; w++) {
 			for (int h = 0; h < 25; h++) {
 				screenshot.setRGB(w, h, rgbBlack);
 			}
 		}
-		
+
 		train.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		boolean isCorrectlyNotMasked = true;
-		BufferedImage maskImage = ImageIO.read(fileMask);
+		final BufferedImage maskImage = ImageIO.read(fileMask);
 
 		// Checks if the corner was masked
 		for (int w = 0; w < 25; w++) {
@@ -243,7 +243,7 @@ public class TCloseMask {
 		screenshot.setRGB(55, 55, rgbWhite);
 
 		train.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
-		BufferedImage maskImage = ImageIO.read(fileMask);
+		final BufferedImage maskImage = ImageIO.read(fileMask);
 
 		for (int w = 0; w < maskImage.getWidth(); w++) {
 			for (int h = 0; h < maskImage.getHeight(); h++) {
@@ -256,7 +256,7 @@ public class TCloseMask {
 			}
 		}
 	}
-	
+
 	/**
 	 * Tests what happens if there is a difference on every corner 
 	 * of the structure element. 
@@ -283,10 +283,10 @@ public class TCloseMask {
 		screenshot.setRGB(44, 66, rgbWhite);
 		screenshot.setRGB(66, 44, rgbWhite);
 		screenshot.setRGB(66, 66, rgbWhite);
-		
+
 		train.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
-		BufferedImage maskImage = ImageIO.read(fileMask);
-		
+		final BufferedImage maskImage = ImageIO.read(fileMask);
+
 		for (int w = 0; w < maskImage.getWidth(); w++) {
 			for (int h = 0; h < maskImage.getHeight(); h++) {
 				if ( 40 <= w && w < 70 && 40 <= h && h < 70) {
@@ -298,7 +298,7 @@ public class TCloseMask {
 			}
 		}
 	}
-	
+
 	/**
 	 * Deletes the temporary files which were created for this test
 	 */
