@@ -33,7 +33,7 @@ import com.xceptance.xlt.api.util.XltProperties;
  * 
  * @author lucas & damian
  */
-public class CompareScreenshots implements WebDriverCustomModule {
+public class AssertVisually implements WebDriverCustomModule {
 	final String PPREFIX = "com.xceptance.xlt.visualassertion.";
 	final String DWAITTIME = "300";
 	final String DMARKBLOCKX = "10";
