@@ -1,4 +1,4 @@
-package test.com.xceptance.visualassertion;
+package test.com.xceptance.xlt.visualassertion;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -9,7 +9,7 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.xceptance.visualassertion.ImageComparison;
+import com.xceptance.xlt.visualassertion.ImageComparison;
 
 /**
  * Tests if the colTolerance is working as expected. 

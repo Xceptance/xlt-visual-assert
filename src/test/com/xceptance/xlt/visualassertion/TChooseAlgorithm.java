@@ -1,4 +1,4 @@
-package test.com.xceptance.visualassertion;
+package test.com.xceptance.xlt.visualassertion;
 
 
 import java.awt.Color;
@@ -12,7 +12,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.xceptance.visualassertion.ImageComparison;
+import com.xceptance.xlt.visualassertion.ImageComparison;
 
 /**
  * Tests if the specified algorithm is chosen and if an exception is 

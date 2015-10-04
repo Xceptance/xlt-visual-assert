@@ -1,4 +1,4 @@
-package com.xceptance.visualassertion;
+package com.xceptance.xlt.visualassertion;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -34,7 +34,7 @@ import com.xceptance.xlt.api.util.XltProperties;
  * @author lucas & damian
  */
 public class CompareScreenshots implements WebDriverCustomModule {
-	final String PPREFIX = "com.xceptance.xlt.imageComparison.";
+	final String PPREFIX = "com.xceptance.xlt.visualassertion.";
 	final String DWAITTIME = "300";
 	final String DMARKBLOCKX = "10";
 	final String DMARKBLOCKY = "10";

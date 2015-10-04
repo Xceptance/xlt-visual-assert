@@ -9,7 +9,7 @@ import javax.imageio.ImageIO;
 
 import org.apache.commons.lang3.SystemUtils;
 
-import com.xceptance.visualassertion.ImageComparison;
+import com.xceptance.xlt.visualassertion.ImageComparison;
 
 public class PrintPixelPerBlockXY {
 
