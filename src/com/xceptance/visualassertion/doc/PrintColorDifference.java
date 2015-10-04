@@ -1,3 +1,4 @@
+package com.xceptance.visualassertion.doc;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -8,6 +9,8 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import javax.imageio.ImageIO;
+
+import org.apache.commons.lang3.SystemUtils;
 
 /**
  * A class to show what the difference in the colors is,
@@ -22,17 +25,18 @@ import javax.imageio.ImageIO;
  * @author daniel
  *
  */
-public class printColorDifference {
+public class PrintColorDifference {
 
 	private static final int imgHeight = 1000;
 	private static final int imgWidth = 1000;
 
+	private final static File tempDirectory = SystemUtils.getJavaIoTmpDir();
+
 	private static BufferedImage reference = new BufferedImage(imgWidth,
 			imgHeight, BufferedImage.TYPE_INT_ARGB);
 	private static BufferedImage comparison = new BufferedImage(imgWidth,
-			imgHeight, BufferedImage.TYPE_INT_ARGB);;
-	private static File outputFile = new File(
-			"/home/daniel/Pictures/output.png");
+			imgHeight, BufferedImage.TYPE_INT_ARGB);
+	private static File outputFile = new File(tempDirectory + "/output.png");
 
 	private static final Color colReference = Color.WHITE;
 	private static final int blockHeight = 200;
@@ -49,7 +53,7 @@ public class printColorDifference {
 	 * @param args
 	 * @throws IOException
 	 */
-	public static void main(String[] args) throws IOException {
+	public static void main(final String[] args) throws IOException {
 		initializeReferenceImage();
 		drawComparisonImage();
 
@@ -59,14 +63,14 @@ public class printColorDifference {
 				printColDiff(xBlock, yBlock);
 			}
 		}
-		
-		
+
+
 		// Create the output image. Fill it with the reference color as a background.
 		// Draw the comparison image onto it, so that the borders still have the comparison images color.
-		
-		BufferedImage outputImage = new BufferedImage(comparison.getWidth() + 200, 
+
+		final BufferedImage outputImage = new BufferedImage(comparison.getWidth() + 200, 
 				comparison.getHeight() + 200, BufferedImage.TYPE_INT_ARGB);
-		Graphics graphics = outputImage.getGraphics();
+		final Graphics graphics = outputImage.getGraphics();
 		graphics.setColor(colReference);
 		graphics.fillRect(0, 0, outputImage.getWidth(), outputImage.getHeight());
 		graphics.drawImage(comparison, 100, 100, null);
@@ -79,8 +83,8 @@ public class printColorDifference {
 	 * Initializes the reference image. It's color is the color to compare.
 	 */
 	private static void initializeReferenceImage() {
-		int rgb = colReference.getRGB();
-		int[] referenceArray = ((DataBufferInt) reference.getRaster()
+		final int rgb = colReference.getRGB();
+		final int[] referenceArray = ((DataBufferInt) reference.getRaster()
 				.getDataBuffer()).getData();
 		Arrays.fill(referenceArray, rgb);
 	}
@@ -99,17 +103,17 @@ public class printColorDifference {
 	 * 
 	 */
 	private static void drawComparisonImage() {
-		int maxXBlock = comparison.getWidth() / blockWidth;
-		int maxYBlock = comparison.getHeight() / blockHeight;
+		final int maxXBlock = comparison.getWidth() / blockWidth;
+		final int maxYBlock = comparison.getHeight() / blockHeight;
 
-		Graphics graphics = comparison.getGraphics();
+		final Graphics graphics = comparison.getGraphics();
 
 		for (int xBlock = 0; xBlock < maxXBlock; xBlock++) {
 			Color currentColor = new Color(0, 0, 0);
 			for (int yBlock = 0; yBlock < maxYBlock; yBlock++) {
 				graphics.setColor(currentColor);
-				int x = xBlock * blockWidth;
-				int y = yBlock * blockHeight;
+				final int x = xBlock * blockWidth;
+				final int y = yBlock * blockHeight;
 				graphics.fillRect(x, y, blockWidth, blockHeight);
 				currentColor = getNextColor(currentColor, xBlock + 1);
 			}
@@ -127,12 +131,12 @@ public class printColorDifference {
 	 *            the column
 	 * @return the next color
 	 */
-	private static Color getNextColor(Color currentColor, int xBlock) {
+	private static Color getNextColor(Color currentColor, final int xBlock) {
 		int red = currentColor.getRed();
 		int green = currentColor.getGreen();
 		int blue = currentColor.getBlue();
-		int blockNumber = comparison.getHeight() / blockHeight;
-		int rgbDiffWithStep = 256 / (blockNumber - 1) -1;
+		final int blockNumber = comparison.getHeight() / blockHeight;
+		final int rgbDiffWithStep = 256 / (blockNumber - 1) -1;
 
 		switch (xBlock) {
 		case 1:
@@ -143,7 +147,7 @@ public class printColorDifference {
 				red++;
 			}
 			break;
-			
+
 		case 2:
 			for (int i = 0; i < rgbDiffWithStep; i++) {
 				if (red == 255) {
@@ -165,7 +169,7 @@ public class printColorDifference {
 				green++;
 			}
 			break;
-			
+
 		case 4:
 			for (int i = 0; i < rgbDiffWithStep; i++) {
 				if (green == 255) {
@@ -187,7 +191,7 @@ public class printColorDifference {
 				blue++;
 			}
 			break;
-			
+
 		case 6:
 			for (int i = 0; i < rgbDiffWithStep; i++) {
 				if (red == 255) {
@@ -200,7 +204,7 @@ public class printColorDifference {
 				blue++;
 			}
 			break;
-			
+
 		case 7:
 			for (int i = 0; i < rgbDiffWithStep; i++) {
 				if (red == 255) {
@@ -239,22 +243,22 @@ public class printColorDifference {
 	 *            the number of the block in y direction, comes from y value *
 	 *            blockHeight
 	 */
-	private static void printColDiff(int xBlock, int yBlock) {
-		int x = xBlock * blockWidth;
-		int y = yBlock * blockHeight;
-		double diff = calculatePixelRgbDiff(x, y, reference, comparison);
+	private static void printColDiff(final int xBlock, final int yBlock) {
+		final int x = xBlock * blockWidth;
+		final int y = yBlock * blockHeight;
+		final double diff = calculatePixelRgbDiff(x, y, reference, comparison);
 
-		Graphics graphics = comparison.getGraphics();
+		final Graphics graphics = comparison.getGraphics();
 
 		if (isDark(comparison.getRGB(x, y))) {
 			graphics.setColor(Color.WHITE);
 		} else {
 			graphics.setColor(Color.BLACK);
 		}
-		Font font = new Font("VERDANA", Font.PLAIN, 22);
+		final Font font = new Font("VERDANA", Font.PLAIN, 22);
 		graphics.setFont(font);
 
-		String diffString = String.format("%.3f", diff);
+		final String diffString = String.format("%.3f", diff);
 		graphics.drawString(diffString, x + 50, y + 50);
 
 		graphics.dispose();
@@ -268,18 +272,18 @@ public class printColorDifference {
 	 *            the rgb value of the color that may or may not be dark
 	 * @return true of the color is dark, false if it's not
 	 */
-	private static boolean isDark(int rgb) {
-		int r = (rgb & 0xff0000) >> 16;
-		int g = (rgb & 0xff00) >> 8;
-		int b = (rgb & 0xff);
+	private static boolean isDark(final int rgb) {
+		final int r = (rgb & 0xff0000) >> 16;
+			final int g = (rgb & 0xff00) >> 8;
+			final int b = (rgb & 0xff);
 
-		double luminance = (r * 0.299 + g * 0.587 + b * 0.114) / 256;
+			final double luminance = (r * 0.299 + g * 0.587 + b * 0.114) / 256;
 
-		if (luminance < 0.5) {
-			return true;
-		} else {
-			return false;
-		}
+			if (luminance < 0.5) {
+				return true;
+			} else {
+				return false;
+			}
 	}
 
 	/**
@@ -300,35 +304,35 @@ public class printColorDifference {
 	 * @return the difference between the colors as an int value. Higher ->
 	 *         Bigger difference
 	 */
-	private static double calculatePixelRgbDiff(int x, int y,
-			BufferedImage img1, BufferedImage img2) {
+	private static double calculatePixelRgbDiff(final int x, final int y,
+			final BufferedImage img1, final BufferedImage img2) {
 
 		final double MAXDIFF = 721.2489168102785;
 
-		int rgb1 = img1.getRGB(x, y);
-		int rgb2 = img2.getRGB(x, y);
+		final int rgb1 = img1.getRGB(x, y);
+		final int rgb2 = img2.getRGB(x, y);
 
 		// Initialize the red, green, blue values
-		int r1 = (rgb1 >> 16) & 0xFF;
-		int g1 = (rgb1 >> 8) & 0xFF;
-		int b1 = rgb1 & 0xFF;
-		int r2 = (rgb2 >> 16) & 0xFF;
-		int g2 = (rgb2 >> 8) & 0xFF;
-		int b2 = rgb2 & 0xFF;
-		int rDiff = r1 - r2;
-		int gDiff = g1 - g2;
-		int bDiff = b1 - b2;
+		final int r1 = (rgb1 >> 16) & 0xFF;
+		final int g1 = (rgb1 >> 8) & 0xFF;
+		final int b1 = rgb1 & 0xFF;
+		final int r2 = (rgb2 >> 16) & 0xFF;
+		final int g2 = (rgb2 >> 8) & 0xFF;
+		final int b2 = rgb2 & 0xFF;
+		final int rDiff = r1 - r2;
+		final int gDiff = g1 - g2;
+		final int bDiff = b1 - b2;
 
 		// Initialize the weight parameters
-		int rLevel = (r1 + r2) / 2;
-		double rWeight = 2 + rLevel / 256;
-		double gWeight = 4.0;
-		double bWeight = 2 + ((255 - rLevel) / 256);
+		final int rLevel = (r1 + r2) / 2;
+		final double rWeight = 2 + rLevel / 256;
+		final double gWeight = 4.0;
+		final double bWeight = 2 + ((255 - rLevel) / 256);
 
-		double cDiff = Math.sqrt(rWeight * rDiff * rDiff + gWeight * gDiff
+		final double cDiff = Math.sqrt(rWeight * rDiff * rDiff + gWeight * gDiff
 				* gDiff + bWeight * bDiff * bDiff);
 
-		double cDiffInPercent = cDiff / MAXDIFF;
+		final double cDiffInPercent = cDiff / MAXDIFF;
 
 		return cDiffInPercent;
 	}

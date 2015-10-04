@@ -1,3 +1,4 @@
+package com.xceptance.visualassertion.doc;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -10,7 +11,7 @@ import org.apache.commons.lang3.SystemUtils;
 
 import com.xceptance.visualassertion.ImageComparison;
 
-public class printPixelPerBlockXY {
+public class PrintPixelPerBlockXY {
 
 	/**
 	 * Should illustrate how the pixelPerBlockXY parameter works. Creates a
@@ -21,9 +22,8 @@ public class printPixelPerBlockXY {
 	 * @param args
 	 */
 
-	private static File fileOutput = new File(
-			"/home/daniel/Pictures/showPixelsPerBlockP.png");
 	private final static File tempDirectory = SystemUtils.getJavaIoTmpDir();
+	private static File fileOutput = new File(tempDirectory + "/showPixelsPerBlockP.png");
 	private static File fileMarked = new File(tempDirectory + "/marked.png");
 	private static File fileTrash = new File(tempDirectory + "/trash.png");
 
