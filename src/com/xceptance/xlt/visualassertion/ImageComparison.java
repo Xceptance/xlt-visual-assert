@@ -29,8 +29,8 @@ import com.xceptance.xlt.api.util.XltLogger;
  */
 public class ImageComparison {
 
-	protected enum ComparisonAlgorithm {
-		EXACTLY, PIXELFUZZY, FUZZY
+	public enum Algorithm {
+		MATCH, COLORFUZZY, FUZZY
 	}
 
 	private BufferedImage difference = null;
@@ -52,7 +52,7 @@ public class ImageComparison {
 
 	private final boolean differenceImage;
 
-	private final ComparisonAlgorithm algorithm;
+	private final Algorithm algorithm;
 
 	/**
 	 * The parameters pixelPerBlockXY and colTolerance define the fuzzyness of
@@ -115,7 +115,7 @@ public class ImageComparison {
 	public ImageComparison(final int markingX, final int markingY, final int pixelPerBlockXY,
 			final double colTolerance, final double pixTolerance, final boolean trainingMode,
 			final boolean closeMask, final int structElementWidth, final int structElementHeight,
-			final boolean differenceImage, final String algorithm) {
+			final boolean differenceImage, final Algorithm algorithm) {
 
 		// Check if markingX or markingY are below 1, which would make no sense
 		// and woudn't work. If they are, just throw an Exception
@@ -135,7 +135,7 @@ public class ImageComparison {
 		this.differenceImage = differenceImage;
 
 		try {
-			this.algorithm = ComparisonAlgorithm.valueOf(algorithm);
+			this.algorithm = algorithm;
 		} catch (final IllegalArgumentException e) {
 			throw new IllegalArgumentException("Specified algorithm not found");
 		}
@@ -221,10 +221,10 @@ public class ImageComparison {
 		// Checks which imagecomparison method to call and calls it.
 		// Sets the differentPixels array
 		switch (algorithm) {
-		case EXACTLY:
+		case MATCH:
 			differentPixels = exactlyEqual(copyImg1, imgOut);
 			break;
-		case PIXELFUZZY:
+		case COLORFUZZY:
 			differentPixels = pixelFuzzyEqual(copyImg1, imgOut);
 			break;
 		case FUZZY:

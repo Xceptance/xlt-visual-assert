@@ -3,16 +3,12 @@ package com.xceptance.xlt.visualassertion;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.text.MessageFormat;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
-import org.eclipse.jetty.io.RuntimeIOException;
 import org.junit.Assert;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.OutputType;
@@ -33,18 +29,67 @@ import com.xceptance.xlt.api.util.XltProperties;
  * 
  * @author lucas & damian
  */
-public class AssertVisually implements WebDriverCustomModule {
-	final String PPREFIX = "com.xceptance.xlt.visualassertion.";
-	final String DWAITTIME = "300";
-	final String DMARKBLOCKX = "10";
-	final String DMARKBLOCKY = "10";
-	final String DPIXELPBLOCKXY = "20";
-	final String DCOLTOLERANCE = "0.1";
-	final String DPIXTOLERANCE = "0.2";
-	final String DCLOSEWIDTH = "5";
-	final String DCLOSEHEIGHT = "5";
-	final String DALGORITHM = "FUZZY";
-	final String DDIFFERENCEIMAGE = "true"; 
+public class AssertVisually implements WebDriverCustomModule
+{
+	private final String PREFIX = "com.xceptance.xlt.visualassertion.";
+
+	/**
+	 * Counter for the current screenshots
+	 */
+	private static ThreadLocal<Integer> indexCounter = new ThreadLocal<Integer>();
+
+	// the property defaults
+	private final int WAITINGTIME = 300;
+
+	private final int MARK_BLOCKSIZE_X = 10;
+	private final int MARK_BLOCKSIZE_Y = 10;
+
+	private final int FUZZY_BLOCKSIZE_XY = 10;
+
+	private final String COLOR_TOLERANCE = "0.1";
+	private final String PIXEL_TOLERANCE = "0.2";
+
+	private final boolean ATTEMPT_TO_CLOSE_MASK = false;
+	private final int MASK_CLOSE_GAP_WIDTH = 5;
+	private final int MASK_CLOSE_GAP_HEIGHT = 5;
+
+	private final String ALGORITHM = "FUZZY";
+
+	private final boolean CREATE_DIFFERENCE_IMAGE = true;
+	private final boolean TRAININGSMODE = false;
+
+	private final String RESULT_DIRECTORY = "results" + File.separator + "visualassertion";
+
+	// subdirectories
+	private final String RESULT_DIRECTORY_BASELINE = "baseline";	
+	private final String RESULT_DIRECTORY_MASKS = "masks";	
+	private final String RESULT_DIRECTORY_RESULTS = "results";	// all live screenshots go here
+
+	// the property names
+	public final String PROPERTY_RESULT_DIRECTORY = PREFIX + "resultDirectory";
+	public final String PROPERTY_WAITING_TIME = PREFIX + "waitingTime";
+
+	public final String PROPERTY_MARK_BLOCKSIZE_X = PREFIX + "mark.blocksize.x";
+	public final String PROPERTY_MARK_BLOCKSIZE_Y = PREFIX + "mark.blocksize.y";
+
+	public final String PROPERTY_COLOR_TOLERANCE = PREFIX + "tolerance.colors";
+	public final String PROPERTY_PIXEL_TOLERANCE = PREFIX + "tolerance.pixels";
+
+	public final String PROPERTY_FUZZY_BLOCKSIZE_XY = PREFIX + "fuzzy.blocksize.xy";
+
+	public final String PROPERTY_CREATE_DIFFERENCEIMAGE = PREFIX + "onFailure.createDifferenceImage";
+
+	public final String PROPERTY_TRAININGSMODE = PREFIX + "trainingsMode";
+
+	public final String PROPERTY_MASK_CLOSE = PREFIX + "mask.close";
+	public final String PROPERTY_MASK_CLOSE_GAP_WIDTH = PREFIX + "mask.close.width";
+	public final String PROPERTY_MASK_CLOSE_GAP_HEIGHT = PREFIX + "mask.close.height";
+
+	public final String PROPERTY_ALGORITHM = PREFIX + "algorithm";
+	public final String PROPERTY_ALGORITHM_FUZZY = "FUZZY";
+	public final String PROPERTY_ALGORITHM_COLORFUZZY = "COLORFUZZY";
+	public final String PROPERTY_ALGORITHM_MATCH = "MATCH";
+
 
 	/**
 	 * No parameters beyond the webdriver are required. Necessary and possible
@@ -108,9 +153,9 @@ public class AssertVisually implements WebDriverCustomModule {
 	 * color difference of up to that much (in percent) will be ignored.<br>
 	 * Default: 0.1.
 	 * <p>
-	 * com.xceptance.xlt.imageComparison.pixTolerance: Fuzzyness parameter,
-	 * used if the specified algorithm is 'FUZZY'. That many different pixels
-	 * (in percent) will be tolerated.<br>
+	 * com.xceptance.xlt.imageComparison.pixTolerance: Fuzzyness parameter, used
+	 * if the specified algorithm is 'FUZZY'. That many different pixels (in
+	 * percent) will be tolerated.<br>
 	 * Default: 0.2
 	 * <p>
 	 * com.xceptance.xlt.imageComparison.trainingMode: If true, differences will
@@ -156,13 +201,13 @@ public class AssertVisually implements WebDriverCustomModule {
 	 * Options: <br>
 	 * EXACTLY: A pixel wise comparison without any tolerance. If there are any
 	 * difference, the exact comparison will return false. <br>
-	 * PIXELFUZZY: A pixel wise comparison with tolerance (using the
+	 * COLORFUZZY: A pixel wise comparison with tolerance (using the
 	 * colTolerance property). Differences between two pixels will be ignored if
 	 * they are under the defined tolerance level. <br>
 	 * FUZZY: A more fuzzy comparison using the pixelPerBlockXY property, the
 	 * colTolerance parameter and the pixTolerance property. The images are
 	 * divided into blocks. Minor differences in color are ignored like in
-	 * PIXELFUZZY. Additionally, the images are divided into squares with a
+	 * COLORFUZZY. Additionally, the images are divided into squares with a
 	 * width and height of pixelPerBlockXY. Whithin these blocks, differences
 	 * will be ignored as long as there are less different pixels then
 	 * pixTolerance.<br>
@@ -172,208 +217,221 @@ public class AssertVisually implements WebDriverCustomModule {
 	 */
 
 	@Override
-	public void execute(final WebDriver webDriver, final String... args) {
+	public void execute(final WebDriver webDriver, final String... args)
+	{
+		//		// see of we got any property passed and have to use these
+		//		final Properties arguments = new Properties();
+		//		if (args.length > 0)
+		//		{
+		//			for (String arg : args)
+		//			{
+		//				// to be done!!!!
+		//			}
+		//		}
 
-		final XltProperties x = XltProperties.getInstance();
+		final XltProperties props = XltProperties.getInstance();
 
 		// Get Properties and convert them from String if necessary
+		final String resultDirectory = props.getProperty(PROPERTY_RESULT_DIRECTORY, RESULT_DIRECTORY);
 
 		// waitTime
-		final String waitTimeS = x.getProperty(PPREFIX + "waitTime", DWAITTIME);
-		final int waitTime = Integer.parseInt(waitTimeS);
+		final int waitTime = props.getProperty(PROPERTY_WAITING_TIME, WAITINGTIME);
 
 		// markBlockX, markBlockY
-		final String markBlockXS = x.getProperty(PPREFIX + "MARKBLOCKX", DMARKBLOCKX);
-		final int markBlockX = Integer.parseInt(markBlockXS);
-		final String markBlockYS = x.getProperty(PPREFIX + "MARKBLOCKX", DMARKBLOCKY);
-		final int markBlockY = Integer.parseInt(markBlockYS);
+		final int markBlockSizeX = props.getProperty(PROPERTY_MARK_BLOCKSIZE_X, MARK_BLOCKSIZE_X);
+		final int markBlockSizeY = props.getProperty(PROPERTY_MARK_BLOCKSIZE_Y, MARK_BLOCKSIZE_Y);
 
 		// pixelPerBlockXY, fuzzyness parameter
-		final String pixelPerBlockXYS = x.getProperty(PPREFIX + "pixelPerBlockXY",
-				DPIXELPBLOCKXY);
-		final int pixelPerBlockXY = Integer.parseInt(pixelPerBlockXYS);
+		final int pixelPerBlockXY = props.getProperty(PROPERTY_FUZZY_BLOCKSIZE_XY, FUZZY_BLOCKSIZE_XY);
 
 		// colTolerance
-		final String colToleranceS = x.getProperty(PPREFIX + "colTolerance",
-				DCOLTOLERANCE);
-		final double colTolerance = Double.parseDouble(colToleranceS);
+		final String colorToleranceValue = props.getProperty(PROPERTY_COLOR_TOLERANCE, COLOR_TOLERANCE);
+		final double colorTolerance = Double.parseDouble(colorToleranceValue);
 
 		// pixTolerance
-		final String pixToleranceS = x.getProperty(PPREFIX + "pixTolerance",
-				DCOLTOLERANCE);
-		final double pixTolerance = Double.parseDouble(pixToleranceS);
+		final String pixelToleranceValue = props.getProperty(PROPERTY_PIXEL_TOLERANCE, PIXEL_TOLERANCE);
+		final double pixelTolerance = Double.parseDouble(pixelToleranceValue);
 
 		// trainingMode
-		final String trainingModeString = x.getProperty(PPREFIX + "trainingMode");
-		final Boolean trainingMode = Boolean.parseBoolean(trainingModeString);
+		final boolean trainingsModeEnabled = props.getProperty(PROPERTY_TRAININGSMODE, TRAININGSMODE);
 
 		// closeMask
-		final String closeMaskString = x.getProperty(PPREFIX + "closeMask");
-		final Boolean closeMask = Boolean.parseBoolean(closeMaskString);
+		final boolean closeMask = props.getProperty(PROPERTY_MASK_CLOSE, ATTEMPT_TO_CLOSE_MASK);
 
 		// closeWidth
-		final String closeWidthString = x.getProperty(PPREFIX + "closeWidth",
-				DCLOSEWIDTH);
-		final int closeWidth = Integer.parseInt(closeWidthString);
+		final int closeMaskWidth = props.getProperty(PROPERTY_MASK_CLOSE_GAP_WIDTH, MASK_CLOSE_GAP_WIDTH);
 
-		// closeHeight
-		final String closeHeightString = x.getProperty(PPREFIX + "closeHeight",
-				DCLOSEHEIGHT);
-		final int closeHeight = Integer.parseInt(closeHeightString);
+		// closeWidth
+		final int closeMaskHeight = props.getProperty(PROPERTY_MASK_CLOSE_GAP_HEIGHT, MASK_CLOSE_GAP_HEIGHT);
 
 		// differenceImage
-		final String differenceImageS = x.getProperty(PPREFIX + "differenceImage", DDIFFERENCEIMAGE);
-		final Boolean differenceImage = Boolean.parseBoolean(differenceImageS);
+		final boolean differenceImage = props.getProperty(PROPERTY_CREATE_DIFFERENCEIMAGE, CREATE_DIFFERENCE_IMAGE);
 
 		// algorithm
-		final String algorithm = x.getProperty(PPREFIX + "algorithm", DALGORITHM);
+		final String algorithmString = props.getProperty(PROPERTY_ALGORITHM, ALGORITHM).trim().toUpperCase();
+		final ImageComparison.Algorithm algorithm;
 
-		// Wait a few miliseconds so the website is fully loaded
-		try {
-			TimeUnit.MILLISECONDS.sleep(waitTime);
-		} catch (final InterruptedException e) {
-			Thread.currentThread().interrupt();
-		}
-
-		// Checks if this is a new testcase. If yes, (re)sets index. If not.
-		// increments index
-		if ((x.getProperty(PPREFIX + "currentID") == Session.getCurrent()
-				.getID())) {
-			String indexString = x.getProperty(PPREFIX + "index");
-			int indexInt = Integer.parseInt(indexString);
-			indexInt++;
-			indexString = String.valueOf(indexInt);
-			x.setProperty(PPREFIX + "index", indexString);
-		}
-
-		else {
-			final String currentID = Session.getCurrent().getID();
-			x.setProperty(PPREFIX + "currentID", currentID);
-			x.setProperty(PPREFIX + "index", "1");
+		switch (algorithmString)
+		{
+		case PROPERTY_ALGORITHM_COLORFUZZY: 
+			algorithm = ImageComparison.Algorithm.COLORFUZZY;
+			break;
+		case PROPERTY_ALGORITHM_MATCH:
+			algorithm = ImageComparison.Algorithm.MATCH;
+			break;
+		case PROPERTY_ALGORITHM_FUZZY: 
+			algorithm = ImageComparison.Algorithm.FUZZY;
+			break;
+		default:
+			algorithm = ImageComparison.Algorithm.FUZZY;
 		}
 
 		// Get testcasename for the correct folder
 		final String currentTestCaseName = Session.getCurrent().getUserID();
 
 		// Get browsername for the correct subfolder
-		final String currentActionName = Session.getCurrent()
-				.getWebDriverActionName();
 		final String browserName = getBrowserName(webDriver);
 
+		// get the current action for naming	
+		final String currentActionName = Session.getCurrent().getWebDriverActionName();
+
 		// Get path to the directory
-		String directory = x.getProperty(PPREFIX + "directory");
-		directory = directory + "/" + currentTestCaseName + "/" + browserName;
+		final File targetDirectory = new File(new File(resultDirectory, currentTestCaseName), browserName);
+		targetDirectory.mkdirs();
 
-		// Set name of the referenceImage
-		final String indexS = x.getProperty(PPREFIX + "index");
-		final String screenshotName = indexS + "-" + currentActionName;
-		final String referencePath = directory + "/" + screenshotName;
+		// retrieve current index counter
+		Integer index = indexCounter.get();
+		if (index == null)
+		{
+			index = 1;
+		}
+		else
+		{
+			index = index + 1;
+		}
+		indexCounter.set(index);
 
-		final File referenceFile = new File(referencePath + ".png");
+		// Set name of the screenshot
+		final String screenshotName = String.format("%03d", index) + "-" + currentActionName;
 
-		// If there's no other screenshot, just save the new one
-		if (!referenceFile.isFile()) {
-			try {
-				takeScreenshot(webDriver, referenceFile);
-			} catch (final IOException e) {
-				throw new RuntimeIOException();
-			}
+		// where the reference is
+		final File resultDirectoryBaselinePath = new File(targetDirectory, RESULT_DIRECTORY_BASELINE);
+		resultDirectoryBaselinePath.mkdirs();
+
+		final File referenceScreenShotFile = new File(resultDirectoryBaselinePath, screenshotName + ".png");
+
+		// where the current screenshot goes
+		final File currentScreenShotPath = new File(new File(resultDirectoryBaselinePath, RESULT_DIRECTORY_RESULTS), Session.getCurrent().getID());
+		currentScreenShotPath.mkdirs();
+
+		final File currentScreenShotFile = new File(currentScreenShotPath, screenshotName + ".png");
+
+		// Wait a few miliseconds so the website is fully loaded
+		try
+		{
+			TimeUnit.MILLISECONDS.sleep(waitTime);
+		}
+		catch (final InterruptedException e)
+		{
+			Thread.currentThread().interrupt();
 		}
 
-		// If there is another screenshot ...
-		else {
-			// Create file for the new screenshot
-			final File screenshotFile = new File(directory + "new-screenshot"
-					+ screenshotName + ".png");
-			try {
-				takeScreenshot(webDriver, screenshotFile);
-			} catch (final IOException e) {
-				throw new RuntimeIOException();
+		try
+		{
+			if (!takeScreenshot(webDriver, currentScreenShotFile))
+			{
+				// webdriver cannot take screenshots, so leave here
+				return;
 			}
 
-			try {
-				// Initialize referenceImage, screenshotImage, delete
-				// screenshotImageFile
-				final BufferedImage screenshot = ImageIO.read(screenshotFile);
-				final BufferedImage reference = ImageIO.read(referenceFile);
+			// If there's no other screenshot, just copy this as baseline
+			if (!referenceScreenShotFile.isFile())
+			{
+				FileUtils.copyFile(currentScreenShotFile, referenceScreenShotFile);
 
-				// Initialize markedImageFile and maskImageFile
-				new File(directory + "/marked/").mkdirs();
-				final String markedImagePath = directory + "/marked/"
-						+ screenshotName + "-marked" + ".png";
-				final File markedImageFile = new File(markedImagePath);
-
-				new File(directory + "/mask/").mkdirs();
-				final String maskImagePath = directory + "/mask/" + screenshotName
-						+ "-mask" + ".png";
-				final File maskImageFile = new File(maskImagePath);
-
-				new File(directory + "/difference/").mkdirs();
-				final String differenceImagePath = directory + "/difference/"
-						+ screenshotName + "-difference" + ".png";
-				final File differenceImageFile = new File(differenceImagePath);
-
-				// Initializes ImageComparison and calls isEqual
-				final ImageComparison imagecomparison = new ImageComparison(
-						markBlockX, markBlockY, pixelPerBlockXY, colTolerance,
-						pixTolerance, trainingMode, closeMask, closeWidth,
-						closeHeight, differenceImage, algorithm);
-				final boolean result = imagecomparison.isEqual(reference, screenshot,
-						maskImageFile, markedImageFile, differenceImageFile);
-
-				// Delete the new screenshot if there was no difference
-				if (result) {
-					screenshotFile.delete();
-				}
-				// Place it into he markedImage folder otherwise
-				else {
-					final Path source = screenshotFile.toPath();
-					final String newScreenshotPath = directory + "/marked/"
-							+ screenshotName + "-new" + ".png";
-					final Path destination = Paths.get(newScreenshotPath);
-					Files.copy(source, destination,
-							StandardCopyOption.REPLACE_EXISTING);
-					screenshotFile.delete();
-				}
-
-				final String assertMessage = "Website does not match the reference screenshot: "
-						+ currentActionName;
-				Assert.assertTrue(assertMessage, result);
-
-			} catch (final IOException e) {
-				throw new RuntimeIOException();
+				// because we have not done anything before, we leave and hope of
+				// another round where we can compare stuff
+				return;
 			}
+
+			// ok, get serious about comparing and so on
+
+			// Initialize referenceImage, screenshotImage, delete
+			// screenshotImageFile
+			final BufferedImage screenshot = ImageIO.read(currentScreenShotFile);
+			final BufferedImage reference = ImageIO.read(referenceScreenShotFile);
+
+			// Initialize markedImageFile and maskImageFile
+			final File markedImageFile = new File(currentScreenShotPath, screenshotName + "-marked" + ".png");
+
+			final File maskDirectoryPath = new File(targetDirectory, RESULT_DIRECTORY_MASKS);
+			maskDirectoryPath.mkdirs();
+
+			// the mask image file
+			final File maskImageFile = new File(maskDirectoryPath, screenshotName + ".png");
+
+			// the difference image file
+			final File differenceImageFile = new File(currentScreenShotPath, screenshotName + "-difference" + ".png");
+
+			// Initializes ImageComparison and calls isEqual
+			final ImageComparison imagecomparison = new ImageComparison(
+					markBlockSizeX, markBlockSizeY, 
+					pixelPerBlockXY, 
+					colorTolerance,
+					pixelTolerance, 
+					trainingsModeEnabled,
+					closeMask, 
+					closeMaskWidth, closeMaskHeight, 
+					differenceImage, algorithm);
+
+			final boolean result = imagecomparison.isEqual(reference, screenshot, maskImageFile, markedImageFile, differenceImageFile);
+
+			final String assertMessage = "Website does not match the reference screenshot: " + currentActionName;
+			Assert.assertTrue(assertMessage, result);
 		}
+		catch (final IOException e)
+		{
+			Assert.fail(MessageFormat.format("Failure during visual image assertion: {0}", e.getMessage()));
+		}
+
 	}
 
 	/**
-	 * Takes a screenshot if the underlying web driver instance is capable of
-	 * doing it.
+	 * Takes a screenshot if the underlying web driver instance is capable of doing it. Fails with 
+	 * a message only in case the webdriver cannot take screenshots. Avoids issue when certain
+	 * drivers are used.
 	 * 
-	 * @throws IOException
+	 * @param webDriver the web driver to use
+	 * @param pngFile the file to write to
+	 * @return true if we could take a screenshot, false otherwise
+	 * @throws IOException in case the files cannot be written
 	 */
-	private void takeScreenshot(final WebDriver webDriver, final File pngFile)
-			throws IOException {
-		if (webDriver instanceof TakesScreenshot) {
-			final byte[] bytes = ((TakesScreenshot) webDriver)
-					.getScreenshotAs(OutputType.BYTES);
+	private boolean takeScreenshot(final WebDriver webDriver, final File pngFile) throws IOException
+	{
+		if (webDriver instanceof TakesScreenshot)
+		{
+			final byte[] bytes = ((TakesScreenshot) webDriver).getScreenshotAs(OutputType.BYTES);
 			FileUtils.writeByteArrayToFile(pngFile, bytes);
-		} else {
-			throw new RuntimeIOException();
+
+			return true;
+		}
+		else
+		{
+			return false;
 		}
 	}
 
 	/**
-	 * Gets and returns the browsername using Selenium methods
+	 * Returns the browsername using Selenium methods
 	 * 
-	 * 
-	 * @param webdriver
-	 * @return
+	 * @param webDriver the WebDriver to query
+	 * @return the browser name
 	 */
-	private String getBrowserName(final WebDriver webdriver) {
-		final Capabilities capabilities = ((RemoteWebDriver) webdriver)
-				.getCapabilities();
+	private String getBrowserName(final WebDriver webDriver)
+	{
+		final Capabilities capabilities = ((RemoteWebDriver) webDriver).getCapabilities();
 		final String browserName = capabilities.getBrowserName();
+
 		return browserName;
 	}
 }
