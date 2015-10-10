@@ -12,6 +12,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.xceptance.xlt.visualassertion.ImageComparison;
+import com.xceptance.xlt.visualassertion.ImageComparison.Algorithm;
 
 /**
  * Tests if the method can handle it should the blocks would go over the border
@@ -62,7 +63,7 @@ public class TBlocks {
 
 		//		This test tests what happens if the borders go over the edge
 		//		It should also check the drawBorders method, since the treshold is so low, it should find differences everywhere
-		final ImageComparison imagecomparison2 = new ImageComparison(10, 10, 20, 0.0, 0.01, false, false, 3, 3, false, "FUZZY");
+		final ImageComparison imagecomparison2 = new ImageComparison(10, 10, 20, 0.0, 0.01, false, false, 3, 3, false, Algorithm.FUZZY);
 		final boolean result = imagecomparison2.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
 		Assert.assertFalse("This wasn't what the test is for, but it's still wrong", result);
 	}

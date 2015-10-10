@@ -27,14 +27,15 @@ import com.xceptance.xlt.api.util.XltLogger;
  * 
  * @author lucas & damian
  */
-public class ImageComparison {
+public class ImageComparison
+{
 
-	public enum Algorithm {
+	public enum Algorithm
+	{
 		MATCH, COLORFUZZY, FUZZY
 	}
 
 	private BufferedImage difference = null;
-	private BufferedImage imgOut = null;
 	private BufferedImage maskImage = null;
 	private final int markingX, markingY, pixelPerBlockXY;
 	private int imageWidth;
@@ -115,13 +116,15 @@ public class ImageComparison {
 	public ImageComparison(final int markingX, final int markingY, final int pixelPerBlockXY,
 			final double colTolerance, final double pixTolerance, final boolean trainingMode,
 			final boolean closeMask, final int structElementWidth, final int structElementHeight,
-			final boolean differenceImage, final Algorithm algorithm) {
+			final boolean differenceImage, final Algorithm algorithm)
+	{
 
 		// Check if markingX or markingY are below 1, which would make no sense
 		// and woudn't work. If they are, just throw an Exception
-		if (markingX < 0 || markingY < 0) {
+		if (markingX < 1 || markingY < 1)
+		{
 			throw new IllegalArgumentException(
-					"Can't draw rectangles with a width or height below one");
+					"Can't draw rectangles with a width or height of 0");
 		}
 		this.markingX = markingX;
 		this.markingY = markingY;
@@ -134,11 +137,25 @@ public class ImageComparison {
 		this.structElementHeight = structElementHeight;
 		this.differenceImage = differenceImage;
 
-		try {
+		try
+		{
 			this.algorithm = algorithm;
-		} catch (final IllegalArgumentException e) {
+		}
+		catch (final IllegalArgumentException e)
+		{
 			throw new IllegalArgumentException("Specified algorithm not found");
 		}
+	}
+
+	/**
+	 * Just requires the algorithm. The rest is defaults.
+	 * 
+	 * @param algorithm
+	 *            the algorithm to use
+	 */
+	public ImageComparison(final Algorithm algorithm)
+	{
+		this(10, 10, 10, 0.1, 0.1, false, false, 10, 10, false, algorithm);
 	}
 
 	/**
@@ -147,14 +164,14 @@ public class ImageComparison {
 	 * them if trainingMode is true. Also draws the differenceImage if asked
 	 * for. And saves the marked image/ the mask image.
 	 * 
-	 * @param img1
+	 * @param baselineImage
 	 *            the reference image
-	 * @param img2
+	 * @param compareImage
 	 *            the image that will be compared to the reference image
 	 * @param fileMask
 	 *            the file where the mask image can be found or where it should
 	 *            be created
-	 * @param fileOut
+	 * @param fileMarked
 	 *            the file where the marked image should be saved if there are
 	 *            differences
 	 * @param fileDifference
@@ -163,56 +180,60 @@ public class ImageComparison {
 	 * @return false if there were changes, true otherwise
 	 * @throws IOException
 	 */
-	public boolean isEqual(final BufferedImage img1, final BufferedImage img2,
-			final File fileMask, final File fileOut, final File fileDifference)
-					throws IOException {
-
+	public boolean isEqual(final BufferedImage baselineImage, final BufferedImage compareImage,
+			final File fileMask, final File fileMarked, final File fileDifference) throws IOException
+			{
 		boolean isEqual = true;
 
 		// Initializes ImageOperations object to access it's methods later
 		final ImageOperations imageoperations = new ImageOperations();
 
 		// copies the images, so it doesn't work directly on them
-		BufferedImage copyImg1 = imageoperations.copyImage(img1);
-		imgOut = imageoperations.copyImage(img2);
+		BufferedImage baselineImageCopy = imageoperations.copyImage(baselineImage);
+		BufferedImage compareImageCopy = imageoperations.copyImage(compareImage);
 
 		// Resizes the images and saves the previous width and height ...
 
 		// Initializes the variables for the previous width and height
-		int prevWidth = imgOut.getWidth();
-		int prevHeight = imgOut.getHeight();
+		final int baselineImageOriginalWidth = compareImageCopy.getWidth();
+		final int baselineImageOriginalHeight = compareImageCopy.getHeight();
 
-		if (imgOut.getWidth() > copyImg1.getWidth()) {
-			prevWidth = copyImg1.getWidth();
-			copyImg1 = imageoperations.increaseImageSize(copyImg1,
-					imgOut.getWidth(), copyImg1.getHeight());
+		final int compareImageOriginalWidth = compareImageCopy.getWidth();
+		final int compareImageOriginalHeight = compareImageCopy.getHeight();
+
+		boolean sizeChanged = false;
+
+		if (baselineImageCopy.getWidth() < compareImageCopy.getWidth())
+		{
+			baselineImageCopy = imageoperations.increaseImageSize(baselineImageCopy, compareImageCopy.getWidth(), baselineImageCopy.getHeight());
+			sizeChanged = true;
 		}
-		if (imgOut.getHeight() > copyImg1.getHeight()) {
-			prevHeight = copyImg1.getHeight();
-			copyImg1 = imageoperations.increaseImageSize(copyImg1,
-					copyImg1.getWidth(), imgOut.getHeight());
+		if (baselineImageCopy.getHeight() < compareImageCopy.getHeight())
+		{
+			baselineImageCopy = imageoperations.increaseImageSize(baselineImageCopy, baselineImageCopy.getWidth(), compareImageCopy.getHeight());
+			sizeChanged = true;
 		}
-		if (imgOut.getWidth() < copyImg1.getWidth()) {
-			prevWidth = imgOut.getWidth();
-			imgOut = imageoperations.increaseImageSize(imgOut,
-					copyImg1.getWidth(), imgOut.getHeight());
+		if (baselineImageCopy.getWidth() > compareImageCopy.getWidth())
+		{
+			compareImageCopy = imageoperations.increaseImageSize(compareImageCopy, baselineImageCopy.getWidth(), compareImageCopy.getHeight());
+			sizeChanged = true;
 		}
-		if (imgOut.getHeight() < copyImg1.getHeight()) {
-			prevHeight = imgOut.getHeight();
-			imgOut = imageoperations.increaseImageSize(imgOut,
-					imgOut.getWidth(), copyImg1.getHeight());
+		if (baselineImageCopy.getHeight() > compareImageCopy.getHeight())
+		{
+			compareImageCopy = imageoperations.increaseImageSize(compareImageCopy, compareImageCopy.getWidth(), baselineImageCopy.getHeight());
+			sizeChanged = true;
 		}
 
 		// end resizing
 
 		// initializes variables for imageHeight and imageWidth
-		imageWidth = imgOut.getWidth();
-		imageHeight = imgOut.getHeight();
+		imageWidth = compareImageCopy.getWidth();
+		imageHeight = compareImageCopy.getHeight();
 
 		// initializes maskImage and masks both images:
-		maskImage = initializeMaskImage(copyImg1, fileMask);
-		copyImg1 = imageoperations.overlayMaskImage(copyImg1, maskImage);
-		imgOut = imageoperations.overlayMaskImage(imgOut, maskImage);
+		maskImage = initializeMaskImage(baselineImageCopy, fileMask);
+		baselineImageCopy = imageoperations.overlayMaskImage(baselineImageCopy, maskImage);
+		compareImageCopy = imageoperations.overlayMaskImage(compareImageCopy, maskImage);
 
 		// Initialize differentPixels array and the difference image
 		int[][] differentPixels = null;
@@ -220,31 +241,39 @@ public class ImageComparison {
 
 		// Checks which imagecomparison method to call and calls it.
 		// Sets the differentPixels array
-		switch (algorithm) {
+		switch (algorithm)
+		{
 		case MATCH:
-			differentPixels = exactlyEqual(copyImg1, imgOut);
+			differentPixels = exactlyEqual(baselineImageCopy, compareImageCopy);
 			break;
 		case COLORFUZZY:
-			differentPixels = pixelFuzzyEqual(copyImg1, imgOut);
+			differentPixels = pixelFuzzyEqual(baselineImageCopy, compareImageCopy);
 			break;
 		case FUZZY:
-			differentPixels = fuzzyEqual(copyImg1, imgOut);
+			differentPixels = fuzzyEqual(baselineImageCopy, compareImageCopy);
 			break;
 		}
 
 		// If there were differences ...
-		if (differentPixels != null) {
+		if (differentPixels != null)
+		{
 
-			if (trainingMode) {
+			if (trainingMode)
+			{
 				// Mask differences in the maskImage
 				maskDifferences(differentPixels);
 
-			} else {
+			}
+			else
+			{
 				// Draw the differences into the difference image
-				drawDifferencesToImage(copyImg1, imgOut, differentPixels);
+				if (differenceImage)
+				{
+					drawDifferencesToImage(baselineImageCopy, compareImageCopy, differentPixels);
+				}
 
 				// Mark the differences
-				markDifferences(differentPixels);
+				markDifferences(compareImageCopy, differentPixels);
 				isEqual = false;
 			}
 		}
@@ -252,42 +281,57 @@ public class ImageComparison {
 		// Close the maskImage if closeMask = true
 		// Do it even if there were no differences or if
 		// trainingmode was false
-		if (closeMask) {
+		if (closeMask)
+		{
 			maskImage = imageoperations.closeImage(maskImage,
 					structElementWidth, structElementHeight);
 		}
 
 		// Save the maskImage if trainingMode was on or
 		// The maskImage should be closed
-		if (trainingMode || closeMask) {
+		if (trainingMode || closeMask)
+		{
 			ImageIO.write(maskImage, "PNG", fileMask);
 		}
 
-		if (!trainingMode) {
-
+		if (!trainingMode)
+		{
 			// If the size of the image changed, mark the
 			// previously nonexistant areas and set isEqual false
-			if (imageWidth != prevWidth || imageHeight != prevHeight) {	
-				difference = markImageBorders(difference, prevWidth, prevHeight);
-				imgOut = markImageBorders(imgOut, prevWidth, prevHeight);				
+			if (sizeChanged)
+			{
+				difference = markImageBorders(difference, 
+						Math.min(baselineImageOriginalWidth, compareImageOriginalWidth), 
+						Math.min(baselineImageOriginalHeight, compareImageOriginalHeight));
+
+				// disabled, because do not mark make the size change transparent
+				// just really mark it
+				//	compareImageCopy = markImageBorders(compareImageCopy,
+				//		Math.min(baselineImageOriginalWidth, compareImageOriginalWidth), 
+				//		Math.min(baselineImageOriginalHeight, compareImageOriginalHeight));
+
 				isEqual = false;
 			}
 		}
 
-		if (isEqual) {
+		if (isEqual)
+		{
 			return true;
-		} else {
+		}
+		else
+		{
 			// Save the differenceImage if differenceImage is true
-			if (differenceImage) {
+			if (differenceImage)
+			{
 				ImageIO.write(difference, "PNG", fileDifference);
 			}
 
 			// Save the marked image
-			ImageIO.write(imgOut, "PNG", fileOut);
+			ImageIO.write(compareImageCopy, "PNG", fileMarked);
 			return false;
 		}
 
-	}
+			}
 
 	/**
 	 * Method for the pixel based comparison with colTolerance. So it will
@@ -302,7 +346,8 @@ public class ImageComparison {
 	 *         differences, null if there were no differences
 	 */
 	private int[][] pixelFuzzyEqual(final BufferedImage img1, final BufferedImage img2)
-			throws IOException {
+			throws IOException
+			{
 
 		boolean equal = true;
 		final ArrayList<Integer> xCoords = new ArrayList<Integer>();
@@ -310,8 +355,10 @@ public class ImageComparison {
 
 		final int imagewidth = img1.getWidth();
 		final int imageheight = img1.getHeight();
-		for (int x = 0; x < imagewidth; x++) {
-			for (int y = 0; y < imageheight; y++) {
+		for (int x = 0; x < imagewidth; x++)
+		{
+			for (int y = 0; y < imageheight; y++)
+			{
 
 				// calculates difference and adds the coordinates to
 				// the relevant ArrayList if the difference is above the
@@ -320,7 +367,8 @@ public class ImageComparison {
 
 				// draws the differenceImage if needed
 
-				if (difference > colTolerance) {
+				if (difference > colTolerance)
+				{
 					xCoords.add(x);
 					yCoords.add(y);
 					equal = false;
@@ -330,27 +378,33 @@ public class ImageComparison {
 
 		int s = xCoords.size();
 		final int[] xArray = new int[s];
-		for (int i = 0; i < s; i++) {
+		for (int i = 0; i < s; i++)
+		{
 			xArray[i] = xCoords.get(i).intValue();
 		}
 
 		s = yCoords.size();
 		final int[] yArray = new int[s];
-		for (int i = 0; i < s; i++) {
+		for (int i = 0; i < s; i++)
+		{
 			yArray[i] = yCoords.get(i).intValue();
 		}
 
 		final int[][] pixels = new int[xArray.length][2];
-		for (int i = 0; i < xArray.length; i++) {
+		for (int i = 0; i < xArray.length; i++)
+		{
 			pixels[i][0] = xArray[i];
 			pixels[i][1] = yArray[i];
 		}
-		if (!equal) {
+		if (!equal)
+		{
 			return pixels;
-		} else {
+		}
+		else
+		{
 			return null;
 		}
-	}
+			}
 
 	/**
 	 * Method for the exact pixel based comparison . Zero tolerance.
@@ -365,7 +419,8 @@ public class ImageComparison {
 	 *         differences, null if there were no differences
 	 */
 	private int[][] exactlyEqual(final BufferedImage img1, final BufferedImage img2)
-			throws IOException {
+			throws IOException
+			{
 		/* Method for the exact comparison of two images */
 		// img1: reference Image, img2: screenshot
 
@@ -375,12 +430,15 @@ public class ImageComparison {
 
 		final int imagewidth = img1.getWidth();
 		final int imageheight = img1.getHeight();
-		for (int x = 0; x < imagewidth; x++) {
-			for (int y = 0; y < imageheight; y++) {
+		for (int x = 0; x < imagewidth; x++)
+		{
+			for (int y = 0; y < imageheight; y++)
+			{
 
 				// if the RGB values of 2 pixels differ
 				// add the x- and y- coordinates to the corresponding ArrayLists
-				if (img1.getRGB(x, y) != img2.getRGB(x, y)) {
+				if (img1.getRGB(x, y) != img2.getRGB(x, y))
+				{
 					xCoords.add(x);
 					yCoords.add(y);
 					exactlyEqual = false;
@@ -389,28 +447,34 @@ public class ImageComparison {
 		}
 		int s = xCoords.size();
 		final int[] xArray = new int[s];
-		for (int i = 0; i < s; i++) {
+		for (int i = 0; i < s; i++)
+		{
 			xArray[i] = xCoords.get(i).intValue();
 		}
 
 		s = yCoords.size();
 		final int[] yArray = new int[s];
-		for (int i = 0; i < s; i++) {
+		for (int i = 0; i < s; i++)
+		{
 			yArray[i] = yCoords.get(i).intValue();
 		}
 
 		final int[][] pixels = new int[xArray.length][2];
-		for (int i = 0; i < xArray.length; i++) {
+		for (int i = 0; i < xArray.length; i++)
+		{
 			pixels[i][0] = xArray[i];
 			pixels[i][1] = yArray[i];
 		}
 
-		if (!exactlyEqual) {
+		if (!exactlyEqual)
+		{
 			return pixels;
-		} else {
+		}
+		else
+		{
 			return null;
 		}
-	}
+			}
 
 	/**
 	 * Compares the img2 image to the img1 image using the fuzzyness parameters
@@ -427,7 +491,8 @@ public class ImageComparison {
 	 * @throws IOException
 	 */
 	private int[][] fuzzyEqual(final BufferedImage img1, final BufferedImage img2)
-			throws IOException {
+			throws IOException
+			{
 
 		/* Method for the regular fuzzy comparison */
 
@@ -442,8 +507,10 @@ public class ImageComparison {
 		final int xBlock = imageWidth / pixelPerBlockXY;
 		final int yBlock = imageHeight / pixelPerBlockXY;
 
-		for (int x = 0; x < xBlock; x++) {
-			for (int y = 0; y < yBlock; y++) {
+		for (int x = 0; x < xBlock; x++)
+		{
+			for (int y = 0; y < yBlock; y++)
+			{
 				subImageWidth = calcPixSpan(pixelPerBlockXY, x, imageWidth);
 				subImageHeight = calcPixSpan(pixelPerBlockXY, y, imageHeight);
 				int differencesPerBlock = 0;
@@ -451,8 +518,10 @@ public class ImageComparison {
 						* subImageHeight * pixTolerance);
 
 				// Go through every pixel in that block
-				for (int w = 0; w < subImageWidth; w++) {
-					for (int h = 0; h < subImageHeight; h++) {
+				for (int w = 0; w < subImageWidth; w++)
+				{
+					for (int h = 0; h < subImageHeight; h++)
+					{
 
 						final int xCoord = x * pixelPerBlockXY + w;
 						final int yCoord = y * pixelPerBlockXY + h;
@@ -463,7 +532,8 @@ public class ImageComparison {
 								yCoord, img1, img2);
 
 						// If there is a notable difference
-						if (difference > colTolerance) {
+						if (difference > colTolerance)
+						{
 
 							// Increment differencesPerBlock and add the
 							// coordinates to the
@@ -478,7 +548,8 @@ public class ImageComparison {
 				// If differencesPerBlock is above pixTolerance
 				// Write the temporary coordinates to the permanent ones
 				// And set equal false
-				if (differencesPerBlock > differencesAllowed) {
+				if (differencesPerBlock > differencesAllowed)
+				{
 					xCoords.addAll(xCoordsTemp);
 					yCoords.addAll(yCoordsTemp);
 					xCoordsTemp.clear();
@@ -486,7 +557,8 @@ public class ImageComparison {
 					equal = false;
 				}
 				// Otherwise clear the temporary coordinates
-				else {
+				else
+				{
 					xCoordsTemp.clear();
 					yCoordsTemp.clear();
 				}
@@ -496,27 +568,33 @@ public class ImageComparison {
 		// Turn the ArrayLists into a single 2d array.
 		int s = xCoords.size();
 		final int[] xArray = new int[s];
-		for (int i = 0; i < s; i++) {
+		for (int i = 0; i < s; i++)
+		{
 			xArray[i] = xCoords.get(i).intValue();
 		}
 
 		s = yCoords.size();
 		final int[] yArray = new int[s];
-		for (int i = 0; i < s; i++) {
+		for (int i = 0; i < s; i++)
+		{
 			yArray[i] = yCoords.get(i).intValue();
 		}
 
 		final int[][] pixels = new int[xArray.length][2];
-		for (int i = 0; i < xArray.length; i++) {
+		for (int i = 0; i < xArray.length; i++)
+		{
 			pixels[i][0] = xArray[i];
 			pixels[i][1] = yArray[i];
 		}
-		if (!equal) {
+		if (!equal)
+		{
 			return pixels;
-		} else {
+		}
+		else
+		{
 			return null;
 		}
-	}
+			}
 
 	/**
 	 * Calculates how many pixel there can be in the current block. Necessary in
@@ -530,7 +608,8 @@ public class ImageComparison {
 	 *            the width/ height that shoudn't be passed
 	 * @return
 	 */
-	private int calcPixSpan(final int pixelPerBlock, final int n, final int overallSpan) {
+	private int calcPixSpan(final int pixelPerBlock, final int n, final int overallSpan)
+	{
 		if (pixelPerBlock * (n + 1) > overallSpan)
 			return overallSpan % pixelPerBlock;
 		else
@@ -553,7 +632,8 @@ public class ImageComparison {
 	 *         Bigger difference
 	 */
 	private double calculatePixelRgbDiff(final int x, final int y, final BufferedImage img1,
-			final BufferedImage img2) {
+			final BufferedImage img2)
+	{
 
 		final double MAXDIFF = 721.2489168102785;
 
@@ -592,21 +672,27 @@ public class ImageComparison {
 	 * @param currentColor
 	 * @return the color with which to mark
 	 */
-	private Color getComplementary(final Color currentColor) {
+	private Color getComplementary(final Color currentColor)
+	{
 		final int red = currentColor.getRed();
 		final int green = currentColor.getGreen();
 		final int blue = currentColor.getBlue();
+
 		int biggest = Math.max(red, green);
 		biggest = Math.max(biggest, blue);
+
 		Color newColor = Color.WHITE;
 
-		if (biggest == red) {
+		if (biggest == red)
+		{
 			newColor = Color.GREEN;
 		}
-		if (biggest == blue) {
+		if (biggest == blue)
+		{
 			newColor = Color.RED;
 		}
-		if ((biggest - green) < 30) {
+		if ((biggest - green) < 30)
+		{
 			newColor = Color.RED;
 		}
 		return newColor;
@@ -624,33 +710,40 @@ public class ImageComparison {
 	 * @param pixels
 	 *            the array with the differences.
 	 */
-	private void markDifferences(final int[][] pixels) {
+	private void markDifferences(final BufferedImage image, final int[][] pixels)
+	{
 
 		// Check if markingX or markingY are 1. If they are, just mark every
 		// different pixel,
 		// don't bother with rectangles
-		if (markingX == 1 || markingY == 1) {
-			for (int i = 0; i < pixels.length; i++) {
-				colorPixel(pixels[i][0], pixels[i][1]);
+		if (markingX == 1 || markingY == 1)
+		{
+			for (int i = 0; i < pixels.length; i++)
+			{
+				colorPixel(image, pixels[i][0], pixels[i][1]);
 			}
 		}
 
 		// And if markingX and markingY are above one, paint rectangles!
 		// Normal case
-		else {
+		else
+		{
 			final int blocksX = imageWidth / markingX;
 			final int blocksY = imageHeight / markingY;
 			final boolean[][] markedBlocks = new boolean[blocksX + 1][blocksY + 1];
-			for (final boolean[] row : markedBlocks) {
+			for (final boolean[] row : markedBlocks)
+			{
 				Arrays.fill(row, false);
 			}
-			for (int x = 0; x < pixels.length; x++) {
+			for (int x = 0; x < pixels.length; x++)
+			{
 				final int xBlock = pixels[x][0] / markingX;
 				final int yBlock = pixels[x][1] / markingY;
-				if (!markedBlocks[xBlock][yBlock]) {
+				if (!markedBlocks[xBlock][yBlock])
+				{
 					subImageWidth = calcPixSpan(markingX, xBlock, imageWidth);
 					subImageHeight = calcPixSpan(markingY, yBlock, imageHeight);
-					drawBorders(xBlock, yBlock, markingX, markingY);
+					drawBorders(image, xBlock, yBlock, markingX, markingY);
 					markedBlocks[xBlock][yBlock] = true;
 				}
 			}
@@ -665,14 +758,16 @@ public class ImageComparison {
 	 * @param pixels
 	 *            the array with the differences.
 	 */
-	private void maskDifferences(final int[][] pixels) {
+	private void maskDifferences(final int[][] pixels)
+	{
 
 		// This method doesn't need a separate if for markingX/ markingY = 1,
 		// the colorArea method works for them
 
 		final long s = System.currentTimeMillis();
 
-		for (int i = 0; i < pixels.length; i++) {
+		for (int i = 0; i < pixels.length; i++)
+		{
 			final int x = Math.max(0, pixels[i][0] - (markingX / 2));
 			final int y = Math.max(0, pixels[i][1] - (markingY / 2));
 
@@ -680,7 +775,7 @@ public class ImageComparison {
 		}
 
 		final long e = System.currentTimeMillis();
-		XltLogger.runTimeLogger.info(MessageFormat.format("Masking image took {0}ms.", e-s));
+		XltLogger.runTimeLogger.info(MessageFormat.format("Masking image took {0}ms.", e - s));
 	}
 
 	/**
@@ -699,25 +794,28 @@ public class ImageComparison {
 	 * @param height
 	 *            Horizontal length of the rectangle to mark
 	 */
-	private void drawBorders(final int currentX, final int currentY, final int width, final int height) {
+	private void drawBorders(final BufferedImage image, final int currentX, final int currentY, final int width, final int height)
+	{
 		int x, y;
 
-		for (int a = 0; a < subImageWidth; a++) {
+		for (int a = 0; a < subImageWidth; a++)
+		{
 			x = currentX * width + a;
 			y = currentY * height;
-			colorPixel(x, y);
+			colorPixel(image, x, y);
 
 			y = currentY * height + subImageHeight - 1;
-			colorPixel(x, y);
+			colorPixel(image, x, y);
 		}
 
-		for (int b = 1; b < subImageHeight - 1; b++) {
+		for (int b = 1; b < subImageHeight - 1; b++)
+		{
 			x = currentX * width;
 			y = currentY * height + b;
-			colorPixel(x, y);
+			colorPixel(image, x, y);
 
 			x = currentX * width + subImageWidth - 1;
-			colorPixel(x, y);
+			colorPixel(image, x, y);
 		}
 	}
 
@@ -730,27 +828,34 @@ public class ImageComparison {
 	 * @param y
 	 *            the y coordinate of the pixel to color
 	 */
-	private void colorPixel(final int x, final int y) {
+	private void colorPixel(final BufferedImage image, final int x, final int y)
+	{
 		int rgb, newRgb;
 		Color currentColor, newColor;
 
-		rgb = imgOut.getRGB(x, y);
+		rgb = image.getRGB(x, y);
 		currentColor = new Color(rgb);
 		newColor = getComplementary(currentColor);
 		newRgb = newColor.getRGB();
-		imgOut.setRGB(x, y, newRgb);
+		image.setRGB(x, y, newRgb);
 	}
 
 	/**
 	 * Just draws a black rectangle
 	 * 
-	 * @param img the image to draw on
-	 * @param x the x position
-	 * @param y the x position
-	 * @param widthX the X width
-	 * @param widthY the Y width
+	 * @param img
+	 *            the image to draw on
+	 * @param x
+	 *            the x position
+	 * @param y
+	 *            the x position
+	 * @param widthX
+	 *            the X width
+	 * @param widthY
+	 *            the Y width
 	 */
-	private void drawBlackRectangle(final BufferedImage img, final int x, final int y, final int widthX, final int widthY) {
+	private void drawBlackRectangle(final BufferedImage img, final int x, final int y, final int widthX, final int widthY)
+	{
 		final Color black = Color.BLACK;
 
 		final Graphics g = img.getGraphics();
@@ -773,18 +878,20 @@ public class ImageComparison {
 	 *            the height from which the marking starts
 	 * @return the marked image
 	 */
-	private BufferedImage markImageBorders(final BufferedImage img, final int startW,
-			final int startH) {
-
+	private BufferedImage markImageBorders(final BufferedImage img, final int startW, final int startH)
+	{
 		final Color markTransparentWhite = new Color(255, 255, 255, 0);
+
 		final Graphics2D g = img.createGraphics();
 		g.setColor(markTransparentWhite);
 		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_IN, 1.0f));
 
-		if (startW < imageWidth) {
+		if (startW < imageWidth)
+		{
 			g.fillRect(startW, 0, img.getWidth() - startW, img.getHeight());
 		}
-		if (startH < imageHeight) {
+		if (startH < imageHeight)
+		{
 			g.fillRect(0, startH, img.getWidth(), img.getHeight() - startH);
 		}
 		g.dispose();
@@ -796,7 +903,8 @@ public class ImageComparison {
 	 * Initializes the difference image. It is initialized fully black, since
 	 * black = no difference. Works directly on the difference image.
 	 */
-	private void initializeDifferenceImage() {
+	private void initializeDifferenceImage()
+	{
 
 		final int rgbBlack = Color.BLACK.getRGB();
 		difference = new BufferedImage(imageWidth, imageHeight,
@@ -814,13 +922,15 @@ public class ImageComparison {
 	 * @param differentPixels
 	 */
 	private void drawDifferencesToImage(final BufferedImage reference,
-			final BufferedImage toCompare, final int[][] differentPixels) {
+			final BufferedImage toCompare, final int[][] differentPixels)
+	{
 
 		double rgbDifference;
 
 		// Go through the differentPixels array, get the difference and
 		// draw the pixel into
-		for (int i = 0; i < differentPixels.length; i++) {
+		for (int i = 0; i < differentPixels.length; i++)
+		{
 			rgbDifference = calculatePixelRgbDiff(differentPixels[i][0],
 					differentPixels[i][1], reference, toCompare);
 			drawDifferencePixel(rgbDifference, differentPixels[i][0],
@@ -838,7 +948,8 @@ public class ImageComparison {
 	 * @param y
 	 *            current y coordinate
 	 */
-	private void drawDifferencePixel(final double ratio, final int x, final int y) {
+	private void drawDifferencePixel(final double ratio, final int x, final int y)
+	{
 		final double grey = 255 * ratio;
 		final int diffColor = (int) Math.round(grey);
 		final Color greyscale = new Color(diffColor, diffColor, diffColor, 255);
@@ -858,14 +969,17 @@ public class ImageComparison {
 	 * @throws IOException
 	 */
 	private BufferedImage initializeMaskImage(final BufferedImage img, final File file)
-			throws IOException {
+			throws IOException
+			{
 		final Color transparentWhite = new Color(255, 255, 255, 0);
 		final int rgbTransparentWhite = transparentWhite.getRGB();
 
-		if (file.exists()) {
+		if (file != null && file.exists())
+		{
 			BufferedImage mask = ImageIO.read(file);
 			if ((mask.getWidth() == img.getWidth())
-					&& (mask.getHeight() == img.getHeight())) {
+					&& (mask.getHeight() == img.getHeight()))
+			{
 
 				// Change image type to TYPE_INT_ARGB
 				mask = new ImageOperations().copyImage(mask);
@@ -881,5 +995,5 @@ public class ImageComparison {
 				.getData();
 		Arrays.fill(maskArray, rgbTransparentWhite);
 		return mask;
-	}
+			}
 }

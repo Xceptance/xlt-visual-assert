@@ -9,7 +9,7 @@ import java.io.IOException;
 /**
  * Provides methods to perform operations on images. Methods are scaling,
  * increasing, copying, overlay, erosion, dilation and closing. Written for use
- * in ImageComparison. The methods were  made to work with binary images.
+ * in ImageComparison. The methods were made to work with binary images.
  * <p>
  * Regarding erosion, dilation and closing: The background/ foreground colors
  * can be manually set, defaults are below. The structure element is always a
@@ -18,15 +18,18 @@ import java.io.IOException;
  * The constructor without parameters initializes these defaults:
  * <p>
  * Foreground color: Black from the java.awt.Color class, Color.BLACK <br>
- * Background color: Transparent white with rgb values of 255, 255, 255 and 0. <br>
+ * Background color: Transparent white with rgb values of 255, 255, 255 and 0.
+ * <br>
  * <p>
- * The scaling, which is included in closeImage, is always done by a factor of 10.
- * It should be analogous to the markingX/ markingY values in ImageComparison.
+ * The scaling, which is included in closeImage, is always done by a factor of
+ * 10. It should be analogous to the markingX/ markingY values in
+ * ImageComparison.
  * 
  * @author damian
  * 
  */
-public class ImageOperations {
+public class ImageOperations
+{
 
 	private final int rgbForegroundColor;
 	private final int rgbBackgroundColor;
@@ -39,7 +42,8 @@ public class ImageOperations {
 	 * Background color: Transparent white. <br>
 	 * Foreground color: Black.
 	 */
-	protected ImageOperations() {
+	protected ImageOperations()
+	{
 		this.rgbBackgroundColor = new Color(255, 255, 255, 0).getRGB();
 		this.rgbForegroundColor = Color.BLACK.getRGB();
 		this.scalingFactor = 10;
@@ -55,7 +59,8 @@ public class ImageOperations {
 	 *            the rgb value of the foreground color erosion/ dilation
 	 */
 	protected ImageOperations(final int rgbBackgroundColor, final int rgbForegroundColor,
-			final int compressionFactor, final double structElementScale) {
+			final int compressionFactor, final double structElementScale)
+	{
 		this.rgbBackgroundColor = rgbBackgroundColor;
 		this.rgbForegroundColor = rgbForegroundColor;
 	}
@@ -75,25 +80,32 @@ public class ImageOperations {
 	 * @return the scaled image
 	 */
 	protected BufferedImage scaleDownMaskImage(final BufferedImage img, final int newWidth,
-			final int newHeight) {
+			final int newHeight)
+	{
 
 		final BufferedImage scaledImage = new BufferedImage(newWidth, newHeight,
 				BufferedImage.TYPE_INT_ARGB);
 		boolean hasForegroundColor;
 
 		// Go through every pixel of the scaled image
-		for (int w = 0; w < scaledImage.getWidth(); w++) {
-			for (int h = 0; h < scaledImage.getHeight(); h++) {
+		for (int w = 0; w < scaledImage.getWidth(); w++)
+		{
+			for (int h = 0; h < scaledImage.getHeight(); h++)
+			{
 				hasForegroundColor = false;
 
 				// Check if the corresponding block in the image to scale has a
 				// black pixel
-				for (int x = w * scalingFactor; x < (w + 1) * scalingFactor; x++) {
-					for (int y = h * scalingFactor; y < (h + 1) * scalingFactor; y++) {
+				for (int x = w * scalingFactor; x < (w + 1) * scalingFactor; x++)
+				{
+					for (int y = h * scalingFactor; y < (h + 1) * scalingFactor; y++)
+					{
 
 						// Check if it isn't over the border
-						if (x < img.getWidth() && y < img.getHeight()) {
-							if (img.getRGB(x, y) == rgbForegroundColor) {
+						if (x < img.getWidth() && y < img.getHeight())
+						{
+							if (img.getRGB(x, y) == rgbForegroundColor)
+							{
 								hasForegroundColor = true;
 								break;
 							}
@@ -103,7 +115,8 @@ public class ImageOperations {
 
 				// And set the pixel of the scaled image black if the
 				// corresponding block had any black pixel
-				if (hasForegroundColor) {
+				if (hasForegroundColor)
+				{
 					scaledImage.setRGB(w, h, rgbForegroundColor);
 				}
 			}
@@ -126,28 +139,35 @@ public class ImageOperations {
 	 * @return the scaled image
 	 */
 	protected BufferedImage scaleUpMaskImage(final BufferedImage img, final int newWidth,
-			final int newHeight) {
+			final int newHeight)
+	{
 
 		final BufferedImage scaledImage = new BufferedImage(newWidth, newHeight,
 				BufferedImage.TYPE_INT_ARGB);
 
 		// Go through every pixel of the image to scale
-		for (int w = 0; w < img.getWidth(); w++) {
-			for (int h = 0; h < img.getHeight(); h++) {
+		for (int w = 0; w < img.getWidth(); w++)
+		{
+			for (int h = 0; h < img.getHeight(); h++)
+			{
 
 				// Check if it has the foreground color
-				if (img.getRGB(w, h) == rgbForegroundColor) {
+				if (img.getRGB(w, h) == rgbForegroundColor)
+				{
 
 					// And set every pixel in the corresponding block true if it
 					// does
 					for (int x = w * scalingFactor; x < w * scalingFactor
-							+ scalingFactor; x++) {
+							+ scalingFactor; x++)
+					{
 						for (int y = h * scalingFactor; y < h * scalingFactor
-								+ scalingFactor; y++) {
+								+ scalingFactor; y++)
+						{
 
 							// So long as it doesn't go over the border
 							if (x < scaledImage.getWidth()
-									&& y < scaledImage.getHeight()) {
+									&& y < scaledImage.getHeight())
+							{
 								scaledImage.setRGB(x, y, rgbForegroundColor);
 							}
 						}
@@ -169,14 +189,17 @@ public class ImageOperations {
 	 * @return the resulting image
 	 */
 	protected BufferedImage increaseImageSize(final BufferedImage img, final int width,
-			final int height) {
+			final int height)
+	{
 		final BufferedImage newImg = new BufferedImage(width, height,
 				BufferedImage.TYPE_INT_ARGB);
 		final int[] newImgArray = ((DataBufferInt) newImg.getRaster().getDataBuffer())
 				.getData();
 		int index;
-		for (int w = img.getWidth(); w <= width; w++) {
-			for (int h = img.getHeight(); h <= height; h++) {
+		for (int w = img.getWidth(); w <= width; w++)
+		{
+			for (int h = img.getHeight(); h <= height; h++)
+			{
 				index = (h - 1) * newImg.getWidth() + w - 1;
 				newImgArray[index] = 0;
 			}
@@ -194,7 +217,8 @@ public class ImageOperations {
 	 *            the image to copy
 	 * @return a copy of that image
 	 */
-	protected BufferedImage copyImage(final BufferedImage source) {
+	protected BufferedImage copyImage(final BufferedImage source)
+	{
 		// Creates a fresh BufferedImage that has the same size and content of
 		// the source image
 		final BufferedImage copy = new BufferedImage(source.getWidth(),
@@ -216,7 +240,8 @@ public class ImageOperations {
 	 * @return
 	 */
 	protected BufferedImage overlayMaskImage(final BufferedImage image,
-			final BufferedImage overlay) {
+			final BufferedImage overlay)
+	{
 		final int[] imageArray = ((DataBufferInt) image.getRaster().getDataBuffer())
 				.getData();
 		final int[] overlayArray = ((DataBufferInt) overlay.getRaster()
@@ -224,10 +249,12 @@ public class ImageOperations {
 
 		// Go through every pixel of the image
 
-		for (int i = 0; i < imageArray.length; i++) {
+		for (int i = 0; i < imageArray.length; i++)
+		{
 
 			// And set it to black if the overlay image is black
-			if (overlayArray[i] == rgbForegroundColor) {
+			if (overlayArray[i] == rgbForegroundColor)
+			{
 				imageArray[i] = overlayArray[i];
 			}
 		}
@@ -250,7 +277,8 @@ public class ImageOperations {
 	 * @return the eroded image
 	 */
 	protected BufferedImage erodeImage(final BufferedImage img,
-			int structElementWidth, int structElementHeight) {
+			int structElementWidth, int structElementHeight)
+	{
 
 		final BufferedImage erosionedImage = new BufferedImage(img.getWidth(),
 				img.getHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -260,36 +288,44 @@ public class ImageOperations {
 		// The origin of the structuring element will be it's middle pixel
 		// Therefore make sure there is a middle pixel, ie make width and height
 		// uneven.
-		if ((structElementWidth % 2) == 0) {
+		if ((structElementWidth % 2) == 0)
+		{
 			structElementWidth++;
 		}
-		if ((structElementHeight % 2) == 0) {
+		if ((structElementHeight % 2) == 0)
+		{
 			structElementHeight++;
 		}
 
 		// Metaphorically places the structure element
 		// In every possible position
-		for (int w = 0; w < img.getWidth(); w++) {
-			for (int h = 0; h < img.getHeight(); h++) {
+		for (int w = 0; w < img.getWidth(); w++)
+		{
+			for (int h = 0; h < img.getHeight(); h++)
+			{
 
 				fits = true;
 
 				// The origin of the structuring element is it's middle pixel
 				for (int x = w - (structElementWidth / 2); x <= w
-						+ (structElementWidth / 2); x++) {
+						+ (structElementWidth / 2); x++)
+				{
 					for (int y = h - (structElementHeight / 2); y <= h
-							+ (structElementHeight / 2); y++) {
+							+ (structElementHeight / 2); y++)
+					{
 
 						// As long as the pixels not over the border
 						if (x >= 0 && x < img.getWidth() && y >= 0
-								&& y < img.getHeight()) {
+								&& y < img.getHeight())
+						{
 
 							// Assumes all the pixels in the structureImage are
 							// 1. If the pixel does not have the right color
 							// black, set fits false, set the pixel in the
 							// erosionImage to the foreground color and break
 							// the loop
-							if (img.getRGB(x, y) != rgbForegroundColor) {
+							if (img.getRGB(x, y) != rgbForegroundColor)
+							{
 								fits = false;
 								erosionedImage.setRGB(w, h, rgbBackgroundColor);
 								break;
@@ -301,7 +337,8 @@ public class ImageOperations {
 				// After every pixel was checked and if fits is true
 				// Set the pixel in the erosionImage black
 				// Some room for performance increase with a better break?
-				if (fits) {
+				if (fits)
+				{
 					erosionedImage.setRGB(w, h, rgbForegroundColor);
 				}
 			}
@@ -329,7 +366,8 @@ public class ImageOperations {
 	 * @throws IOException
 	 */
 	protected BufferedImage dilateImage(final BufferedImage img,
-			int structElementWidth, int structElementHeight) throws IOException {
+			int structElementWidth, int structElementHeight) throws IOException
+			{
 
 		final BufferedImage dilationImage = new BufferedImage(img.getWidth(),
 				img.getHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -338,17 +376,21 @@ public class ImageOperations {
 		// The origin of the structuring element will be it's middle pixel
 		// Therefore make sure there is a middle pixel, ie make width and height
 		// uneven.
-		if ((structElementWidth % 2) == 0) {
+		if ((structElementWidth % 2) == 0)
+		{
 			structElementWidth++;
 		}
-		if ((structElementHeight % 2) == 0) {
+		if ((structElementHeight % 2) == 0)
+		{
 			structElementHeight++;
 		}
 
 		// Metaphorically places the structure element
 		// In every possible position
-		for (int w = 0; w < img.getWidth(); w++) {
-			for (int h = 0; h < img.getHeight(); h++) {
+		for (int w = 0; w < img.getWidth(); w++)
+		{
+			for (int h = 0; h < img.getHeight(); h++)
+			{
 
 				hits = false;
 
@@ -357,20 +399,24 @@ public class ImageOperations {
 				// There might be some room for performance increase here
 				// The origin of the structuring element is it's middle pixel
 				for (int x = w - (structElementWidth / 2); x <= w
-						+ (structElementWidth / 2); x++) {
+						+ (structElementWidth / 2); x++)
+				{
 					for (int y = h - (structElementHeight / 2); y <= h
-							+ (structElementHeight / 2); y++) {
+							+ (structElementHeight / 2); y++)
+					{
 
 						// As long as the pixels don't go over the border
 						if (x >= 0 && x < img.getWidth() && y >= 0
-								&& y < img.getHeight()) {
+								&& y < img.getHeight())
+						{
 
 							// Assumes all the pixels in the structureImage are
 							// 1. If the pixel is black, set hits true, set the
 							// pixel in the dilationImage to the foreground
 							// color
 							// and break the loop
-							if (img.getRGB(x, y) == rgbForegroundColor) {
+							if (img.getRGB(x, y) == rgbForegroundColor)
+							{
 								hits = true;
 								dilationImage.setRGB(w, h, rgbForegroundColor);
 							}
@@ -380,13 +426,14 @@ public class ImageOperations {
 
 				// After every pixel was checked and if hits is false
 				// Set the pixel in the dilationImage to he background color
-				if (!hits) {
+				if (!hits)
+				{
 					dilationImage.setRGB(w, h, rgbBackgroundColor);
 				}
 			}
 		}
 		return dilationImage;
-	}
+			}
 
 	/**
 	 * Shrinks an image using the shrinkImage method, closes it and scales it
@@ -405,7 +452,8 @@ public class ImageOperations {
 	 * @throws IOException
 	 */
 	protected BufferedImage closeImage(BufferedImage img,
-			final int structElementWidth, final int structElementHeight) throws IOException {
+			final int structElementWidth, final int structElementHeight) throws IOException
+			{
 
 		final int scaledWidth = (int) Math.ceil(img.getWidth() / scalingFactor);
 		final int scaledHeight = (int) Math.ceil(img.getHeight() / scalingFactor);
@@ -423,5 +471,5 @@ public class ImageOperations {
 		img = scaleUpMaskImage(shrunkImg, img.getWidth(), img.getHeight());
 
 		return img;
-	}
+			}
 }

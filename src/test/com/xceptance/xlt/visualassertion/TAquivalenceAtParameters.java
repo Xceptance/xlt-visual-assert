@@ -15,6 +15,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.xceptance.xlt.visualassertion.ImageComparison;
+import com.xceptance.xlt.visualassertion.ImageComparison.Algorithm;
 
 /**
  * Tests if the FUZZY algorithm with both tolerance values = 0 and
@@ -38,9 +39,9 @@ public class TAquivalenceAtParameters
 	private static File differenceFileFuzzy;
 	private static File thrashFile;
 
-	private static ImageComparison imgCompExact = new ImageComparison(10, 10, 0, 0, 0, false, false, 0, 0, true, "EXACTLY");
-	private static ImageComparison imgCompPFuzzy = new ImageComparison(10, 10, 0, 0, 0, false, false, 0, 0, true, "PIXELFUZZY");
-	private static ImageComparison imgCompFuzzy = new ImageComparison(10, 10, 1, 0, 0, false, false, 0, 0, true, "FUZZY");
+	private static ImageComparison imgCompExact = new ImageComparison(10, 10, 0, 0, 0, false, false, 0, 0, true, Algorithm.MATCH);
+	private static ImageComparison imgCompPFuzzy = new ImageComparison(10, 10, 0, 0, 0, false, false, 0, 0, true, Algorithm.COLORFUZZY);
+	private static ImageComparison imgCompFuzzy = new ImageComparison(10, 10, 1, 0, 0, false, false, 0, 0, true, Algorithm.FUZZY);
 
 	/**
 	 * Initializes two 200 * 200 images, all pixels get a random number between
