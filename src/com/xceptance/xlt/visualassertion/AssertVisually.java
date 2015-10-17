@@ -375,14 +375,14 @@ public class AssertVisually implements WebDriverCustomModule
 
 			// Initializes ImageComparison and calls isEqual
 			final ImageComparison imagecomparison = new ImageComparison(
-					markBlockSizeX, markBlockSizeY, 
-					pixelPerBlockXY, 
-					colorTolerance,
-					pixelTolerance, 
-					trainingsModeEnabled,
-					closeMask, 
-					closeMaskWidth, closeMaskHeight, 
-					differenceImage, algorithm);
+					algorithm, markBlockSizeX, 
+					markBlockSizeY, 
+					pixelPerBlockXY,
+					colorTolerance, 
+					pixelTolerance,
+					trainingsModeEnabled, 
+					closeMask, closeMaskWidth, 
+					closeMaskHeight, differenceImage);
 
 			final boolean result = imagecomparison.isEqual(reference, screenshot, maskImageFile, markedImageFile, differenceImageFile);
 

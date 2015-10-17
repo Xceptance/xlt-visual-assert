@@ -17,7 +17,7 @@ import javax.imageio.ImageIO;
 import com.xceptance.xlt.api.util.XltLogger;
 
 /**
- * Class for comparison of images, written to continously compare screenshots of
+ * Class for comparison of images, written to continuously compare screenshots of
  * websites. The class consists of a wrapper method isEqual and several internal
  * methods. It uses the ImageOperations class.
  * 
@@ -25,31 +25,34 @@ import com.xceptance.xlt.api.util.XltLogger;
  * should be created is determined at the instantiation. The isEqual method
  * marks differences with rectangles. Their size can not be changed.
  * 
- * @author lucas & damian
+ * @author lucas & damian & rene
  */
 public class ImageComparison
 {
-
 	public enum Algorithm
 	{
 		MATCH, COLORFUZZY, FUZZY
 	}
 
-	private BufferedImage difference = null;
-	private BufferedImage maskImage = null;
-	private final int markingX, markingY, pixelPerBlockXY;
+	private BufferedImage difference;
+	private BufferedImage maskImage;
+
+	private final int markingSizeX;
+	private final int markingSizeY;
+	private final int fuzzyBlockDimension;
+
 	private int imageWidth;
 	private int imageHeight;
 	private int subImageWidth;
 	private int subImageHeight;
 
-	private final double colTolerance;
-	private final double pixTolerance;
+	private final double colorTolerance;
+	private final double pixelTolerance;
 
-	private final boolean trainingMode;
+	private final boolean trainingsMode;
 	private final boolean closeMask;
-	private final int structElementWidth;
-	private final int structElementHeight;
+	private final int closeMaskWidth;
+	private final int closeMaskHeight;
 
 	private final boolean differenceImage;
 
@@ -73,35 +76,34 @@ public class ImageComparison
 	 * closed. Black areas in the mask image will not be detected in later
 	 * comparisons.
 	 * <p>
-	 * 
 	 * @param markingX
 	 *            determines the height of the blocks used for marking and
 	 *            masking. Has to be above 0
 	 * @param markingY
 	 *            determines the width of the blocks used for marking and
 	 *            masking. Has to be above 0.
-	 * @param pixelPerBlockXY
+	 * @param fuzzyBlockDimension
 	 *            in the fuzzyEqual method, the images are divided into blocks
 	 *            for further fuzzyness. This parameter determines the width and
 	 *            height of the blocks.
-	 * @param colTolerance
+	 * @param colorTolerance
 	 *            up to where small differences in color should be tolerated. A
 	 *            value between zero and one should be given. Zero: No
 	 *            tolerance.
-	 * @param pixTolerance
+	 * @param pixelTolerance
 	 *            how many differences per block will be tolerated, in percent.
 	 *            value between zero and one should be given. One: 100%. All
 	 *            pixels can be different.
-	 * @param trainingMode
+	 * @param trainingsMode
 	 *            whether or not the training mode should be used. If true,
 	 *            differences will be masked for later tests, not marked. And
 	 *            the comparison will always return true.
 	 * @param closeMask
 	 *            decides if small gaps in the mask should be closed after a
 	 *            training run.
-	 * @param structElementWidth
+	 * @param closeMaskWidth
 	 *            determines up to which width gaps should be closed
-	 * @param structElementHeight
+	 * @param closeMaskHeight
 	 *            determines up to which height gaps should be closed
 	 * @param differenceImage
 	 *            decides if a difference image should be created in addition to
@@ -113,38 +115,30 @@ public class ImageComparison
 	 *            does not match any algorithm, it throws an
 	 *            IllegalArgumentException.
 	 */
-	public ImageComparison(final int markingX, final int markingY, final int pixelPerBlockXY,
-			final double colTolerance, final double pixTolerance, final boolean trainingMode,
-			final boolean closeMask, final int structElementWidth, final int structElementHeight,
-			final boolean differenceImage, final Algorithm algorithm)
+	public ImageComparison(final Algorithm algorithm, final int markingX, final int markingY,
+			final int fuzzyBlockDimension, final double colorTolerance, final double pixelTolerance,
+			final boolean trainingsMode, final boolean closeMask, final int closeMaskWidth,
+			final int closeMaskHeight, final boolean differenceImage)
 	{
-
 		// Check if markingX or markingY are below 1, which would make no sense
 		// and woudn't work. If they are, just throw an Exception
 		if (markingX < 1 || markingY < 1)
 		{
-			throw new IllegalArgumentException(
-					"Can't draw rectangles with a width or height of 0");
+			throw new IllegalArgumentException("Can't draw rectangles with a width or height of 0");
 		}
-		this.markingX = markingX;
-		this.markingY = markingY;
-		this.pixelPerBlockXY = pixelPerBlockXY;
-		this.colTolerance = colTolerance;
-		this.pixTolerance = pixTolerance;
-		this.trainingMode = trainingMode;
-		this.closeMask = closeMask;
-		this.structElementWidth = structElementWidth;
-		this.structElementHeight = structElementHeight;
-		this.differenceImage = differenceImage;
 
-		try
-		{
-			this.algorithm = algorithm;
-		}
-		catch (final IllegalArgumentException e)
-		{
-			throw new IllegalArgumentException("Specified algorithm not found");
-		}
+		this.algorithm = algorithm;
+
+		this.markingSizeX = markingX;
+		this.markingSizeY = markingY;
+		this.fuzzyBlockDimension = fuzzyBlockDimension;
+		this.colorTolerance = colorTolerance;
+		this.pixelTolerance = pixelTolerance;
+		this.trainingsMode = trainingsMode;
+		this.closeMask = closeMask;
+		this.closeMaskWidth = closeMaskWidth;
+		this.closeMaskHeight = closeMaskHeight;
+		this.differenceImage = differenceImage;
 	}
 
 	/**
@@ -155,7 +149,7 @@ public class ImageComparison
 	 */
 	public ImageComparison(final Algorithm algorithm)
 	{
-		this(10, 10, 10, 0.1, 0.1, false, false, 10, 10, false, algorithm);
+		this(algorithm, 10, 10, 10, 0.1, 0.1, false, false, 10, 10, false);
 	}
 
 	/**
@@ -254,13 +248,13 @@ public class ImageComparison
 			break;
 		}
 
-		// If there were differences ...
+		// If there are differences ...
 		if (differentPixels != null)
 		{
-
-			if (trainingMode)
+			if (trainingsMode)
 			{
-				// Mask differences in the maskImage
+				// Mask differences in the maskImage only
+				// do not report problems
 				maskDifferences(differentPixels);
 
 			}
@@ -283,18 +277,17 @@ public class ImageComparison
 		// trainingmode was false
 		if (closeMask)
 		{
-			maskImage = imageoperations.closeImage(maskImage,
-					structElementWidth, structElementHeight);
+			maskImage = imageoperations.closeImage(maskImage, closeMaskWidth, closeMaskHeight);
 		}
 
 		// Save the maskImage if trainingMode was on or
 		// The maskImage should be closed
-		if (trainingMode || closeMask)
+		if (trainingsMode || closeMask)
 		{
 			ImageIO.write(maskImage, "PNG", fileMask);
 		}
 
-		if (!trainingMode)
+		if (!trainingsMode)
 		{
 			// If the size of the image changed, mark the
 			// previously nonexistant areas and set isEqual false
@@ -367,7 +360,7 @@ public class ImageComparison
 
 				// draws the differenceImage if needed
 
-				if (difference > colTolerance)
+				if (difference > colorTolerance)
 				{
 					xCoords.add(x);
 					yCoords.add(y);
@@ -408,7 +401,6 @@ public class ImageComparison
 
 	/**
 	 * Method for the exact pixel based comparison . Zero tolerance.
-	 * ColTolerance is not used.
 	 * <p>
 	 * 
 	 * @param img1
@@ -445,6 +437,7 @@ public class ImageComparison
 				}
 			}
 		}
+
 		int s = xCoords.size();
 		final int[] xArray = new int[s];
 		for (int i = 0; i < s; i++)
@@ -504,18 +497,18 @@ public class ImageComparison
 		int differencesAllowed;
 
 		// Create blocks, go through every block
-		final int xBlock = imageWidth / pixelPerBlockXY;
-		final int yBlock = imageHeight / pixelPerBlockXY;
+		final int xBlock = imageWidth / fuzzyBlockDimension;
+		final int yBlock = imageHeight / fuzzyBlockDimension;
 
 		for (int x = 0; x < xBlock; x++)
 		{
 			for (int y = 0; y < yBlock; y++)
 			{
-				subImageWidth = calcPixSpan(pixelPerBlockXY, x, imageWidth);
-				subImageHeight = calcPixSpan(pixelPerBlockXY, y, imageHeight);
+				subImageWidth = calcPixSpan(fuzzyBlockDimension, x, imageWidth);
+				subImageHeight = calcPixSpan(fuzzyBlockDimension, y, imageHeight);
 				int differencesPerBlock = 0;
 				differencesAllowed = (int) Math.floor(subImageWidth
-						* subImageHeight * pixTolerance);
+						* subImageHeight * pixelTolerance);
 
 				// Go through every pixel in that block
 				for (int w = 0; w < subImageWidth; w++)
@@ -523,8 +516,8 @@ public class ImageComparison
 					for (int h = 0; h < subImageHeight; h++)
 					{
 
-						final int xCoord = x * pixelPerBlockXY + w;
-						final int yCoord = y * pixelPerBlockXY + h;
+						final int xCoord = x * fuzzyBlockDimension + w;
+						final int yCoord = y * fuzzyBlockDimension + h;
 
 						// calculate the difference and draw the differenceImage
 						// if needed
@@ -532,7 +525,7 @@ public class ImageComparison
 								yCoord, img1, img2);
 
 						// If there is a notable difference
-						if (difference > colTolerance)
+						if (difference > colorTolerance)
 						{
 
 							// Increment differencesPerBlock and add the
@@ -674,28 +667,29 @@ public class ImageComparison
 	 */
 	private Color getComplementary(final Color currentColor)
 	{
-		final int red = currentColor.getRed();
-		final int green = currentColor.getGreen();
-		final int blue = currentColor.getBlue();
+		final double redLimit = 0.8;
 
-		int biggest = Math.max(red, green);
-		biggest = Math.max(biggest, blue);
+		final int nonRedSum = currentColor.getGreen() + currentColor.getBlue();
 
-		Color newColor = Color.WHITE;
-
-		if (biggest == red)
+		if (nonRedSum == 0)
 		{
-			newColor = Color.GREEN;
+			// only red
+			return Color.RED;
 		}
-		if (biggest == blue)
+		if (currentColor.getRed() < currentColor.getBlue() || currentColor.getRed() < currentColor.getGreen())
 		{
-			newColor = Color.RED;
+			// red does not dominate
+			return Color.RED;
 		}
-		if ((biggest - green) < 30)
+		else if ((currentColor.getRed() / nonRedSum) > redLimit )
 		{
-			newColor = Color.RED;
+			// red is strong in that one
+			return Color.GREEN;
 		}
-		return newColor;
+		else
+		{
+			return Color.RED;
+		}
 	}
 
 	/**
@@ -712,40 +706,43 @@ public class ImageComparison
 	 */
 	private void markDifferences(final BufferedImage image, final int[][] pixels)
 	{
-
 		// Check if markingX or markingY are 1. If they are, just mark every
 		// different pixel,
 		// don't bother with rectangles
-		if (markingX == 1 || markingY == 1)
+		if (markingSizeX == 1 || markingSizeY == 1)
 		{
 			for (int i = 0; i < pixels.length; i++)
 			{
 				colorPixel(image, pixels[i][0], pixels[i][1]);
 			}
+
+			return;
 		}
 
 		// And if markingX and markingY are above one, paint rectangles!
 		// Normal case
-		else
+		final int blocksX = imageWidth / markingSizeX;
+		final int blocksY = imageHeight / markingSizeY;
+
+		final boolean[][] markedBlocks = new boolean[blocksX + 1][blocksY + 1];
+
+		for (final boolean[] row : markedBlocks)
 		{
-			final int blocksX = imageWidth / markingX;
-			final int blocksY = imageHeight / markingY;
-			final boolean[][] markedBlocks = new boolean[blocksX + 1][blocksY + 1];
-			for (final boolean[] row : markedBlocks)
+			Arrays.fill(row, false);
+		}
+
+		for (int x = 0; x < pixels.length; x++)
+		{
+			final int xBlock = pixels[x][0] / markingSizeX;
+			final int yBlock = pixels[x][1] / markingSizeY;
+
+			if (!markedBlocks[xBlock][yBlock])
 			{
-				Arrays.fill(row, false);
-			}
-			for (int x = 0; x < pixels.length; x++)
-			{
-				final int xBlock = pixels[x][0] / markingX;
-				final int yBlock = pixels[x][1] / markingY;
-				if (!markedBlocks[xBlock][yBlock])
-				{
-					subImageWidth = calcPixSpan(markingX, xBlock, imageWidth);
-					subImageHeight = calcPixSpan(markingY, yBlock, imageHeight);
-					drawBorders(image, xBlock, yBlock, markingX, markingY);
-					markedBlocks[xBlock][yBlock] = true;
-				}
+				subImageWidth = calcPixSpan(markingSizeX, xBlock, imageWidth);
+				subImageHeight = calcPixSpan(markingSizeY, yBlock, imageHeight);
+
+				drawBorders(image, xBlock, yBlock, markingSizeX, markingSizeY);
+				markedBlocks[xBlock][yBlock] = true;
 			}
 		}
 	}
@@ -768,10 +765,10 @@ public class ImageComparison
 
 		for (int i = 0; i < pixels.length; i++)
 		{
-			final int x = Math.max(0, pixels[i][0] - (markingX / 2));
-			final int y = Math.max(0, pixels[i][1] - (markingY / 2));
+			final int x = Math.max(0, pixels[i][0] - (markingSizeX / 2));
+			final int y = Math.max(0, pixels[i][1] - (markingSizeY / 2));
 
-			drawBlackRectangle(maskImage, x, y, markingX, markingY);
+			drawBlackRectangle(maskImage, x, y, markingSizeX, markingSizeY);
 		}
 
 		final long e = System.currentTimeMillis();

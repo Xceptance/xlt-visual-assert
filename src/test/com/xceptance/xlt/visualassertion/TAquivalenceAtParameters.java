@@ -39,9 +39,9 @@ public class TAquivalenceAtParameters
 	private static File differenceFileFuzzy;
 	private static File thrashFile;
 
-	private static ImageComparison imgCompExact = new ImageComparison(10, 10, 0, 0, 0, false, false, 0, 0, true, Algorithm.MATCH);
-	private static ImageComparison imgCompPFuzzy = new ImageComparison(10, 10, 0, 0, 0, false, false, 0, 0, true, Algorithm.COLORFUZZY);
-	private static ImageComparison imgCompFuzzy = new ImageComparison(10, 10, 1, 0, 0, false, false, 0, 0, true, Algorithm.FUZZY);
+	private static ImageComparison imgCompExact = new ImageComparison(Algorithm.MATCH, 10, 10, 0, 0, 0, false, false, 0, 0, true);
+	private static ImageComparison imgCompPFuzzy = new ImageComparison(Algorithm.COLORFUZZY, 10, 10, 0, 0, 0, false, false, 0, 0, true);
+	private static ImageComparison imgCompFuzzy = new ImageComparison(Algorithm.FUZZY, 10, 10, 1, 0, 0, false, false, 0, 0, true);
 
 	/**
 	 * Initializes two 200 * 200 images, all pixels get a random number between

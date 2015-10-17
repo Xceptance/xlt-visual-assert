@@ -9,35 +9,46 @@ import test.com.xceptance.xlt.visualassertion.ImageTest;
 
 import com.xceptance.xlt.visualassertion.ImageComparison.Algorithm;
 
+/**
+ * Tests the exact compare mode.
+ * 
+ * @author rschwietzke
+ *
+ */
 public class ExactMatch extends ImageTest
 {
 	@Test
 	public void blank() throws IOException
 	{
-		final TestCompare tc = new TestCompare().compare(Algorithm.MATCH, "blank.png", "blank.png");
-		Assert.assertTrue(tc.result);
-		Assert.assertFalse(tc.markedFileAsResult.exists());
+		new TestCompare().
+		match("blank.png").to("blank.png").
+		isEqual().hasNoMarking();
 	}
 
 	@Test
 	public void photo() throws IOException
 	{
-		final TestCompare tc = new TestCompare().compare(Algorithm.MATCH, "photo.png", "photo.png");
-		Assert.assertTrue(tc.result);
-		Assert.assertFalse(tc.markedFileAsResult.exists());
+		new TestCompare().
+		match("photo.png").to("photo.png").
+		isEqual().hasNoMarking();
 	}
 
 	@Test
 	public void photoSameButDifferentFile() throws IOException
 	{
-		final TestCompare tc = new TestCompare().compare(Algorithm.MATCH, "photo.png", "photo2.png");
-		Assert.assertTrue(tc.result);
-		Assert.assertFalse(tc.markedFileAsResult.exists());
+		new TestCompare().
+		match("photo.png").to("photo2.png").
+		isEqual().hasNoMarking();
 	}	
 
 	@Test
 	public void noMatchPixelDiff() throws IOException
 	{
+		new TestCompare().
+		match("blank.png").to("oneblackpixel.png").
+		isNotEqual().
+		hasMarking("fivePixelsSmallerRect.png");
+
 		final TestCompare tc = new TestCompare().compare(Algorithm.MATCH, "blank.png", "oneblackpixel.png");
 		Assert.assertFalse(tc.result);
 		Assert.assertTrue(compareFiles("noMatchPixelMaskExpected.png", tc.markedFileAsResult));
