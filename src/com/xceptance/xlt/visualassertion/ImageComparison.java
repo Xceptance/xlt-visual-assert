@@ -623,7 +623,7 @@ public class ImageComparison
 	 * @return the difference between the colors as an int value. Higher ->
 	 *         Bigger difference
 	 */
-	private static double calculatePixelRGBDiff(final int rgb1, final int rgb2)
+	public static double calculatePixelRGBDiff(final int rgb1, final int rgb2)
 	{
 		final double MAXDIFF = 721.2489168102785;
 
