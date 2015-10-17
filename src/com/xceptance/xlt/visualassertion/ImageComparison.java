@@ -620,8 +620,7 @@ public class ImageComparison
 	 *            color number 1
 	 * @param rgb2
 	 *            color number 2
-	 * @return the difference between the colors as an int value. Higher ->
-	 *         Bigger difference
+	 * @return the difference between the colors as percent from 0.0 to 1.0
 	 */
 	public static double calculatePixelRGBDiff(final int rgb1, final int rgb2)
 	{
