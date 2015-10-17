@@ -1,13 +1,8 @@
 package test.com.xceptance.xlt.visualassertion.exactmatch;
 
-import java.io.IOException;
-
-import org.junit.Assert;
 import org.junit.Test;
 
 import test.com.xceptance.xlt.visualassertion.ImageTest;
-
-import com.xceptance.xlt.visualassertion.ImageComparison.Algorithm;
 
 /**
  * Tests the exact compare mode.
@@ -18,7 +13,7 @@ import com.xceptance.xlt.visualassertion.ImageComparison.Algorithm;
 public class ExactMatch extends ImageTest
 {
 	@Test
-	public void blank() throws IOException
+	public void blank() 
 	{
 		new TestCompare().
 		match("blank.png").to("blank.png").
@@ -26,7 +21,7 @@ public class ExactMatch extends ImageTest
 	}
 
 	@Test
-	public void photo() throws IOException
+	public void photo() 
 	{
 		new TestCompare().
 		match("photo.png").to("photo.png").
@@ -34,7 +29,7 @@ public class ExactMatch extends ImageTest
 	}
 
 	@Test
-	public void photoSameButDifferentFile() throws IOException
+	public void photoSameButDifferentFile() 
 	{
 		new TestCompare().
 		match("photo.png").to("photo2.png").
@@ -42,39 +37,38 @@ public class ExactMatch extends ImageTest
 	}	
 
 	@Test
-	public void noMatchPixelDiff() throws IOException
+	public void noMatchPixelDiff() 
 	{
 		new TestCompare().
 		match("blank.png").to("oneblackpixel.png").
 		isNotEqual().
-		hasMarking("fivePixelsSmallerRect.png");
-
-		final TestCompare tc = new TestCompare().compare(Algorithm.MATCH, "blank.png", "oneblackpixel.png");
-		Assert.assertFalse(tc.result);
-		Assert.assertTrue(compareFiles("noMatchPixelMaskExpected.png", tc.markedFileAsResult));
+		hasMarking("noMatchPixelDiff.png");
 	}		
 
 	@Test
-	public void noMatchDifferentSize() throws IOException
+	public void noMatchDifferentSize() 
 	{
-		final TestCompare tc = new TestCompare().compare(Algorithm.MATCH, "photo.png", "photo-205x205.png");
-		Assert.assertFalse(tc.result);
-		Assert.assertTrue(compareFiles("photo-205x205-MaskExpected.png", tc.markedFileAsResult));
+		new TestCompare().
+		match("photo.png").to("photo-205x205.png").
+		isNotEqual().
+		hasMarking("photo-205x205-MaskExpected.png");
 	}	
 
 	@Test
-	public void noMatchDifferentSizeReversed() throws IOException
+	public void noMatchDifferentSizeReversed() 
 	{
-		final TestCompare tc = new TestCompare().compare(Algorithm.MATCH, "photo-205x205.png", "photo.png");
-		Assert.assertFalse(tc.result);
-		Assert.assertTrue(compareFiles("photo-205x205-ReversedMaskExpected.png", tc.markedFileAsResult));
+		new TestCompare().
+		match("photo-205x205.png").to("photo.png").
+		isNotEqual().
+		hasMarking("photo-205x205-ReversedMaskExpected.png");
 	}		
 
 	@Test
-	public void noMatchNegated() throws IOException
+	public void noMatchNegated() 
 	{
-		final TestCompare tc = new TestCompare().compare(Algorithm.MATCH, "blank.png", "negated-blank.png");
-		Assert.assertFalse(tc.result);
-		Assert.assertTrue(compareFiles("negated-MaskExpected.png", tc.markedFileAsResult));
+		new TestCompare().
+		match("blank.png").to("negated-blank.png").
+		isNotEqual().
+		hasMarking("negated-MaskExpected.png");
 	}		
 }

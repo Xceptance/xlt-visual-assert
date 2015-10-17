@@ -19,7 +19,7 @@ public class Mark extends ImageTest
 	 * @throws IOException
 	 */
 	@Test
-	public void pixel0x0() throws IOException
+	public void pixel0x0() 
 	{
 		new TestCompare().
 		match("white-35x35.png").to("white-35x35-1pixel-0x0.png").
@@ -32,7 +32,7 @@ public class Mark extends ImageTest
 	 * @throws IOException
 	 */
 	@Test
-	public void pixel1x1() throws IOException
+	public void pixel1x1()
 	{
 		new TestCompare().
 		match("white-35x35.png").to("white-35x35-1pixel-1x1.png").
@@ -45,7 +45,7 @@ public class Mark extends ImageTest
 	 * @throws IOException
 	 */
 	@Test
-	public void pixels10x10() throws IOException
+	public void pixels10x10() 
 	{
 		new TestCompare().
 		match("white-35x35.png").to("white-35x35-4pixels-10x10.png").
@@ -59,7 +59,7 @@ public class Mark extends ImageTest
 	 * @throws IOException
 	 */
 	@Test
-	public void fivePixelsSmallerRect() throws IOException
+	public void fivePixelsSmallerRect() 
 	{
 		new TestCompare().
 		match("white-35x35.png").to("white-35x35-5pixels.png").
@@ -73,7 +73,7 @@ public class Mark extends ImageTest
 	 * @throws IOException
 	 */
 	@Test
-	public void fivePixelsMark5x5() throws IOException
+	public void fivePixelsMark5x5() 
 	{
 		new TestCompare().
 		match("white-35x35.png").to("white-35x35-5pixels.png").mark(5,5).
@@ -86,7 +86,7 @@ public class Mark extends ImageTest
 	 * @throws IOException
 	 */
 	@Test
-	public void markPixelsOnly() throws IOException
+	public void markPixelsOnly()
 	{
 		new TestCompare().
 		match("white-35x35.png").to("white-35x35-5pixels.png").mark(1,1).
@@ -100,7 +100,7 @@ public class Mark extends ImageTest
 	 * @throws IOException
 	 */
 	@Test
-	public void markNonSquare() throws IOException
+	public void markNonSquare() 
 	{
 		new TestCompare().
 		match("white-35x35.png").to("white-35x35-5pixels.png").mark(5,3).
@@ -114,7 +114,7 @@ public class Mark extends ImageTest
 	 * @throws IOException
 	 */
 	@Test
-	public void markNonSquareClosed() throws IOException
+	public void markNonSquareClosed() 
 	{
 		new TestCompare().
 		match("white-35x35.png").to("white-35x35-5pixels.png").mark(2,2).
