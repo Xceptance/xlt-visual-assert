@@ -238,13 +238,13 @@ public class ImageComparison
 		switch (algorithm)
 		{
 		case MATCH:
-			differentPixels = exactlyEqual(baselineImageCopy, compareImageCopy);
+			differentPixels = exactCompare(baselineImageCopy, compareImageCopy);
 			break;
 		case COLORFUZZY:
-			differentPixels = pixelFuzzyEqual(baselineImageCopy, compareImageCopy);
+			differentPixels = colorFuzzyCompare(baselineImageCopy, compareImageCopy);
 			break;
 		case FUZZY:
-			differentPixels = fuzzyEqual(baselineImageCopy, compareImageCopy);
+			differentPixels = fuzzyCompare(baselineImageCopy, compareImageCopy);
 			break;
 		}
 
@@ -338,25 +338,25 @@ public class ImageComparison
 	 * @return an array with the coordinates of the pixels where there were
 	 *         differences, null if there were no differences
 	 */
-	private int[][] pixelFuzzyEqual(final BufferedImage img1, final BufferedImage img2)
+	private int[][] colorFuzzyCompare(final BufferedImage img1, final BufferedImage img2)
 			throws IOException
 			{
-
 		boolean equal = true;
+
 		final ArrayList<Integer> xCoords = new ArrayList<Integer>();
 		final ArrayList<Integer> yCoords = new ArrayList<Integer>();
 
 		final int imagewidth = img1.getWidth();
 		final int imageheight = img1.getHeight();
+
 		for (int x = 0; x < imagewidth; x++)
 		{
 			for (int y = 0; y < imageheight; y++)
 			{
-
 				// calculates difference and adds the coordinates to
 				// the relevant ArrayList if the difference is above the
 				// colTolerance
-				final double difference = calculatePixelRgbDiff(x, y, img1, img2);
+				final double difference = calculatePixelRGBDiff(img1.getRGB(x, y), img2.getRGB(x, y));
 
 				// draws the differenceImage if needed
 
@@ -410,7 +410,7 @@ public class ImageComparison
 	 * @return an array with the coordinates of the pixels where there were
 	 *         differences, null if there were no differences
 	 */
-	private int[][] exactlyEqual(final BufferedImage img1, final BufferedImage img2)
+	private int[][] exactCompare(final BufferedImage img1, final BufferedImage img2)
 			throws IOException
 			{
 		/* Method for the exact comparison of two images */
@@ -483,7 +483,7 @@ public class ImageComparison
 	 *         differences, null if there were no differences
 	 * @throws IOException
 	 */
-	private int[][] fuzzyEqual(final BufferedImage img1, final BufferedImage img2)
+	private int[][] fuzzyCompare(final BufferedImage img1, final BufferedImage img2)
 			throws IOException
 			{
 
@@ -521,8 +521,7 @@ public class ImageComparison
 
 						// calculate the difference and draw the differenceImage
 						// if needed
-						final double difference = calculatePixelRgbDiff(xCoord,
-								yCoord, img1, img2);
+						final double difference = calculatePixelRGBDiff(img1.getRGB(xCoord, yCoord), img2.getRGB(xCoord, yCoord));
 
 						// If there is a notable difference
 						if (difference > colorTolerance)
@@ -617,21 +616,16 @@ public class ImageComparison
 	 * http://www.compuphase.com/cmetric.htm . The algorithm is based on
 	 * experiments with people, not theoretics. It is thereby not certain.
 	 * 
-	 * @param x
-	 *            the first color as an rgb value
-	 * @param y
-	 *            the second color as an rgb value
+	 * @param rgb1
+	 *            color number 1
+	 * @param rgb2
+	 *            color number 2
 	 * @return the difference between the colors as an int value. Higher ->
 	 *         Bigger difference
 	 */
-	private double calculatePixelRgbDiff(final int x, final int y, final BufferedImage img1,
-			final BufferedImage img2)
+	private static double calculatePixelRGBDiff(final int rgb1, final int rgb2)
 	{
-
 		final double MAXDIFF = 721.2489168102785;
-
-		final int rgb1 = img1.getRGB(x, y);
-		final int rgb2 = img2.getRGB(x, y);
 
 		// Initialize the red, green, blue values
 		final int r1 = (rgb1 >> 16) & 0xFF;
@@ -650,8 +644,7 @@ public class ImageComparison
 		final double gWeight = 4.0;
 		final double bWeight = 2 + ((255 - rLevel) / 256);
 
-		final double cDiff = Math.sqrt(rWeight * rDiff * rDiff + gWeight * gDiff
-				* gDiff + bWeight * bDiff * bDiff);
+		final double cDiff = Math.sqrt(rWeight * rDiff * rDiff + gWeight * gDiff * gDiff + bWeight * bDiff * bDiff);
 
 		final double cDiffInPercent = cDiff / MAXDIFF;
 
@@ -918,20 +911,13 @@ public class ImageComparison
 	 * 
 	 * @param differentPixels
 	 */
-	private void drawDifferencesToImage(final BufferedImage reference,
-			final BufferedImage toCompare, final int[][] differentPixels)
+	private void drawDifferencesToImage(final BufferedImage reference, final BufferedImage toCompare, final int[][] differentPixels)
 	{
-
-		double rgbDifference;
-
-		// Go through the differentPixels array, get the difference and
-		// draw the pixel into
+		// Go through the differentPixels array, get the difference and draw the pixel into
 		for (int i = 0; i < differentPixels.length; i++)
 		{
-			rgbDifference = calculatePixelRgbDiff(differentPixels[i][0],
-					differentPixels[i][1], reference, toCompare);
-			drawDifferencePixel(rgbDifference, differentPixels[i][0],
-					differentPixels[i][1]);
+			final double rgbDifference = calculatePixelRGBDiff(reference.getRGB(differentPixels[i][0], differentPixels[i][1]), toCompare.getRGB(differentPixels[i][0], differentPixels[i][1]));
+			drawDifferencePixel(rgbDifference, differentPixels[i][0], differentPixels[i][1]);
 		}
 	}
 

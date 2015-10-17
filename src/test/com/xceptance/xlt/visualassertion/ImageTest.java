@@ -107,7 +107,13 @@ public abstract class ImageTest
 
 			return this;
 		}
+		public TestCompare colorFuzzy(final String baselineImagePath)
+		{
+			this.algorithm = Algorithm.COLORFUZZY;
+			this.baselineImagePath = baselineImagePath;
 
+			return this;
+		}
 		public TestCompare to( final String toCompareToImagePath)
 		{
 			this.toCompareToImagePath = toCompareToImagePath;
