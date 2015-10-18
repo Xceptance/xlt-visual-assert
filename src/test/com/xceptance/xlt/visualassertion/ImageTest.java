@@ -80,7 +80,7 @@ public abstract class ImageTest
 
 		private final int fuzzyBlockDimension = 10;
 		private double colorTolerance = 0.1;
-		private final double pixTolerance = 0.1;
+		private double pixelTolerance = 0.1;
 		private final boolean trainingMode = false;
 		private final boolean closeMask = false;
 		private final int structElementWidth = 10;
@@ -107,7 +107,7 @@ public abstract class ImageTest
 			{
 				markedFileAsResult = getTempFile("marked", ".png");
 
-				final ImageComparison imagecomparison = new ImageComparison(algorithm, markingSizeX, markingSizeY, fuzzyBlockDimension, colorTolerance, pixTolerance, trainingMode, closeMask, structElementWidth, structElementHeight, differenceImage);
+				final ImageComparison imagecomparison = new ImageComparison(algorithm, markingSizeX, markingSizeY, fuzzyBlockDimension, colorTolerance, pixelTolerance, trainingMode, closeMask, structElementWidth, structElementHeight, differenceImage);
 				imagecomparison.setMainMarkingColor(markingColor);
 				result = imagecomparison.isEqual(baselineImage, toCompareToImage, maskFile, markedFileAsResult, differenceFile);	
 			}
@@ -230,9 +230,12 @@ public abstract class ImageTest
 			this.colorTolerance = diff;
 			return this;
 		}
+		public TestCompare pixelDifference(final double diff)
+		{
+			this.pixelTolerance = diff;
+			return this;
+		}	
 	}
-
-
 
 	protected File createTestImageGradient(final Color startColor, final int r, final int g, final int b) throws IOException
 	{

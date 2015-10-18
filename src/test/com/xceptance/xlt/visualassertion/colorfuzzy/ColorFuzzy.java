@@ -142,4 +142,15 @@ public class ColorFuzzy extends ImageTest
 		final File b = createTestImage2DGradient(Color.BLACK, Color.GREEN);
 		new TestCompare().colorFuzzy("red-256x256.png").to(b).mark(1, 1).markColor(Color.BLUE).colorDifference(0.2).isNotEqual().hasMarking("gradient2DRed_2_Color05.png");
 	}	
+
+	/**
+	 * Test default, ok, change the color spectrum. make sure pixel diff does not change a thing
+	 * @throws IOException
+	 */
+	@Test
+	public void gradient2DRed_2_Color05_PixelDiffSet() throws IOException 
+	{
+		final File b = createTestImage2DGradient(Color.BLACK, Color.GREEN);
+		new TestCompare().colorFuzzy("red-256x256.png").to(b).mark(1, 1).markColor(Color.BLUE).colorDifference(0.2).pixelDifference(0.5).isNotEqual().hasMarking("gradient2DRed_2_Color05.png");
+	}	
 }
