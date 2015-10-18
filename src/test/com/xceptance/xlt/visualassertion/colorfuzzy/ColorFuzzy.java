@@ -106,7 +106,7 @@ public class ColorFuzzy extends ImageTest
 	@Test
 	public void gradient2DBlack_Color01() throws IOException 
 	{
-		final File b = createTestImage2DGradient(Color.BLACK);
+		final File b = createTestImage2DGradient(Color.BLACK, Color.BLUE);
 		new TestCompare().colorFuzzy(b).to("black-256x256.png").mark(1, 1).isNotEqual().hasMarking("gradient2DBlack_Color01.png");
 	}
 
@@ -117,7 +117,29 @@ public class ColorFuzzy extends ImageTest
 	@Test
 	public void gradient2DBlack_Color05() throws IOException 
 	{
-		final File b = createTestImage2DGradient(Color.BLACK);
+		final File b = createTestImage2DGradient(Color.BLACK, Color.BLUE);
 		new TestCompare().colorFuzzy(b).to("black-256x256.png").mark(1, 1).colorDifference(0.5).isNotEqual().hasMarking("gradient2DBlack_Color05.png");
+	}	
+
+	/**
+	 * Test default, ok, change the color spectrum
+	 * @throws IOException
+	 */
+	@Test
+	public void gradient2DRed_Color05() throws IOException 
+	{
+		final File b = createTestImage2DGradient(Color.BLACK, Color.GREEN);
+		new TestCompare().colorFuzzy(b).to("red-256x256.png").mark(1, 1).markColor(Color.BLUE).colorDifference(0.5).isNotEqual().hasMarking("gradient2DRed_Color05.png");
+	}	
+
+	/**
+	 * Test default, ok, change the color spectrum
+	 * @throws IOException
+	 */
+	@Test
+	public void gradient2DRed_2_Color05() throws IOException 
+	{
+		final File b = createTestImage2DGradient(Color.BLACK, Color.GREEN);
+		new TestCompare().colorFuzzy("red-256x256.png").to(b).mark(1, 1).markColor(Color.BLUE).colorDifference(0.2).isNotEqual().hasMarking("gradient2DRed_2_Color05.png");
 	}	
 }

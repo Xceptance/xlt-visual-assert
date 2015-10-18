@@ -71,6 +71,8 @@ public abstract class ImageTest
 		private File markedFileAsResult;
 		private File differenceFile;
 
+		private Color markingColor = Color.RED;
+
 		private boolean result;
 
 		private int markingSizeX = 10;
@@ -106,6 +108,7 @@ public abstract class ImageTest
 				markedFileAsResult = getTempFile("marked", ".png");
 
 				final ImageComparison imagecomparison = new ImageComparison(algorithm, markingSizeX, markingSizeY, fuzzyBlockDimension, colorTolerance, pixTolerance, trainingMode, closeMask, structElementWidth, structElementHeight, differenceImage);
+				imagecomparison.setMainMarkingColor(markingColor);
 				result = imagecomparison.isEqual(baselineImage, toCompareToImage, maskFile, markedFileAsResult, differenceFile);	
 			}
 			catch(final IOException ioe)
@@ -217,7 +220,11 @@ public abstract class ImageTest
 			this.markingSizeY = y;
 			return this;
 		}
-
+		public TestCompare markColor(final Color markingColor)
+		{
+			this.markingColor = markingColor;
+			return this;
+		}
 		public TestCompare colorDifference(final double diff)
 		{
 			this.colorTolerance = diff;
@@ -258,17 +265,30 @@ public abstract class ImageTest
 		return saveImage(img);
 	}
 
-	protected File createTestImage2DGradient(final Color startColor) throws IOException
+	protected File createTestImage2DGradient(final Color startColor, final Color constant) throws IOException
 	{
 		final BufferedImage img = new BufferedImage(256, 256, BufferedImage.TYPE_INT_RGB);
 
 		img.setRGB(0, 0, startColor.getRGB());
 
-		for (int w = 1; w < img.getWidth(); w++)
+		for (int w = 0; w < img.getWidth(); w++)
 		{
-			for (int h = 1; h < img.getWidth(); h++)
+			for (int h = 0; h < img.getWidth(); h++)
 			{
-				img.setRGB(w, h, new Color(w, h, 0).getRGB());
+				int color = 0;
+				if (constant == Color.RED)
+				{
+					color = new Color(0, w, h).getRGB();
+				}
+				else if (constant == Color.GREEN)
+				{
+					color = new Color(w, 0, h).getRGB();
+				}
+				else if (constant == Color.BLUE)
+				{
+					color = new Color(w, h, 0).getRGB();
+				}
+				img.setRGB(w, h, color);
 			}
 		}
 		return saveImage(img);

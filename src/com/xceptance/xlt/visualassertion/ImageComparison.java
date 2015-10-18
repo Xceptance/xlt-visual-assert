@@ -34,6 +34,8 @@ public class ImageComparison
 		MATCH, COLORFUZZY, FUZZY
 	}
 
+	private Color mainMarkingColor = Color.RED;
+
 	private BufferedImage difference;
 	private BufferedImage maskImage;
 
@@ -824,7 +826,16 @@ public class ImageComparison
 
 		rgb = image.getRGB(x, y);
 		currentColor = new Color(rgb);
-		newColor = getComplementary(currentColor);
+
+		// just in case we overwrote the marking color
+		if (mainMarkingColor == Color.RED)
+		{
+			newColor = getComplementary(currentColor);
+		}
+		else 
+		{
+			newColor = mainMarkingColor;
+		}
 		newRgb = newColor.getRGB();
 		image.setRGB(x, y, newRgb);
 	}
@@ -978,4 +989,9 @@ public class ImageComparison
 		Arrays.fill(maskArray, rgbTransparentWhite);
 		return mask;
 			}
+
+	public void setMainMarkingColor(final Color mainMarkingColor)
+	{
+		this.mainMarkingColor = mainMarkingColor;
+	}
 }
