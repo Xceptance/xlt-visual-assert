@@ -147,6 +147,21 @@ public abstract class ImageTest
 
 			return this;
 		}
+		public TestCompare fuzzy(final String baselineImagePath)
+		{
+			this.algorithm = Algorithm.FUZZY;
+			try
+			{
+				this.baselineImage = loadImage(baselineImagePath);
+			}
+			catch (final IOException e)
+			{
+				Assert.fail(e.getMessage());
+			}
+
+			return this;
+		}		
+
 		public TestCompare colorFuzzy(final File baselineFile)
 		{
 			this.algorithm = Algorithm.COLORFUZZY;
