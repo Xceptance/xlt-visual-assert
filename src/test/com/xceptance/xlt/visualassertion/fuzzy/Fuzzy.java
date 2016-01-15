@@ -162,5 +162,34 @@ public class Fuzzy extends ImageTest
 		pixelDifference(0.0).
 		isNotEqual();
 	}	
+
+	/**
+	 * Test more tolerance but on a smaller area
+	 * @throws IOException
+	 */
+	@Test
+	public void pixel_02_color_02_dimension_3_noDifference() 
+	{
+		new TestCompare().
+		fuzzy("white-10x10.png").to("white-10x10.png").
+		colorDifference(0.1).
+		pixelDifference(0.1).
+		fuzzyBlockDimension(3).
+		isEqual();
+	}	
+
+	/**
+	 * Test more tolerance but on a smaller area
+	 * @throws IOException
+	 */
+	@Test
+	public void pixel_02_color_02_dimension_3_difference_1_pixel() 
+	{
+		new TestCompare().fuzzy("white-10x10.png").to("white-10x10-1pixel.png").colorDifference(0.1).pixelDifference(0.1).fuzzyBlockDimension(3).isNotEqual(); // 0.9 pixels diff
+		new TestCompare().fuzzy("white-10x10.png").to("white-10x10-1pixel.png").colorDifference(0.1).pixelDifference(0.11).fuzzyBlockDimension(3).isNotEqual(); // 1/9 pixels diff
+		new TestCompare().fuzzy("white-10x10.png").to("white-10x10-1pixel.png").colorDifference(0.1).pixelDifference(0.12).fuzzyBlockDimension(3).isEqual(); // > 1/9 pixels diff
+	}	
+
+
 }
 

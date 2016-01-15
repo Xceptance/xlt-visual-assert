@@ -78,6 +78,10 @@ public class ImageComparison
 	 * closed. Black areas in the mask image will not be detected in later
 	 * comparisons.
 	 * <p>
+	 * @param algorithm
+	 *            the algorithm the comparison should use. If the given string
+	 *            does not match any algorithm, it throws an
+	 *            IllegalArgumentException.
 	 * @param markingX
 	 *            determines the height of the blocks used for marking and
 	 *            masking. Has to be above 0
@@ -112,10 +116,6 @@ public class ImageComparison
 	 *            the markedImage. The difference image is a greyscale image,
 	 *            the higher the difference between the compared images, the
 	 *            lighter the corresponding area in the difference image.
-	 * @param comparisonAlgorithm
-	 *            the algorithm the comparison should use. If the given string
-	 *            does not match any algorithm, it throws an
-	 *            IllegalArgumentException.
 	 */
 	public ImageComparison(final Algorithm algorithm, final int markingX, final int markingY,
 			final int fuzzyBlockDimension, final double colorTolerance, final double pixelTolerance,

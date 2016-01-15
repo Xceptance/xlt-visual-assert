@@ -78,7 +78,7 @@ public abstract class ImageTest
 		private int markingSizeX = 10;
 		private int markingSizeY = 10;
 
-		private final int fuzzyBlockDimension = 10;
+		private int fuzzyBlockDimension = 10;
 		private double colorTolerance = 0.1;
 		private double pixelTolerance = 0.1;
 		private final boolean trainingMode = false;
@@ -161,6 +161,13 @@ public abstract class ImageTest
 
 			return this;
 		}		
+
+		public TestCompare fuzzyBlockDimension(final int dimension)
+		{
+			this.fuzzyBlockDimension = dimension;
+
+			return this;
+		}
 
 		public TestCompare colorFuzzy(final File baselineFile)
 		{
