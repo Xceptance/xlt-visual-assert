@@ -16,102 +16,112 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.xceptance.xlt.visualassertion.ImageComparison;
+import com.xceptance.xlt.visualassertion.ImageComparison.Algorithm;
 
 /**
- * Tests whether an existent mask would be used if the screenshot image is
- * smaller or bigger. It should not be. A change in size should mean a new mask image.
+ * Tests whether an existent mask would be used if the screenshot image is smaller or bigger. It should not be. A change
+ * in size should mean a new mask image.
  * 
  * @author damian
  */
-public class TResizeWithActiveMask {
+public class TResizeWithActiveMask
+{
 
-	private static BufferedImage smallBlackImg;
-	private static BufferedImage bigWhiteImg;
+    private static BufferedImage smallBlackImg;
 
-	private final static File directory = SystemUtils.getJavaIoTmpDir();
-	private static File fileMask = new File(directory, "/fileMask.png");
-	private static File fileOut = new File(directory, "/fileOut.png");
-	private static File differenceFile = new File(directory + "/difference.png");
+    private static BufferedImage bigWhiteImg;
 
-	private final static int rgbBlack = Color.BLACK.getRGB();
-	private final static int rgbWhite = Color.WHITE.getRGB();
+    private final static File directory = SystemUtils.getJavaIoTmpDir();
 
-	@BeforeClass
-	public static void initializeImagesAndMask() throws IOException {
+    private static File fileMask = new File(directory, "/fileMask.png");
 
-		// Reference and bigWhiteImg and are equal except for the bottom rows
-		// 300-400,
-		// which are white in the bigWhiteImg and nonexistent in the
-		// smallBlackImg
-		smallBlackImg = new BufferedImage(300, 300, BufferedImage.TYPE_INT_ARGB);
-		for (int w = 0; w < smallBlackImg.getWidth(); w++) {
-			for (int h = 0; h < smallBlackImg.getHeight(); h++) {
-				smallBlackImg.setRGB(w, h, rgbBlack);
-			}
-		}
+    private static File fileOut = new File(directory, "/fileOut.png");
 
-		bigWhiteImg = new BufferedImage(400, 400, BufferedImage.TYPE_INT_ARGB);
-		for (int w = 0; w < bigWhiteImg.getWidth(); w++) {
-			for (int h = 0; h < bigWhiteImg.getHeight(); h++) {
-				bigWhiteImg.setRGB(w, h, rgbWhite);
-			}
-		}
+    private static File differenceFile = new File(directory + "/difference.png");
 
-		//The mask image has the same size as the smallBlackImg
-		final BufferedImage img = initializeBlackMaskImage(smallBlackImg);
-		ImageIO.write(img, "PNG", fileMask);
-	}
+    private final static int rgbBlack = Color.BLACK.getRGB();
 
-	/**
-	 * Tests what happens if the image to compare is bigger. ImageComparison
-	 * 
-	 * @throws IOException
-	 */
-	@Test
-	public void biggerScreenshotImage() throws IOException {
-		final ImageComparison imagecomparison1 = new ImageComparison(10, 10, 10,
-				0.1, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
-		final boolean result = imagecomparison1.isEqual(smallBlackImg, bigWhiteImg,
-				fileMask, fileOut, differenceFile);
-		Assert.assertFalse("Former maskImage shouldn't be used if the "
-				+ "screenshot has a bigger size - result: " + result, result);
-	}
+    private final static int rgbWhite = Color.WHITE.getRGB();
 
-	/**
-	 * Tests what happens if the image to compare is smaller. ImageComparison
-	 * 
-	 * @throws IOException
-	 */
-	@Test
-	public void smallerScreenshotImage() throws IOException {
-		final ImageComparison imagecomparison1 = new ImageComparison(10, 10, 10,
-				0.1, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
-		final boolean result = imagecomparison1.isEqual(bigWhiteImg, smallBlackImg,
-				fileMask, fileOut, differenceFile);
-		Assert.assertFalse("Former maskImage shouldn't be used if the "
-				+ "screenshot has a smaller size - result: " + result, result);
-	}
+    @BeforeClass
+    public static void initializeImagesAndMask() throws IOException
+    {
 
-	/**
-	 * Deletes the temporary files which were created for this test
-	 */
-	@AfterClass
-	public static void deleteFiles() {
-		fileMask.delete();
-		fileOut.delete();
-		differenceFile.delete();
-	}
+        // Reference and bigWhiteImg and are equal except for the bottom rows
+        // 300-400,
+        // which are white in the bigWhiteImg and nonexistent in the
+        // smallBlackImg
+        smallBlackImg = new BufferedImage(300, 300, BufferedImage.TYPE_INT_ARGB);
+        for (int w = 0; w < smallBlackImg.getWidth(); w++)
+        {
+            for (int h = 0; h < smallBlackImg.getHeight(); h++)
+            {
+                smallBlackImg.setRGB(w, h, rgbBlack);
+            }
+        }
 
-	private static BufferedImage initializeBlackMaskImage(final BufferedImage img) {
+        bigWhiteImg = new BufferedImage(400, 400, BufferedImage.TYPE_INT_ARGB);
+        for (int w = 0; w < bigWhiteImg.getWidth(); w++)
+        {
+            for (int h = 0; h < bigWhiteImg.getHeight(); h++)
+            {
+                bigWhiteImg.setRGB(w, h, rgbWhite);
+            }
+        }
 
-		// No relation to the code in ImageComparison
-		// Creates the maskImage image, creates the array with its pixels and
-		// fills the array with the rgb value of black
-		final BufferedImage maskImg = new BufferedImage(img.getWidth(),
-				img.getHeight(), BufferedImage.TYPE_INT_ARGB);
-		final int[] maskImgArray = ((DataBufferInt) maskImg.getRaster()
-				.getDataBuffer()).getData();
-		Arrays.fill(maskImgArray, Color.BLACK.getRGB());
-		return maskImg;
-	}
+        // The mask image has the same size as the smallBlackImg
+        final BufferedImage img = initializeBlackMaskImage(smallBlackImg);
+        ImageIO.write(img, "PNG", fileMask);
+    }
+
+    /**
+     * Tests what happens if the image to compare is bigger. ImageComparison
+     * 
+     * @throws IOException
+     */
+    @Test
+    public void biggerScreenshotImage() throws IOException
+    {
+        final ImageComparison imagecomparison1 = new ImageComparison(Algorithm.COLORFUZZY, 10, 10, 10, 0.1, 0.01, false, false, 3, 3,
+                                                                     false);
+        final boolean result = imagecomparison1.isEqual(smallBlackImg, bigWhiteImg, fileMask, fileOut, differenceFile);
+        Assert.assertFalse("Former maskImage shouldn't be used if the " + "screenshot has a bigger size - result: " + result, result);
+    }
+
+    /**
+     * Tests what happens if the image to compare is smaller. ImageComparison
+     * 
+     * @throws IOException
+     */
+    @Test
+    public void smallerScreenshotImage() throws IOException
+    {
+        final ImageComparison imagecomparison1 = new ImageComparison(Algorithm.COLORFUZZY, 10, 10, 10, 0.1, 0.01, false, false, 3, 3,
+                                                                     false);
+        final boolean result = imagecomparison1.isEqual(bigWhiteImg, smallBlackImg, fileMask, fileOut, differenceFile);
+        Assert.assertFalse("Former maskImage shouldn't be used if the " + "screenshot has a smaller size - result: " + result, result);
+    }
+
+    /**
+     * Deletes the temporary files which were created for this test
+     */
+    @AfterClass
+    public static void deleteFiles()
+    {
+        fileMask.delete();
+        fileOut.delete();
+        differenceFile.delete();
+    }
+
+    private static BufferedImage initializeBlackMaskImage(final BufferedImage img)
+    {
+
+        // No relation to the code in ImageComparison
+        // Creates the maskImage image, creates the array with its pixels and
+        // fills the array with the rgb value of black
+        final BufferedImage maskImg = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        final int[] maskImgArray = ((DataBufferInt) maskImg.getRaster().getDataBuffer()).getData();
+        Arrays.fill(maskImgArray, Color.BLACK.getRGB());
+        return maskImg;
+    }
 }

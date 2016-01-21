@@ -16,93 +16,101 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.xceptance.xlt.visualassertion.ImageComparison;
-
+import com.xceptance.xlt.visualassertion.ImageComparison.Algorithm;
 
 /**
- * Tests if the resizing when images of different size are compared is working as expected.
- * Specifically it tests if the resulting marked image has the correct size,
- * if the screenshot image was correctly copied to the marked image and
- * if it marked the formerly nonexistent parts and did not mark the formerly existent parts. 
- * 
+ * Tests if the resizing when images of different size are compared is working as expected. Specifically it tests if the
+ * resulting marked image has the correct size, if the screenshot image was correctly copied to the marked image and if
+ * it marked the formerly nonexistent parts and did not mark the formerly existent parts.
  * 
  * @author damian
- *
  */
-public class TResizeImage {
+public class TResizeImage
+{
 
-	private static BufferedImage reference;
-	private static BufferedImage screenshot;
+    private static BufferedImage reference;
 
-	private final static File directory = SystemUtils.getJavaIoTmpDir();
-	private static File fileMask = new File(directory, "/fileMask.png");
-	private static File fileOut = new File(directory, "/fileOut.png");
-	private static File differenceFile = new File(directory + "/difference.png");
+    private static BufferedImage screenshot;
 
-	private final static int rgbWhite = Color.WHITE.getRGB();
-	private final static int rgbMarked = new Color(0, 0, 0, 0).getRGB();
+    private final static File directory = SystemUtils.getJavaIoTmpDir();
 
+    private static File fileMask = new File(directory, "/fileMask.png");
 
-	@BeforeClass
-	public static void initializeImages() {
-		//		Initializes reference and screenshot images. 
-		//		Both images are white. Reference image size: 300*300. Screenshot image size: 50*50.
+    private static File fileOut = new File(directory, "/fileOut.png");
 
-		reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
-		final int[] referenceArray = ((DataBufferInt) reference.getRaster().getDataBuffer()).getData();
-		Arrays.fill(referenceArray, rgbWhite);
+    private static File differenceFile = new File(directory + "/difference.png");
 
-		screenshot = new BufferedImage(50, 50, BufferedImage.TYPE_INT_RGB);
-		final int[] screenshotArray = ((DataBufferInt) screenshot.getRaster().getDataBuffer()).getData();
-		Arrays.fill(screenshotArray, rgbWhite);
-	}
+    private final static int rgbWhite = Color.WHITE.getRGB();
 
-	/**
-	 * Tests the resulting marked images size. 
-	 * 
-	 * @throws IOException
-	 */
-	@Test
-	public void correctSizePixelFuzzyEqual() throws IOException {
-		final ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.01, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
-		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
-		final BufferedImage img = ImageIO.read(fileOut);
+    private final static int rgbMarked = new Color(0, 0, 0, 0).getRGB();
 
-		Assert.assertEquals(reference.getWidth(), img.getWidth());
-		Assert.assertEquals(reference.getHeight(), img.getHeight());
-	}
+    @BeforeClass
+    public static void initializeImages()
+    {
+        // Initializes reference and screenshot images.
+        // Both images are white. Reference image size: 300*300. Screenshot image size: 50*50.
 
-	/**
-	 * Tests if the screenshot image was correctly copied and not marked.
-	 * And if the formerly nonexistent areas were marked
-	 * ImageComparison Parameters: 1, 1, 0.01, false, false, PIXELFUZZY
-	 * 
-	 * @throws IOException
-	 */
-	@Test
-	public void correctBreakPointPixelFuzzyEqual() throws IOException {
-		final ImageComparison imagecomparison = new ImageComparison(10, 10, 1, 0.01, 0.01, false, false, 3, 3, false, "PIXELFUZZY");
-		imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
-		final BufferedImage img = ImageIO.read(fileOut);
-		for (int w = 0; w < img.getWidth(); w++) {
-			for (int h = 0; h < img.getHeight(); h++) {
-				if (w < 50 && h < 50) {
-					Assert.assertEquals(rgbWhite, img.getRGB(w, h));
-				}
-				else {
-					Assert.assertEquals(rgbMarked, img.getRGB(w, h));
-				}
-			}
-		}
-	}
+        reference = new BufferedImage(300, 300, BufferedImage.TYPE_INT_RGB);
+        final int[] referenceArray = ((DataBufferInt) reference.getRaster().getDataBuffer()).getData();
+        Arrays.fill(referenceArray, rgbWhite);
 
+        screenshot = new BufferedImage(50, 50, BufferedImage.TYPE_INT_RGB);
+        final int[] screenshotArray = ((DataBufferInt) screenshot.getRaster().getDataBuffer()).getData();
+        Arrays.fill(screenshotArray, rgbWhite);
+    }
 
-	/**
-	 * Deletes the temporary files which were created for this test
-	 */
-	@AfterClass
-	public static void deleteFile() {
-		fileMask.delete();
-		fileOut.delete();
-		differenceFile.delete();
-	}
+    /**
+     * Tests the resulting marked images size.
+     * 
+     * @throws IOException
+     */
+    @Test
+    public void correctSizePixelFuzzyEqual() throws IOException
+    {
+        final ImageComparison imagecomparison = new ImageComparison(Algorithm.COLORFUZZY, 10, 10, 1, 0.01, 0.01, false, false, 3, 3, false);
+        imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
+        final BufferedImage img = ImageIO.read(fileOut);
+
+        Assert.assertEquals(reference.getWidth(), img.getWidth());
+        Assert.assertEquals(reference.getHeight(), img.getHeight());
+    }
+
+    /**
+     * Tests if the screenshot image was correctly copied and not marked. And if the formerly nonexistent areas were
+     * marked ImageComparison Parameters: 1, 1, 0.01, false, false, PIXELFUZZY
+     * 
+     * @throws IOException
+     */
+    @Test
+    public void correctBreakPointPixelFuzzyEqual() throws IOException
+    {
+        final ImageComparison imagecomparison = new ImageComparison(Algorithm.COLORFUZZY, 10, 10, 1, 0.01, 0.01, false, false, 3, 3, false);
+        imagecomparison.isEqual(reference, screenshot, fileMask, fileOut, differenceFile);
+        final BufferedImage img = ImageIO.read(fileOut);
+        for (int w = 0; w < img.getWidth(); w++)
+        {
+            for (int h = 0; h < img.getHeight(); h++)
+            {
+                if (w < 50 && h < 50)
+                {
+                    Assert.assertEquals(rgbWhite, img.getRGB(w, h));
+                }
+                else
+                {
+                    Assert.assertEquals(rgbMarked, img.getRGB(w, h));
+                }
+            }
+        }
+    }
+
+    /**
+     * Deletes the temporary files which were created for this test
+     */
+    @AfterClass
+    public static void deleteFile()
+    {
+        fileMask.delete();
+        fileOut.delete();
+        differenceFile.delete();
+    }
 }
