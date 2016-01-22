@@ -179,47 +179,25 @@ public class ImageComparison
         BufferedImage baselineImageCopy = imageoperations.copyImage(baselineImage);
         BufferedImage compareImageCopy = imageoperations.copyImage(compareImage);
 
-        // Resizes the images and saves the previous width and height ...
-
-        // Initializes the variables for the previous width and height
-        final int baselineImageOriginalWidth = compareImageCopy.getWidth();
-        final int baselineImageOriginalHeight = compareImageCopy.getHeight();
-
-        final int compareImageOriginalWidth = compareImageCopy.getWidth();
-        final int compareImageOriginalHeight = compareImageCopy.getHeight();
-
+        // resize image to the larger one if they differ in size
         boolean sizeChanged = false;
+        imageWidth = Math.max(baselineImageCopy.getWidth(), compareImageCopy.getWidth());
+        imageHeight = Math.max(baselineImageCopy.getHeight(), compareImageCopy.getHeight());
 
-        if (baselineImageCopy.getWidth() < compareImageCopy.getWidth())
+        // if compareImage is taller or wider resize baselineImageCopy
+        if (baselineImageCopy.getWidth() < imageWidth || baselineImageCopy.getHeight() < imageHeight)
         {
-            baselineImageCopy = imageoperations.increaseImageSize(baselineImageCopy, compareImageCopy.getWidth(),
-                                                                  baselineImageCopy.getHeight());
-            sizeChanged = true;
-        }
-        if (baselineImageCopy.getHeight() < compareImageCopy.getHeight())
-        {
-            baselineImageCopy = imageoperations.increaseImageSize(baselineImageCopy, baselineImageCopy.getWidth(),
-                                                                  compareImageCopy.getHeight());
-            sizeChanged = true;
-        }
-        if (baselineImageCopy.getWidth() > compareImageCopy.getWidth())
-        {
-            compareImageCopy = imageoperations.increaseImageSize(compareImageCopy, baselineImageCopy.getWidth(),
-                                                                 compareImageCopy.getHeight());
-            sizeChanged = true;
-        }
-        if (baselineImageCopy.getHeight() > compareImageCopy.getHeight())
-        {
-            compareImageCopy = imageoperations.increaseImageSize(compareImageCopy, compareImageCopy.getWidth(),
-                                                                 baselineImageCopy.getHeight());
+            baselineImageCopy = imageoperations.increaseImageSize(baselineImageCopy, imageWidth, imageHeight);
             sizeChanged = true;
         }
 
+        // if baselineImage is taller or wider resize compareImageCopy
+        if (compareImageCopy.getWidth() < imageWidth || compareImageCopy.getHeight() < imageHeight)
+        {
+            compareImageCopy = imageoperations.increaseImageSize(compareImageCopy, imageWidth, imageHeight);
+            sizeChanged = true;
+        }
         // end resizing
-
-        // initializes variables for imageHeight and imageWidth
-        imageWidth = compareImageCopy.getWidth();
-        imageHeight = compareImageCopy.getHeight();
 
         // initializes maskImage and masks both images:
         maskImage = initializeMaskImage(baselineImageCopy, fileMask);
@@ -290,8 +268,10 @@ public class ImageComparison
             // previously nonexistant areas and set isEqual false
             if (sizeChanged)
             {
-                difference = markImageBorders(difference, Math.min(baselineImageOriginalWidth, compareImageOriginalWidth),
-                                              Math.min(baselineImageOriginalHeight, compareImageOriginalHeight));
+                int originalMinWidth = Math.min(baselineImage.getWidth(), compareImage.getWidth());
+                int originalMinHeight = Math.min(baselineImage.getHeight(), compareImage.getHeight());
+
+                difference = markImageBorders(difference, originalMinWidth, originalMinHeight);
 
                 // disabled, because do not mark make the size change transparent
                 // just really mark it
