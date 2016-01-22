@@ -712,11 +712,13 @@ public class ImageComparison
         // the colorArea method works for them
 
         final long s = System.currentTimeMillis();
+        final int halfMarkingSizeX = markingSizeX / 2;
+        final int halfMarkingSizeY = markingSizeY / 2;
 
         for (int i = 0; i < pixels.length; i++)
         {
-            final int x = Math.max(0, pixels[i][0] - (markingSizeX / 2));
-            final int y = Math.max(0, pixels[i][1] - (markingSizeY / 2));
+            final int x = Math.max(0, pixels[i][0] - halfMarkingSizeX);
+            final int y = Math.max(0, pixels[i][1] - halfMarkingSizeY);
 
             drawBlackRectangle(maskImage, x, y, markingSizeX, markingSizeY);
         }
@@ -877,9 +879,10 @@ public class ImageComparison
         // Go through the differentPixels array, get the difference and draw the pixel into
         for (int i = 0; i < differentPixels.length; i++)
         {
-            final double rgbDifference = calculatePixelRGBDiff(reference.getRGB(differentPixels[i][0], differentPixels[i][1]),
-                                                               toCompare.getRGB(differentPixels[i][0], differentPixels[i][1]));
-            drawDifferencePixel(rgbDifference, differentPixels[i][0], differentPixels[i][1]);
+            int x = differentPixels[i][0];
+            int y = differentPixels[i][1];
+            final double rgbDifference = calculatePixelRGBDiff(reference.getRGB(x, y), toCompare.getRGB(x, y));
+            drawDifferencePixel(rgbDifference, x, y);
         }
     }
 
