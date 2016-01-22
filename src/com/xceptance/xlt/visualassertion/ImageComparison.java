@@ -312,8 +312,6 @@ public class ImageComparison
      */
     private int[][] colorFuzzyCompare(final BufferedImage img1, final BufferedImage img2) throws IOException
     {
-        boolean equal = true;
-
         final ArrayList<Integer> xCoords = new ArrayList<Integer>();
         final ArrayList<Integer> yCoords = new ArrayList<Integer>();
 
@@ -328,34 +326,15 @@ public class ImageComparison
                 // the relevant ArrayList if the difference is above the
                 // colTolerance
                 final double difference = calculatePixelRGBDiff(img1.getRGB(x, y), img2.getRGB(x, y));
-
-                // draws the differenceImage if needed
-
                 if (difference > colorTolerance)
                 {
                     xCoords.add(x);
                     yCoords.add(y);
-                    equal = false;
                 }
             }
         }
 
-        int s = xCoords.size();
-        final int[][] pixels = new int[s][2];
-        for (int i = 0; i < s; i++)
-        {
-            pixels[i][0] = xCoords.get(i).intValue();
-            pixels[i][1] = yCoords.get(i).intValue();
-        }
-
-        if (!equal)
-        {
-            return pixels;
-        }
-        else
-        {
-            return null;
-        }
+        return convertCoordinateListsTo2dArray(xCoords, yCoords);
     }
 
     /**
@@ -374,57 +353,26 @@ public class ImageComparison
         /* Method for the exact comparison of two images */
         // img1: reference Image, img2: screenshot
 
-        boolean exactlyEqual = true;
         final ArrayList<Integer> xCoords = new ArrayList<Integer>();
         final ArrayList<Integer> yCoords = new ArrayList<Integer>();
 
-        final int imagewidth = img1.getWidth();
-        final int imageheight = img1.getHeight();
-        for (int x = 0; x < imagewidth; x++)
+        final int imageWidth = img1.getWidth();
+        final int imageHeight = img1.getHeight();
+        for (int x = 0; x < imageWidth; x++)
         {
-            for (int y = 0; y < imageheight; y++)
+            for (int y = 0; y < imageHeight; y++)
             {
-
                 // if the RGB values of 2 pixels differ
                 // add the x- and y- coordinates to the corresponding ArrayLists
                 if (img1.getRGB(x, y) != img2.getRGB(x, y))
                 {
                     xCoords.add(x);
                     yCoords.add(y);
-                    exactlyEqual = false;
                 }
             }
         }
 
-        int s = xCoords.size();
-        final int[] xArray = new int[s];
-        for (int i = 0; i < s; i++)
-        {
-            xArray[i] = xCoords.get(i).intValue();
-        }
-
-        s = yCoords.size();
-        final int[] yArray = new int[s];
-        for (int i = 0; i < s; i++)
-        {
-            yArray[i] = yCoords.get(i).intValue();
-        }
-
-        final int[][] pixels = new int[xArray.length][2];
-        for (int i = 0; i < xArray.length; i++)
-        {
-            pixels[i][0] = xArray[i];
-            pixels[i][1] = yArray[i];
-        }
-
-        if (!exactlyEqual)
-        {
-            return pixels;
-        }
-        else
-        {
-            return null;
-        }
+        return convertCoordinateListsTo2dArray(xCoords, yCoords);
     }
 
     /**
@@ -441,15 +389,12 @@ public class ImageComparison
      */
     private int[][] fuzzyCompare(final BufferedImage img1, final BufferedImage img2) throws IOException
     {
-
         /* Method for the regular fuzzy comparison */
 
-        boolean equal = true;
         final ArrayList<Integer> xCoords = new ArrayList<Integer>();
         final ArrayList<Integer> yCoords = new ArrayList<Integer>();
         final ArrayList<Integer> xCoordsTemp = new ArrayList<Integer>();
         final ArrayList<Integer> yCoordsTemp = new ArrayList<Integer>();
-        int differencesAllowed;
 
         // Create blocks, go through every block
         final int xBlock = imageWidth / fuzzyBlockDimension;
@@ -462,14 +407,13 @@ public class ImageComparison
                 subImageWidth = calcPixSpan(fuzzyBlockDimension, x, imageWidth);
                 subImageHeight = calcPixSpan(fuzzyBlockDimension, y, imageHeight);
                 int differencesPerBlock = 0;
-                differencesAllowed = (int) Math.floor(subImageWidth * subImageHeight * pixelTolerance);
+                int differencesAllowed = (int) Math.floor(subImageWidth * subImageHeight * pixelTolerance);
 
                 // Go through every pixel in that block
                 for (int w = 0; w < subImageWidth; w++)
                 {
                     for (int h = 0; h < subImageHeight; h++)
                     {
-
                         final int xCoord = x * fuzzyBlockDimension + w;
                         final int yCoord = y * fuzzyBlockDimension + h;
 
@@ -493,53 +437,19 @@ public class ImageComparison
 
                 // If differencesPerBlock is above pixTolerance
                 // Write the temporary coordinates to the permanent ones
-                // And set equal false
                 if (differencesPerBlock > differencesAllowed)
                 {
                     xCoords.addAll(xCoordsTemp);
                     yCoords.addAll(yCoordsTemp);
-                    xCoordsTemp.clear();
-                    yCoordsTemp.clear();
-                    equal = false;
                 }
-                // Otherwise clear the temporary coordinates
-                else
-                {
-                    xCoordsTemp.clear();
-                    yCoordsTemp.clear();
-                }
+
+                // clear the temporary coordinates
+                xCoordsTemp.clear();
+                yCoordsTemp.clear();
             }
         }
 
-        // Turn the ArrayLists into a single 2d array.
-        int s = xCoords.size();
-        final int[] xArray = new int[s];
-        for (int i = 0; i < s; i++)
-        {
-            xArray[i] = xCoords.get(i).intValue();
-        }
-
-        s = yCoords.size();
-        final int[] yArray = new int[s];
-        for (int i = 0; i < s; i++)
-        {
-            yArray[i] = yCoords.get(i).intValue();
-        }
-
-        final int[][] pixels = new int[xArray.length][2];
-        for (int i = 0; i < xArray.length; i++)
-        {
-            pixels[i][0] = xArray[i];
-            pixels[i][1] = yArray[i];
-        }
-        if (!equal)
-        {
-            return pixels;
-        }
-        else
-        {
-            return null;
-        }
+        return convertCoordinateListsTo2dArray(xCoords, yCoords);
     }
 
     /**
@@ -558,8 +468,8 @@ public class ImageComparison
     {
         if (pixelPerBlock * (n + 1) > overallSpan)
             return overallSpan % pixelPerBlock;
-        else
-            return pixelPerBlock;
+
+        return pixelPerBlock;
     }
 
     /**
@@ -766,23 +676,16 @@ public class ImageComparison
      */
     private void colorPixel(final BufferedImage image, final int x, final int y)
     {
-        int rgb, newRgb;
-        Color currentColor, newColor;
-
-        rgb = image.getRGB(x, y);
-        currentColor = new Color(rgb);
+        Color currentColor = new Color(image.getRGB(x, y));
+        Color newColor = mainMarkingColor;
 
         // just in case we overwrote the marking color
         if (mainMarkingColor == Color.RED)
         {
             newColor = getComplementary(currentColor);
         }
-        else
-        {
-            newColor = mainMarkingColor;
-        }
-        newRgb = newColor.getRGB();
-        image.setRGB(x, y, newRgb);
+
+        image.setRGB(x, y, newColor.getRGB());
     }
 
     /**
@@ -801,10 +704,8 @@ public class ImageComparison
      */
     private void drawBlackRectangle(final BufferedImage img, final int x, final int y, final int widthX, final int widthY)
     {
-        final Color black = Color.BLACK;
-
         final Graphics g = img.getGraphics();
-        g.setColor(black);
+        g.setColor(Color.BLACK);
         g.fillRect(x, y, widthX, widthY);
         g.dispose();
 
@@ -825,8 +726,8 @@ public class ImageComparison
     private BufferedImage markImageBorders(final BufferedImage img, final int startW, final int startH)
     {
         final Color markTransparentWhite = new Color(255, 255, 255, 0);
-
         final Graphics2D g = img.createGraphics();
+
         g.setColor(markTransparentWhite);
         g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_IN, 1.0f));
 
@@ -849,11 +750,9 @@ public class ImageComparison
      */
     private void initializeDifferenceImage()
     {
-
-        final int rgbBlack = Color.BLACK.getRGB();
         difference = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
         final int[] differenceArray = ((DataBufferInt) difference.getRaster().getDataBuffer()).getData();
-        Arrays.fill(differenceArray, rgbBlack);
+        Arrays.fill(differenceArray, Color.BLACK.getRGB());
     }
 
     /**
@@ -905,15 +804,11 @@ public class ImageComparison
      */
     private BufferedImage initializeMaskImage(final BufferedImage img, final File file) throws IOException
     {
-        final Color transparentWhite = new Color(255, 255, 255, 0);
-        final int rgbTransparentWhite = transparentWhite.getRGB();
-
         if (file != null && file.exists())
         {
             BufferedImage mask = ImageIO.read(file);
             if ((mask.getWidth() == img.getWidth()) && (mask.getHeight() == img.getHeight()))
             {
-
                 // Change image type to TYPE_INT_ARGB
                 mask = new ImageOperations().copyImage(mask);
                 return mask;
@@ -924,12 +819,33 @@ public class ImageComparison
         final int height = img.getHeight();
         final BufferedImage mask = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         final int[] maskArray = ((DataBufferInt) mask.getRaster().getDataBuffer()).getData();
+
+        final int rgbTransparentWhite = new Color(255, 255, 255, 0).getRGB();
         Arrays.fill(maskArray, rgbTransparentWhite);
+
         return mask;
     }
 
     public void setMainMarkingColor(final Color mainMarkingColor)
     {
         this.mainMarkingColor = mainMarkingColor;
+    }
+
+    private int[][] convertCoordinateListsTo2dArray(final ArrayList<Integer> xCoords, final ArrayList<Integer> yCoords)
+    {
+        int s = xCoords.size();
+
+        int[][] pixels = null;
+        if (s > 0)
+        {
+            pixels = new int[s][2];
+            for (int i = 0; i < s; i++)
+            {
+                pixels[i][0] = xCoords.get(i).intValue();
+                pixels[i][1] = yCoords.get(i).intValue();
+            }
+        }
+
+        return pixels;
     }
 }
