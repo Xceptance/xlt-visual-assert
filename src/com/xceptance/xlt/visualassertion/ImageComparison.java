@@ -341,25 +341,13 @@ public class ImageComparison
         }
 
         int s = xCoords.size();
-        final int[] xArray = new int[s];
+        final int[][] pixels = new int[s][2];
         for (int i = 0; i < s; i++)
         {
-            xArray[i] = xCoords.get(i).intValue();
+            pixels[i][0] = xCoords.get(i).intValue();
+            pixels[i][1] = yCoords.get(i).intValue();
         }
 
-        s = yCoords.size();
-        final int[] yArray = new int[s];
-        for (int i = 0; i < s; i++)
-        {
-            yArray[i] = yCoords.get(i).intValue();
-        }
-
-        final int[][] pixels = new int[xArray.length][2];
-        for (int i = 0; i < xArray.length; i++)
-        {
-            pixels[i][0] = xArray[i];
-            pixels[i][1] = yArray[i];
-        }
         if (!equal)
         {
             return pixels;
