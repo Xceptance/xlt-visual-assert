@@ -20,323 +20,389 @@ import com.xceptance.xlt.visualassertion.ImageComparison.Algorithm;
 
 public abstract class ImageTest
 {
-	final ArrayList<File> tempFiles = new ArrayList<File>();
+    final ArrayList<File> tempFiles = new ArrayList<File>();
 
-	protected File getTempFile(final String prefix, final String suffix)
-	{
-		final File f = new File(FileUtils.getTempDirectoryPath(), prefix + "-" + UUID.randomUUID().toString() + suffix);	
-		tempFiles.add(f);
+    protected File getTempFile(final String prefix, final String suffix)
+    {
+        final File f = new File(FileUtils.getTempDirectoryPath(), prefix + "-" + UUID.randomUUID().toString() + suffix);
+        tempFiles.add(f);
 
-		return f;
-	}
+        return f;
+    }
 
-	protected File resolveFile(final String name)
-	{
-		final String path = ClassUtils.getPackageName(this.getClass()).replace(".", "/");
-		return new File( "src/" + path + "/" + name);
-	}
+    protected File resolveFile(final String name)
+    {
+        final String path = ClassUtils.getPackageName(this.getClass()).replace(".", "/");
+        return new File("src/" + path + "/" + name);
+    }
 
-	protected BufferedImage loadImage(final String name) throws IOException
-	{
-		final BufferedImage p1 = ImageIO.read(resolveFile(name));
-		return p1;
-	}
-	protected BufferedImage loadImage(final File f) throws IOException
-	{
-		final BufferedImage p1 = ImageIO.read(f);
-		return p1;
-	}
-	/**
-	 * Save the image into a temp file
-	 * @param img the image to write
-	 * @return the file that was written
-	 * @throws IOException
-	 */
-	protected File saveImage(final BufferedImage img) throws IOException
-	{
-		final File f = this.getTempFile("baseline", ".png");
-		ImageIO.write(img, "PNG", f);
-		tempFiles.add(f);
-		return f;
-	}	
+    protected BufferedImage loadImage(final String name) throws IOException
+    {
+        final BufferedImage p1 = ImageIO.read(resolveFile(name));
+        return p1;
+    }
 
-	public class TestCompare
-	{
-		private Algorithm algorithm;
+    protected BufferedImage loadImage(final File f) throws IOException
+    {
+        final BufferedImage p1 = ImageIO.read(f);
+        return p1;
+    }
 
-		private  BufferedImage baselineImage;
-		private BufferedImage toCompareToImage;
+    /**
+     * Save the image into a temp file
+     * 
+     * @param img the image to write
+     * @return the file that was written
+     * @throws IOException
+     */
+    protected File saveImage(final BufferedImage img) throws IOException
+    {
+        final File f = this.getTempFile("baseline", ".png");
+        ImageIO.write(img, "PNG", f);
+        tempFiles.add(f);
+        return f;
+    }
 
-		private File maskFile;
-		private File markedFileAsResult;
-		private File differenceFile;
+    public class TestCompare
+    {
+        private Algorithm algorithm;
 
-		private Color markingColor = Color.RED;
+        private BufferedImage baselineImage;
 
-		private boolean result;
+        private BufferedImage toCompareToImage;
 
-		private int markingSizeX = 10;
-		private int markingSizeY = 10;
+        private File maskFile;
 
-		private int fuzzyBlockDimension = 10;
-		private double colorTolerance = 0.1;
-		private double pixelTolerance = 0.1;
-		private final boolean trainingMode = false;
-		private final boolean closeMask = false;
-		private final int structElementWidth = 10;
-		private final int structElementHeight = 10;
-		private final boolean differenceImage = false;
+        private File markedFileAsResult;
 
-		private boolean wasExecuted = false;
+        private File differenceFile;
 
-		public TestCompare()
-		{
+        private Color markingColor = Color.RED;
 
-		}
+        private boolean result;
 
-		private TestCompare execute()
-		{
-			if (wasExecuted)
-			{
-				return this;
-			}
+        private int markingSizeX = 10;
 
-			wasExecuted = true;
+        private int markingSizeY = 10;
 
-			try 
-			{
-				markedFileAsResult = getTempFile("marked", ".png");
+        private int fuzzyBlockDimension = 10;
 
-				final ImageComparison imagecomparison = new ImageComparison(algorithm, markingSizeX, markingSizeY, fuzzyBlockDimension, colorTolerance, pixelTolerance, trainingMode, closeMask, structElementWidth, structElementHeight, differenceImage);
-				imagecomparison.setMainMarkingColor(markingColor);
-				result = imagecomparison.isEqual(baselineImage, toCompareToImage, maskFile, markedFileAsResult, differenceFile);	
-			}
-			catch(final IOException ioe)
-			{
-				Assert.fail(ioe.getMessage());
-			}
+        private double colorTolerance = 0.1;
 
-			return this;
-		}
+        private double pixelTolerance = 0.1;
 
-		public TestCompare match(final String baselineImagePath)
-		{
-			this.algorithm = Algorithm.MATCH;
-			try
-			{
-				this.baselineImage = loadImage(baselineImagePath);
-			}
-			catch (final IOException e)
-			{
-				Assert.fail(e.getMessage());
-			}
+        private final boolean trainingMode = false;
 
-			return this;
-		}
-		public TestCompare colorFuzzy(final String baselineImagePath)
-		{
-			this.algorithm = Algorithm.COLORFUZZY;
-			try
-			{
-				this.baselineImage = loadImage(baselineImagePath);
-			}
-			catch (final IOException e)
-			{
-				Assert.fail(e.getMessage());
-			}
+        private final boolean closeMask = false;
 
-			return this;
-		}
-		public TestCompare fuzzy(final String baselineImagePath)
-		{
-			this.algorithm = Algorithm.FUZZY;
-			try
-			{
-				this.baselineImage = loadImage(baselineImagePath);
-			}
-			catch (final IOException e)
-			{
-				Assert.fail(e.getMessage());
-			}
+        private final int structElementWidth = 10;
 
-			return this;
-		}		
+        private final int structElementHeight = 10;
 
-		public TestCompare fuzzyBlockDimension(final int dimension)
-		{
-			this.fuzzyBlockDimension = dimension;
+        private final boolean differenceImage = false;
 
-			return this;
-		}
+        private boolean wasExecuted = false;
 
-		public TestCompare colorFuzzy(final File baselineFile)
-		{
-			this.algorithm = Algorithm.COLORFUZZY;
-			try
-			{
-				this.baselineImage = loadImage(baselineFile);
-			}
-			catch (final IOException e)
-			{
-				Assert.fail(e.getMessage());
-			}
+        public TestCompare()
+        {
 
-			return this;
-		}
-		public TestCompare to(final String toCompareToImagePath)
-		{
-			try
-			{
-				this.toCompareToImage = loadImage(toCompareToImagePath);
-			}
-			catch (final IOException e)
-			{
-				Assert.fail(e.getMessage());
-			}
-			return this;
-		}
-		public TestCompare to(final File toCompareFile)
-		{
-			try
-			{
-				this.toCompareToImage = loadImage(toCompareFile);
-			}
-			catch (final IOException e)
-			{
-				Assert.fail(e.getMessage());
-			}
-			return this;
-		}
-		public TestCompare isEqual()
-		{
-			execute();
-			Assert.assertTrue(result);
-			return this;
-		}
-		public TestCompare isNotEqual()
-		{
-			execute();
-			Assert.assertFalse(result);
-			return this;
-		}
-		public TestCompare hasMarking(final String markFilePath)
-		{
-			try
-			{
-				Assert.assertTrue(compareFiles(markFilePath, markedFileAsResult));
-			}
-			catch (final IOException e)
-			{
-				Assert.fail("Problems reading images: " + e.getMessage());
-			}
-			return this;
-		}
-		public TestCompare hasNoMarking()
-		{
-			Assert.assertFalse(markedFileAsResult.exists());
-			return this;
-		}
-		public TestCompare mark(final int x, final int y)
-		{
-			this.markingSizeX = x;
-			this.markingSizeY = y;
-			return this;
-		}
-		public TestCompare markColor(final Color markingColor)
-		{
-			this.markingColor = markingColor;
-			return this;
-		}
-		public TestCompare colorDifference(final double diff)
-		{
-			this.colorTolerance = diff;
-			return this;
-		}
-		public TestCompare pixelDifference(final double diff)
-		{
-			this.pixelTolerance = diff;
-			return this;
-		}	
-	}
+        }
 
-	protected File createTestImageGradient(final Color startColor, final int r, final int g, final int b) throws IOException
-	{
-		final BufferedImage img = new BufferedImage(300, 13, BufferedImage.TYPE_INT_RGB);
+        private TestCompare execute()
+        {
+            if (wasExecuted)
+            {
+                return this;
+            }
 
-		// white
-		final Graphics graphics = img.getGraphics();
-		graphics.setColor(Color.WHITE);
-		graphics.fillRect(0, 0, img.getWidth(), img.getHeight());
-		graphics.dispose();		
+            wasExecuted = true;
 
-		int sR = startColor.getRed();
-		int sG = startColor.getGreen();
-		int sB = startColor.getBlue();
+            try
+            {
+                markedFileAsResult = getTempFile("marked", ".png");
 
-		for (int w = 1; w < img.getWidth(); w = w + 3)
-		{
-			sR = sR + r;
-			sG = sG + g;
-			sB = sB + b;
+                final ImageComparison imagecomparison = new ImageComparison(algorithm, markingSizeX, markingSizeY, fuzzyBlockDimension,
+                                                                            colorTolerance, pixelTolerance, trainingMode, closeMask,
+                                                                            structElementWidth, structElementHeight, differenceImage);
+                imagecomparison.setMainMarkingColor(markingColor);
+                result = imagecomparison.isEqual(baselineImage, toCompareToImage, maskFile, markedFileAsResult, differenceFile);
+            }
+            catch (final IOException ioe)
+            {
+                Assert.fail(ioe.getMessage());
+            }
 
-			if (sR > 255 || sB > 255|| sG > 255)
-			{
-				break;
-			}
+            return this;
+        }
 
-			img.setRGB(w, 7, new Color(sR, sG, sB).getRGB());
-		}
+        public TestCompare match(final String baselineImagePath)
+        {
+            this.algorithm = Algorithm.MATCH;
+            try
+            {
+                this.baselineImage = loadImage(baselineImagePath);
+            }
+            catch (final IOException e)
+            {
+                Assert.fail(e.getMessage());
+            }
 
-		return saveImage(img);
-	}
+            return this;
+        }
 
-	protected File createTestImage2DGradient(final Color startColor, final Color constant) throws IOException
-	{
-		final BufferedImage img = new BufferedImage(256, 256, BufferedImage.TYPE_INT_RGB);
+        public TestCompare colorFuzzy(final String baselineImagePath)
+        {
+            this.algorithm = Algorithm.COLORFUZZY;
+            try
+            {
+                this.baselineImage = loadImage(baselineImagePath);
+            }
+            catch (final IOException e)
+            {
+                Assert.fail(e.getMessage());
+            }
 
-		img.setRGB(0, 0, startColor.getRGB());
+            return this;
+        }
 
-		for (int w = 0; w < img.getWidth(); w++)
-		{
-			for (int h = 0; h < img.getWidth(); h++)
-			{
-				int color = 0;
-				if (constant == Color.RED)
-				{
-					color = new Color(0, w, h).getRGB();
-				}
-				else if (constant == Color.GREEN)
-				{
-					color = new Color(w, 0, h).getRGB();
-				}
-				else if (constant == Color.BLUE)
-				{
-					color = new Color(w, h, 0).getRGB();
-				}
-				img.setRGB(w, h, color);
-			}
-		}
-		return saveImage(img);
-	}
+        public TestCompare fuzzy(final String baselineImagePath)
+        {
+            this.algorithm = Algorithm.FUZZY;
+            try
+            {
+                this.baselineImage = loadImage(baselineImagePath);
+            }
+            catch (final IOException e)
+            {
+                Assert.fail(e.getMessage());
+            }
 
-	protected Color addColors(final Color a, final Color b)
-	{
-		final Color c = new Color(a.getRed() + b.getRed(), a.getGreen() + b.getGreen(), a.getBlue() + b.getBlue());
-		System.out.println(c.toString());
-		return c;
-	}
+            return this;
+        }
 
-	protected boolean compareFiles(final String expected, final File actual) throws IOException
-	{
-		return FileUtils.contentEquals(resolveFile(expected), actual);
-	}
+        public TestCompare fuzzyBlockDimension(final int dimension)
+        {
+            this.fuzzyBlockDimension = dimension;
 
-	@After
-	public void cleanFiles()
-	{
-		for (final File f : tempFiles)
-		{
-			// FileUtils.deleteQuietly(f);
-		}
-	}
+            return this;
+        }
+
+        public TestCompare colorFuzzy(final File baselineFile)
+        {
+            this.algorithm = Algorithm.COLORFUZZY;
+            try
+            {
+                this.baselineImage = loadImage(baselineFile);
+            }
+            catch (final IOException e)
+            {
+                Assert.fail(e.getMessage());
+            }
+
+            return this;
+        }
+
+        public TestCompare to(final String toCompareToImagePath)
+        {
+            try
+            {
+                this.toCompareToImage = loadImage(toCompareToImagePath);
+            }
+            catch (final IOException e)
+            {
+                Assert.fail(e.getMessage());
+            }
+            return this;
+        }
+
+        public TestCompare to(final File toCompareFile)
+        {
+            try
+            {
+                this.toCompareToImage = loadImage(toCompareFile);
+            }
+            catch (final IOException e)
+            {
+                Assert.fail(e.getMessage());
+            }
+            return this;
+        }
+
+        public TestCompare isEqual()
+        {
+            execute();
+            Assert.assertTrue(result);
+            return this;
+        }
+
+        public TestCompare isNotEqual()
+        {
+            execute();
+            Assert.assertFalse(result);
+            return this;
+        }
+
+        public TestCompare hasMarking(final String markFilePath)
+        {
+            try
+            {
+                Assert.assertTrue(compareFiles(markFilePath, markedFileAsResult));
+            }
+            catch (final IOException e)
+            {
+                Assert.fail("Problems reading images: " + e.getMessage());
+            }
+            return this;
+        }
+
+        public TestCompare hasNoMarking()
+        {
+            Assert.assertFalse(markedFileAsResult.exists());
+            return this;
+        }
+
+        public TestCompare mark(final int x, final int y)
+        {
+            this.markingSizeX = x;
+            this.markingSizeY = y;
+            return this;
+        }
+
+        public TestCompare markColor(final Color markingColor)
+        {
+            this.markingColor = markingColor;
+            return this;
+        }
+
+        public TestCompare colorDifference(final double diff)
+        {
+            this.colorTolerance = diff;
+            return this;
+        }
+
+        public TestCompare pixelDifference(final double diff)
+        {
+            this.pixelTolerance = diff;
+            return this;
+        }
+    }
+
+    protected File createTestImageGradient(final Color startColor, final int r, final int g, final int b) throws IOException
+    {
+        final BufferedImage img = new BufferedImage(300, 13, BufferedImage.TYPE_INT_RGB);
+
+        // white
+        final Graphics graphics = img.getGraphics();
+        graphics.setColor(Color.WHITE);
+        graphics.fillRect(0, 0, img.getWidth(), img.getHeight());
+        graphics.dispose();
+
+        int sR = startColor.getRed();
+        int sG = startColor.getGreen();
+        int sB = startColor.getBlue();
+
+        for (int w = 1; w < img.getWidth(); w = w + 3)
+        {
+            sR = sR + r;
+            sG = sG + g;
+            sB = sB + b;
+
+            if (sR > 255 || sB > 255 || sG > 255)
+            {
+                break;
+            }
+
+            img.setRGB(w, 7, new Color(sR, sG, sB).getRGB());
+        }
+
+        return saveImage(img);
+    }
+
+    protected File createTestImage2DGradient(final Color startColor, final Color constant) throws IOException
+    {
+        final BufferedImage img = new BufferedImage(256, 256, BufferedImage.TYPE_INT_RGB);
+
+        img.setRGB(0, 0, startColor.getRGB());
+
+        for (int w = 0; w < img.getWidth(); w++)
+        {
+            for (int h = 0; h < img.getWidth(); h++)
+            {
+                int color = 0;
+                if (constant == Color.RED)
+                {
+                    color = new Color(0, w, h).getRGB();
+                }
+                else if (constant == Color.GREEN)
+                {
+                    color = new Color(w, 0, h).getRGB();
+                }
+                else if (constant == Color.BLUE)
+                {
+                    color = new Color(w, h, 0).getRGB();
+                }
+                img.setRGB(w, h, color);
+            }
+        }
+        return saveImage(img);
+    }
+
+    protected Color addColors(final Color a, final Color b)
+    {
+        final Color c = new Color(a.getRed() + b.getRed(), a.getGreen() + b.getGreen(), a.getBlue() + b.getBlue());
+        System.out.println(c.toString());
+        return c;
+    }
+
+    protected boolean compareFiles(final String expected, final File actual) throws IOException
+    {
+        return compareImages(loadImage(resolveFile(expected)), loadImage(actual));
+    }
+
+    /**
+     * Compares two images pixel by pixel.
+     * 
+     * @param imgA
+     *            the first image.
+     * @param imgB
+     *            the second image.
+     * @return whether the images are both the same or not.
+     */
+    public static boolean compareImages(BufferedImage imgA, BufferedImage imgB)
+    {
+        // The images must be the same size.
+        if (imgA.getWidth() == imgB.getWidth() && imgA.getHeight() == imgB.getHeight())
+        {
+            int width = imgA.getWidth();
+            int height = imgA.getHeight();
+
+            // Loop over every pixel.
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    // Compare the pixels for equality.
+                    if (imgA.getRGB(x, y) != imgB.getRGB(x, y))
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+        else
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    @After
+    public void cleanFiles()
+    {
+        for (final File f : tempFiles)
+        {
+            // FileUtils.deleteQuietly(f);
+        }
+    }
 }
