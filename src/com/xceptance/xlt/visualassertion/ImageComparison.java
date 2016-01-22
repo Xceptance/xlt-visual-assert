@@ -249,7 +249,7 @@ public class ImageComparison
 
         // Close the maskImage if closeMask = true
         // Do it even if there were no differences or if
-        // trainingmode was false
+        // training mode was false
         if (closeMask)
         {
             maskImage = imageoperations.closeImage(maskImage, closeMaskWidth, closeMaskHeight);
@@ -262,25 +262,22 @@ public class ImageComparison
             ImageIO.write(maskImage, "PNG", fileMask);
         }
 
-        if (!trainingsMode)
+        // If the size of the image changed, mark the
+        // previously non existent areas and set isEqual false
+        if (sizeChanged && !trainingsMode)
         {
-            // If the size of the image changed, mark the
-            // previously nonexistant areas and set isEqual false
-            if (sizeChanged)
-            {
-                int originalMinWidth = Math.min(baselineImage.getWidth(), compareImage.getWidth());
-                int originalMinHeight = Math.min(baselineImage.getHeight(), compareImage.getHeight());
+            int originalMinWidth = Math.min(baselineImage.getWidth(), compareImage.getWidth());
+            int originalMinHeight = Math.min(baselineImage.getHeight(), compareImage.getHeight());
 
-                difference = markImageBorders(difference, originalMinWidth, originalMinHeight);
+            difference = markImageBorders(difference, originalMinWidth, originalMinHeight);
 
-                // disabled, because do not mark make the size change transparent
-                // just really mark it
-                // compareImageCopy = markImageBorders(compareImageCopy,
-                // Math.min(baselineImageOriginalWidth, compareImageOriginalWidth),
-                // Math.min(baselineImageOriginalHeight, compareImageOriginalHeight));
+            // disabled, because do not mark make the size change transparent
+            // just really mark it
+            // compareImageCopy = markImageBorders(compareImageCopy,
+            // Math.min(baselineImageOriginalWidth, compareImageOriginalWidth),
+            // Math.min(baselineImageOriginalHeight, compareImageOriginalHeight));
 
-                isEqual = false;
-            }
+            isEqual = false;
         }
 
         if (isEqual)
