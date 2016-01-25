@@ -331,7 +331,7 @@ public class TCloseMask
         {
             for (int h = 0; h < maskImage.getHeight(); h++)
             {
-                if (40 <= w && w < 70 && 40 <= h && h < 70)
+                if (30 <= w && w < 80 && 30 <= h && h < 80)
                 {
                     Assert.assertEquals(rgbBlack, maskImage.getRGB(w, h));
                 }
