@@ -45,20 +45,22 @@ public class ImageOperations
         this.scalingFactor = 10;
     }
 
-    /**
-     * Manually sets the background and foreground colors for the erosion and dilation methods and derivative methods.
-     * 
-     * @param rgbBackgroundColor
-     *            the rgb value of the background color for erosion/ dilation
-     * @param rgbForegroundColor
-     *            the rgb value of the foreground color erosion/ dilation
-     */
-    protected ImageOperations(final int rgbBackgroundColor, final int rgbForegroundColor, final int compressionFactor,
-                              final double structElementScale)
-    {
-        this.rgbBackgroundColor = rgbBackgroundColor;
-        this.rgbForegroundColor = rgbForegroundColor;
-    }
+    // /**
+    // * Manually sets the background and foreground colors for the erosion and dilation methods and derivative methods.
+    // *
+    // * @param rgbBackgroundColor
+    // * the rgb value of the background color for erosion/ dilation
+    // * @param rgbForegroundColor
+    // * the rgb value of the foreground color erosion/ dilation
+    // */
+    // protected ImageOperations(final int rgbBackgroundColor, final int rgbForegroundColor, final int
+    // compressionFactor,
+    // final double structElementScale)
+    // {
+    // this.rgbBackgroundColor = rgbBackgroundColor;
+    // this.rgbForegroundColor = rgbForegroundColor;
+    // // TODO: missing usage of compressionFactor and structElementScale
+    // }
 
     /**
      * Scales a binary image up to the given size. Does not innately preserve Width/ Height ratio. Used in closeImage.
@@ -90,7 +92,6 @@ public class ImageOperations
                 {
                     for (int y = h * scalingFactor; y < (h + 1) * scalingFactor; y++)
                     {
-
                         // Check if it isn't over the border
                         if (x < img.getWidth() && y < img.getHeight())
                         {
@@ -135,18 +136,15 @@ public class ImageOperations
         {
             for (int h = 0; h < img.getHeight(); h++)
             {
-
                 // Check if it has the foreground color
                 if (img.getRGB(w, h) == rgbForegroundColor)
                 {
-
                     // And set every pixel in the corresponding block true if it
                     // does
                     for (int x = w * scalingFactor; x < w * scalingFactor + scalingFactor; x++)
                     {
                         for (int y = h * scalingFactor; y < h * scalingFactor + scalingFactor; y++)
                         {
-
                             // So long as it doesn't go over the border
                             if (x < scaledImage.getWidth() && y < scaledImage.getHeight())
                             {
