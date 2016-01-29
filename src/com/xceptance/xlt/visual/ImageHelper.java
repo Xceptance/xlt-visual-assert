@@ -5,9 +5,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class ImageHelper
 {
@@ -44,11 +42,6 @@ public class ImageHelper
         g.dispose();
 
         return copy;
-    }
-
-    protected static BufferedImage createEmptyImage(int width, int height, int type)
-    {
-        return new BufferedImage(width, height, type);
     }
 
     protected static BufferedImage createEmptyImage(BufferedImage source)
@@ -156,6 +149,13 @@ public class ImageHelper
         return pixelPerBlock;
     }
 
+    /**
+     * Exact pixel by pixel compare. Images must have the same size
+     * 
+     * @param img1
+     * @param img2
+     * @return {@link int[][]} or null where int[i][0] = x, int[i][1] = y
+     */
     protected static int[][] imageCompare(final BufferedImage img1, final BufferedImage img2)
     {
         final ArrayList<Integer> xCoords = new ArrayList<Integer>();
@@ -423,7 +423,7 @@ public class ImageHelper
         // }
         final Graphics g = newImg.createGraphics();
 
-        // TODO: START untested filling method, compare with out commented code above
+        // TODO: START untested filling method, compare with commented out code above
         g.setColor(new Color(0, 0, 0, 0));
         g.fillRect(0, 0, width, height);
         // TODO: END
@@ -701,7 +701,6 @@ public class ImageHelper
                 x = pixels[i][0];
                 y = pixels[i][1];
                 colorPixel(copy, x, y, c);
-                // copy.setRGB(x, y, getComplementary(new Color(copy.getRGB(x, y))).getRGB());
             }
 
             return copy;
@@ -837,22 +836,6 @@ public class ImageHelper
         {
             return Color.RED;
         }
-    }
-
-    /**
-     * Initializes the difference image. It is initialized fully black, since black = no difference. Works directly on
-     * the difference image.
-     * 
-     * @param imageWidth
-     * @param imageHeight
-     */
-    protected static BufferedImage initializeDifferenceImage(int imageWidth, int imageHeight)
-    {
-        BufferedImage difference = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_ARGB);
-        final int[] differenceArray = ((DataBufferInt) difference.getRaster().getDataBuffer()).getData();
-        Arrays.fill(differenceArray, Color.BLACK.getRGB());
-
-        return difference;
     }
 
     /**

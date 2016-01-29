@@ -237,16 +237,17 @@ public class VisualAssertion implements WebDriverCustomModule
             // the difference image file
             final File differenceImageFile = new File(currentScreenShotPath, screenshotName + "-difference" + ".png");
 
-            //////////////////////////////////
             ComparisonAlgorithm algorithm = null;
             switch (algorithmString)
             {
                 case PROPERTY_ALGORITHM_COLORFUZZY:
                     algorithm = new ColorFuzzy(colorTolerance);
                     break;
+
                 case PROPERTY_ALGORITHM_EXACTMATCH:
                     algorithm = new ExactMatch();
                     break;
+
                 case PROPERTY_ALGORITHM_FUZZY:
                     algorithm = new PixelFuzzy(pixelTolerance, colorTolerance, pixelPerBlockXY);
                     break;
@@ -286,15 +287,6 @@ public class VisualAssertion implements WebDriverCustomModule
 
                 writeImage(comperator.getMarkedDifferencesImage(markBlockSizeX, markBlockSizeY, null), markedImageFile);
             }
-
-            // // Initializes ImageComparison and calls isEqual
-            // final ImageComparison imagecomparison = new ImageComparison(algorithm, markBlockSizeX, markBlockSizeY,
-            // pixelPerBlockXY,
-            // colorTolerance, pixelTolerance, trainingsModeEnabled, closeMask,
-            // closeMaskWidth, closeMaskHeight, differenceImage);
-            //
-            // final boolean result = imagecomparison.isEqual(reference, screenshot, maskImageFile, markedImageFile,
-            // differenceImageFile);
 
             final String assertMessage = "Website does not match the reference screenshot: " + currentActionName;
             Assert.assertTrue(assertMessage, result);

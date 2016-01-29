@@ -97,8 +97,6 @@ public class ImageMask
             x = Math.max(0, pixels[i][0] - halfMarkingSizeX);
             y = Math.max(0, pixels[i][1] - halfMarkingSizeY);
 
-            // copy = ImageHelper.drawRect(copy, maskingColor, x, y, markerMaskWidth, markerMaskHeight);
-
             g.fillRect(x, y, markerMaskWidth, markerMaskHeight);
 
         }

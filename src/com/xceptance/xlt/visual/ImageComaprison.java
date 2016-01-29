@@ -57,6 +57,7 @@ public class ImageComaprison
             case COLORFUZZY:
                 lastDifferences = ImageHelper.colorFuzzyCompare(maskedReference, maskedCompareImage, algorithm.getColorTolerance());
                 break;
+
             case PIXELFUZZY:
                 lastDifferences = ImageHelper.fuzzyCompare(maskedReference, maskedCompareImage, algorithm.getColorTolerance(),
                                                            algorithm.getPixelTolerance(), algorithm.getFuzzyBlockSize());
