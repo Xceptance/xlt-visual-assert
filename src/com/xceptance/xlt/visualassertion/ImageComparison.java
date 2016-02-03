@@ -40,9 +40,9 @@ public class ImageComparison
         if (maxWidth != minWidth || maxHeight != minHeight)
         {
             resized = true;
-            reference = ImageHelper.adeptImageSize(reference, maxWidth, maxHeight);
-            lastCompareImage = ImageHelper.adeptImageSize(lastCompareImage, maxWidth, maxHeight);
-            maskCopy = ImageHelper.adeptImageSize(maskCopy, maxWidth, maxHeight);
+            reference = ImageHelper.adaptImageSize(reference, maxWidth, maxHeight);
+            lastCompareImage = ImageHelper.adaptImageSize(lastCompareImage, maxWidth, maxHeight);
+            maskCopy = ImageHelper.adaptImageSize(maskCopy, maxWidth, maxHeight);
 
         }
         BufferedImage maskedReference = ImageHelper.overlayMaskImage(reference, maskCopy, ImageHelper.BLACK.getRGB());

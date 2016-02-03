@@ -433,7 +433,7 @@ public class ImageHelper
         return newImg;
     }
 
-    protected static BufferedImage adeptImageSize(BufferedImage img, int width, int height)
+    protected static BufferedImage adaptImageSize(BufferedImage img, int width, int height)
     {
         if (img.getWidth() != width || img.getHeight() != height)
         {
