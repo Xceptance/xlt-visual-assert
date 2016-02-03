@@ -38,6 +38,8 @@ public class VisualAssertion implements WebDriverCustomModule
     // the property defaults
     private final int WAITINGTIME = 300;
 
+    private final String ALL = "all";
+
     private final int MARK_BLOCKSIZE_X = 10;
 
     private final int MARK_BLOCKSIZE_Y = 10;
@@ -71,6 +73,7 @@ public class VisualAssertion implements WebDriverCustomModule
 
     // the property names
     public final String PROPERTY_RESULT_DIRECTORY = PREFIX + "resultDirectory";
+    public final String PROPERTY_ID = PREFIX + "ID";
 
     public final String PROPERTY_WAITING_TIME = PREFIX + "waitingTime";
 
@@ -146,6 +149,9 @@ public class VisualAssertion implements WebDriverCustomModule
         // algorithm
         final String algorithmString = props.getProperty(PROPERTY_ALGORITHM, ALGORITHM).trim().toUpperCase();
 
+        // something to distinguish environments
+        final String id = props.getProperty(PROPERTY_ID, ALL);
+
         // Get testcasename for the correct folder
         final String currentTestCaseName = Session.getCurrent().getUserName();
 
@@ -156,7 +162,7 @@ public class VisualAssertion implements WebDriverCustomModule
         final String currentActionName = Session.getCurrent().getCurrentActionName();
 
         // Get path to the directory
-        final File targetDirectory = new File(new File(resultDirectory, currentTestCaseName), browserName);
+        final File targetDirectory = new File(new File(new File(resultDirectory, id), currentTestCaseName), browserName);
         targetDirectory.mkdirs();
 
         // retrieve current index counter
@@ -181,7 +187,7 @@ public class VisualAssertion implements WebDriverCustomModule
         final File referenceScreenShotFile = new File(resultDirectoryBaselinePath, screenshotName + ".png");
 
         // where the current screenshot goes
-        final File currentScreenShotPath = new File(new File(resultDirectoryBaselinePath, RESULT_DIRECTORY_RESULTS),
+        final File currentScreenShotPath = new File(new File(targetDirectory, RESULT_DIRECTORY_RESULTS),
                 Session.getCurrent().getID());
         currentScreenShotPath.mkdirs();
 
