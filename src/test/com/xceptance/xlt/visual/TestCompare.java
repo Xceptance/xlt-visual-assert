@@ -5,11 +5,11 @@ import java.awt.image.BufferedImage;
 
 import org.junit.Assert;
 
-import com.xceptance.xlt.visual.ImageComparison;
-import com.xceptance.xlt.visual.ImageMask;
-import com.xceptance.xlt.visual.algorithm.ComparisonAlgorithm;
-import com.xceptance.xlt.visual.algorithm.ExactMatch;
-import com.xceptance.xlt.visual.mask.RectangleMask;
+import com.xceptance.xlt.visualassertion.ImageComparison;
+import com.xceptance.xlt.visualassertion.ImageMask;
+import com.xceptance.xlt.visualassertion.algorithm.ComparisonAlgorithm;
+import com.xceptance.xlt.visualassertion.algorithm.ExactMatch;
+import com.xceptance.xlt.visualassertion.mask.RectangleMask;
 
 public class TestCompare extends ImageTest
 {

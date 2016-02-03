@@ -1,4 +1,4 @@
-package com.xceptance.xlt.visual.algorithm;
+package com.xceptance.xlt.visualassertion.algorithm;
 
 public class PixelFuzzy extends ComparisonAlgorithm
 {

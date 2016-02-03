@@ -1,9 +1,9 @@
-package com.xceptance.xlt.visual;
+package com.xceptance.xlt.visualassertion;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
-import com.xceptance.xlt.visual.algorithm.ComparisonAlgorithm;
+import com.xceptance.xlt.visualassertion.algorithm.ComparisonAlgorithm;
 
 public class ImageComparison
 {

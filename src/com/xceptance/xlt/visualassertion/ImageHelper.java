@@ -1,4 +1,4 @@
-package com.xceptance.xlt.visual;
+package com.xceptance.xlt.visualassertion;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;

@@ -1,4 +1,4 @@
-package com.xceptance.xlt.visual.xltmodule;
+package com.xceptance.xlt.visualassertion;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -19,13 +19,11 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import com.xceptance.xlt.api.engine.Session;
 import com.xceptance.xlt.api.engine.scripting.WebDriverCustomModule;
 import com.xceptance.xlt.api.util.XltProperties;
-import com.xceptance.xlt.visual.ImageComparison;
-import com.xceptance.xlt.visual.ImageMask;
-import com.xceptance.xlt.visual.algorithm.ColorFuzzy;
-import com.xceptance.xlt.visual.algorithm.ComparisonAlgorithm;
-import com.xceptance.xlt.visual.algorithm.ExactMatch;
-import com.xceptance.xlt.visual.algorithm.PixelFuzzy;
-import com.xceptance.xlt.visual.mask.RectangleMask;
+import com.xceptance.xlt.visualassertion.algorithm.ColorFuzzy;
+import com.xceptance.xlt.visualassertion.algorithm.ComparisonAlgorithm;
+import com.xceptance.xlt.visualassertion.algorithm.ExactMatch;
+import com.xceptance.xlt.visualassertion.algorithm.PixelFuzzy;
+import com.xceptance.xlt.visualassertion.mask.RectangleMask;
 
 public class VisualAssertion implements WebDriverCustomModule
 {
@@ -105,7 +103,7 @@ public class VisualAssertion implements WebDriverCustomModule
     public final String PROPERTY_ALGORITHM_EXACTMATCH = "EXACT";
 
     @Override
-    public void execute(WebDriver webdriver, String... arguments)
+    public void execute(final WebDriver webdriver, final String... arguments)
     {
         final XltProperties props = XltProperties.getInstance();
 
@@ -184,7 +182,7 @@ public class VisualAssertion implements WebDriverCustomModule
 
         // where the current screenshot goes
         final File currentScreenShotPath = new File(new File(resultDirectoryBaselinePath, RESULT_DIRECTORY_RESULTS),
-                                                    Session.getCurrent().getID());
+                Session.getCurrent().getID());
         currentScreenShotPath.mkdirs();
 
         final File currentScreenShotFile = new File(currentScreenShotPath, screenshotName + ".png");
@@ -201,7 +199,7 @@ public class VisualAssertion implements WebDriverCustomModule
 
         try
         {
-            BufferedImage screenshot = takeScreenshot(webdriver);
+            final BufferedImage screenshot = takeScreenshot(webdriver);
             if (screenshot == null)
             {
                 // webdriver cannot take screenshots, so leave here
@@ -240,17 +238,17 @@ public class VisualAssertion implements WebDriverCustomModule
             ComparisonAlgorithm algorithm = null;
             switch (algorithmString)
             {
-                case PROPERTY_ALGORITHM_COLORFUZZY:
-                    algorithm = new ColorFuzzy(colorTolerance);
-                    break;
+            case PROPERTY_ALGORITHM_COLORFUZZY:
+                algorithm = new ColorFuzzy(colorTolerance);
+                break;
 
-                case PROPERTY_ALGORITHM_EXACTMATCH:
-                    algorithm = new ExactMatch();
-                    break;
+            case PROPERTY_ALGORITHM_EXACTMATCH:
+                algorithm = new ExactMatch();
+                break;
 
-                case PROPERTY_ALGORITHM_FUZZY:
-                    algorithm = new PixelFuzzy(pixelTolerance, colorTolerance, pixelPerBlockXY);
-                    break;
+            case PROPERTY_ALGORITHM_FUZZY:
+                algorithm = new PixelFuzzy(pixelTolerance, colorTolerance, pixelPerBlockXY);
+                break;
             }
 
             ImageMask mask;
@@ -276,9 +274,9 @@ public class VisualAssertion implements WebDriverCustomModule
                 writeImage(mask.getMask(), maskImageFile);
             }
 
-            ImageComparison comperator = new ImageComparison(reference);
+            final ImageComparison comperator = new ImageComparison(reference);
 
-            boolean result = comperator.isEqual(screenshot, mask, algorithm);
+            final boolean result = comperator.isEqual(screenshot, mask, algorithm);
 
             if (!result)
             {
@@ -318,7 +316,7 @@ public class VisualAssertion implements WebDriverCustomModule
             {
                 return ImageIO.read(new ByteArrayInputStream(bytes));
             }
-            catch (IOException e)
+            catch (final IOException e)
             {
                 throw new RuntimeException(e);
             }
@@ -344,13 +342,13 @@ public class VisualAssertion implements WebDriverCustomModule
         return browserName;
     }
 
-    private void writeImage(BufferedImage image, File file)
+    private void writeImage(final BufferedImage image, final File file)
     {
         try
         {
             ImageIO.write(image, "PNG", file);
         }
-        catch (IOException e)
+        catch (final IOException e)
         {
             throw new RuntimeException(e);
         }
