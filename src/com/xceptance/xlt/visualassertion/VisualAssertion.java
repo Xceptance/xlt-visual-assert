@@ -147,7 +147,7 @@ public class VisualAssertion implements WebDriverCustomModule
         final String algorithmString = props.getProperty(PROPERTY_ALGORITHM, ALGORITHM).trim().toUpperCase();
 
         // Get testcasename for the correct folder
-        final String currentTestCaseName = Session.getCurrent().getUserID();
+        final String currentTestCaseName = Session.getCurrent().getUserName();
 
         // Get browsername for the correct subfolder
         final String browserName = getBrowserName(webdriver);
