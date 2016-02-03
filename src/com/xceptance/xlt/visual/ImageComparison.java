@@ -3,9 +3,9 @@ package com.xceptance.xlt.visual;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
-import com.xceptance.xlt.visual.alogrithm.ComparisonAlgorithm;
+import com.xceptance.xlt.visual.algorithm.ComparisonAlgorithm;
 
-public class ImageComaprison
+public class ImageComparison
 {
     private int[][] lastDifferences = null;
 
@@ -19,7 +19,7 @@ public class ImageComaprison
     // must be adepted
     private int initialWidth = 0, initialHeight = 0;
 
-    public ImageComaprison(BufferedImage reference)
+    public ImageComparison(BufferedImage reference)
     {
         this.reference = reference;
     }

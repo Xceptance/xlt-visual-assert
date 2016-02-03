@@ -19,12 +19,12 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import com.xceptance.xlt.api.engine.Session;
 import com.xceptance.xlt.api.engine.scripting.WebDriverCustomModule;
 import com.xceptance.xlt.api.util.XltProperties;
-import com.xceptance.xlt.visual.ImageComaprison;
+import com.xceptance.xlt.visual.ImageComparison;
 import com.xceptance.xlt.visual.ImageMask;
-import com.xceptance.xlt.visual.alogrithm.ColorFuzzy;
-import com.xceptance.xlt.visual.alogrithm.ComparisonAlgorithm;
-import com.xceptance.xlt.visual.alogrithm.ExactMatch;
-import com.xceptance.xlt.visual.alogrithm.PixelFuzzy;
+import com.xceptance.xlt.visual.algorithm.ColorFuzzy;
+import com.xceptance.xlt.visual.algorithm.ComparisonAlgorithm;
+import com.xceptance.xlt.visual.algorithm.ExactMatch;
+import com.xceptance.xlt.visual.algorithm.PixelFuzzy;
 import com.xceptance.xlt.visual.mask.RectangleMask;
 
 public class VisualAssertion implements WebDriverCustomModule
@@ -276,7 +276,7 @@ public class VisualAssertion implements WebDriverCustomModule
                 writeImage(mask.getMask(), maskImageFile);
             }
 
-            ImageComaprison comperator = new ImageComaprison(reference);
+            ImageComparison comperator = new ImageComparison(reference);
 
             boolean result = comperator.isEqual(screenshot, mask, algorithm);
 

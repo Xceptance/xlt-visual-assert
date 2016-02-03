@@ -3,8 +3,8 @@ package test.com.xceptance.xlt.visual.exact;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.xceptance.xlt.visual.alogrithm.ComparisonAlgorithm;
-import com.xceptance.xlt.visual.alogrithm.ExactMatch;
+import com.xceptance.xlt.visual.algorithm.ComparisonAlgorithm;
+import com.xceptance.xlt.visual.algorithm.ExactMatch;
 import com.xceptance.xlt.visual.mask.RectangleMask;
 
 import test.com.xceptance.xlt.visual.ImageTest;

@@ -5,10 +5,10 @@ import java.awt.image.BufferedImage;
 
 import org.junit.Assert;
 
-import com.xceptance.xlt.visual.ImageComaprison;
+import com.xceptance.xlt.visual.ImageComparison;
 import com.xceptance.xlt.visual.ImageMask;
-import com.xceptance.xlt.visual.alogrithm.ComparisonAlgorithm;
-import com.xceptance.xlt.visual.alogrithm.ExactMatch;
+import com.xceptance.xlt.visual.algorithm.ComparisonAlgorithm;
+import com.xceptance.xlt.visual.algorithm.ExactMatch;
 import com.xceptance.xlt.visual.mask.RectangleMask;
 
 public class TestCompare extends ImageTest
@@ -17,7 +17,7 @@ public class TestCompare extends ImageTest
 
     private ComparisonAlgorithm algorithm;
 
-    private ImageComaprison comperator;
+    private ImageComparison comperator;
 
     private ImageMask masker;
 
@@ -64,7 +64,7 @@ public class TestCompare extends ImageTest
     public TestCompare to(BufferedImage comparisonImage)
     {
         this.comparisonImage = comparisonImage;
-        comperator = new ImageComaprison(referenceImage);
+        comperator = new ImageComparison(referenceImage);
 
         return this;
     }
@@ -128,7 +128,7 @@ public class TestCompare extends ImageTest
         return masker;
     }
 
-    public ImageComaprison getComperator()
+    public ImageComparison getComperator()
     {
         return comperator;
     }

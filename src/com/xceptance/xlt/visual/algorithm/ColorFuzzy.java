@@ -1,4 +1,4 @@
-package com.xceptance.xlt.visual.alogrithm;
+package com.xceptance.xlt.visual.algorithm;
 
 public class ColorFuzzy extends ComparisonAlgorithm
 {

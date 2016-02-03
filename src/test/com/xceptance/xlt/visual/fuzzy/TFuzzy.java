@@ -5,8 +5,8 @@ import java.io.IOException;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.xceptance.xlt.visual.alogrithm.ComparisonAlgorithm;
-import com.xceptance.xlt.visual.alogrithm.PixelFuzzy;
+import com.xceptance.xlt.visual.algorithm.ComparisonAlgorithm;
+import com.xceptance.xlt.visual.algorithm.PixelFuzzy;
 import com.xceptance.xlt.visual.mask.RectangleMask;
 
 import test.com.xceptance.xlt.visual.ImageTest;
