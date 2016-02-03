@@ -153,7 +153,7 @@ public class VisualAssertion implements WebDriverCustomModule
         final String browserName = getBrowserName(webdriver);
 
         // get the current action for naming
-        final String currentActionName = Session.getCurrent().getWebDriverActionName();
+        final String currentActionName = Session.getCurrent().getCurrentActionName();
 
         // Get path to the directory
         final File targetDirectory = new File(new File(resultDirectory, currentTestCaseName), browserName);
