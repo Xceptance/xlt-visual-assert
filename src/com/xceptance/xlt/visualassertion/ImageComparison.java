@@ -51,7 +51,7 @@ public class ImageComparison
         switch (algorithm.getType())
         {
             case EXACTMATCH:
-                lastDifferences = ImageHelper.imageCompare(maskedReference, maskedCompareImage);
+                lastDifferences = ImageHelper.compareImages(maskedReference, maskedCompareImage);
                 break;
 
             case COLORFUZZY:

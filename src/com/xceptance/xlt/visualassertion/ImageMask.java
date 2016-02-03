@@ -57,7 +57,7 @@ public class ImageMask
                 break;
 
             case EXACTMATCH:
-                differences = ImageHelper.imageCompare(reference, image);
+                differences = ImageHelper.compareImages(reference, image);
                 break;
         }
 

@@ -156,7 +156,7 @@ public class ImageHelper
      * @param img2
      * @return {@link int[][]} or null where int[i][0] = x, int[i][1] = y
      */
-    protected static int[][] imageCompare(final BufferedImage img1, final BufferedImage img2)
+    protected static int[][] compareImages(final BufferedImage img1, final BufferedImage img2)
     {
         final ArrayList<Integer> xCoords = new ArrayList<Integer>();
         final ArrayList<Integer> yCoords = new ArrayList<Integer>();
