@@ -2,7 +2,7 @@
 <testcase xmlns="http://xlt.xceptance.com/xlt-script/2" version="6" baseURL="http://localhost:8080">
   <description>Simulates browsing the catalog, adding product(s) to the cart, checkout as guest and place the order.</description>
   <module name="posters.functional.modules.OpenHomepage"/>
-  <module name="posters.functional.modules.AssertVisually"/>
+  <module name="posters.functional.modules.VisualAssertion"/>
   <module name="posters.functional.modules.AddToCart"/>
   <action name="OpenCartOverview"/>
   <command name="clickAndWait" target="id=headerCartOverview"/>
