@@ -262,7 +262,7 @@ public class VisualAssertion implements WebDriverCustomModule
             else
             {
                 mask = new ImageMask(reference);
-                ImageIO.write(mask.getMask(), "PNG", maskImageFile);
+                writeImage(mask.getMask(), maskImageFile);
             }
 
             if (trainingsModeEnabled)
@@ -273,7 +273,7 @@ public class VisualAssertion implements WebDriverCustomModule
                 if (closeMask)
                     mask.closeMask(closeMaskWidth, closeMaskHeight);
 
-                ImageIO.write(mask.getMask(), "PNG", maskImageFile);
+                writeImage(mask.getMask(), maskImageFile);
             }
 
             ImageComaprison comperator = new ImageComaprison(reference);

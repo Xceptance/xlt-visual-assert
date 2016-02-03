@@ -23,7 +23,7 @@ public class ImageMask
             this.mask = ImageHelper.createEmptyImage(referenceImage);
 
             // fill the mask with transparent white
-            this.mask = ImageHelper.fillImage(this.reference, ImageHelper.WHITE_TRANSPARENT);
+            this.mask = ImageHelper.fillImage(this.mask, ImageHelper.WHITE_TRANSPARENT);
         }
         else
         {
