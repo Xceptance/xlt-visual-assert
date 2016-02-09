@@ -4,6 +4,7 @@
   <module name="posters.functional.modules.OpenHomepage"/>
   <module name="posters.functional.modules.VisualAssertion"/>
   <module name="posters.functional.modules.AddToCart"/>
+  <module name="posters.functional.modules.VisualAssertion"/>
   <action name="OpenCartOverview"/>
   <command name="clickAndWait" target="id=headerCartOverview"/>
   <action name="StartCheckout"/>
@@ -43,6 +44,7 @@
     <parameter name="year" value="${expDateYear}"/>
   </module>
   <command name="clickAndWait" target="id=btnAddPayment"/>
+  <module name="posters.functional.modules.VisualAssertion"/>
   <action name="Order"/>
   <module name="posters.functional.modules.VerifyOrderOverview">
     <parameter name="index" value="0"/>
@@ -66,4 +68,5 @@
   <command name="clickAndWait" target="id=btnOrder"/>
   <command name="assertElementPresent" target="id=successMessage"/>
   <command name="assertText" target="id=btnCartOverview" value="regexp:.*0.*0.*"/>
+  <module name="posters.functional.modules.VisualAssertion"/>
 </testcase>

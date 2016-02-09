@@ -17,25 +17,25 @@ public class ImageComparison
 
     // only used to draw borders in difference file if on image compare one of the images had different sizes and image
     // must be adepted
-    private int initialWidth = 0, initialHeight = 0;
+    private final int initialWidth = 0, initialHeight = 0;
 
-    public ImageComparison(BufferedImage reference)
+    public ImageComparison(final BufferedImage reference)
     {
         this.reference = reference;
     }
 
-    public boolean isEqual(BufferedImage compareImage, BufferedImage mask, ComparisonAlgorithm algorithm)
+    public boolean isEqual(final BufferedImage compareImage, final BufferedImage mask, final ComparisonAlgorithm algorithm)
     {
         resized = false;
 
         lastCompareImage = ImageHelper.copyImage(compareImage);
         BufferedImage maskCopy = ImageHelper.copyImage(mask);
 
-        int maxWidth = Math.max(reference.getWidth(), lastCompareImage.getWidth());
-        int maxHeight = Math.max(reference.getHeight(), lastCompareImage.getHeight());
+        final int maxWidth = Math.max(reference.getWidth(), lastCompareImage.getWidth());
+        final int maxHeight = Math.max(reference.getHeight(), lastCompareImage.getHeight());
 
-        int minWidth = Math.min(reference.getWidth(), lastCompareImage.getWidth());
-        int minHeight = Math.min(reference.getHeight(), lastCompareImage.getHeight());
+        final int minWidth = Math.min(reference.getWidth(), lastCompareImage.getWidth());
+        final int minHeight = Math.min(reference.getHeight(), lastCompareImage.getHeight());
 
         if (maxWidth != minWidth || maxHeight != minHeight)
         {
@@ -45,23 +45,23 @@ public class ImageComparison
             maskCopy = ImageHelper.adaptImageSize(maskCopy, maxWidth, maxHeight);
 
         }
-        BufferedImage maskedReference = ImageHelper.overlayMaskImage(reference, maskCopy, ImageHelper.BLACK.getRGB());
-        BufferedImage maskedCompareImage = ImageHelper.overlayMaskImage(lastCompareImage, maskCopy, ImageHelper.BLACK.getRGB());
+        final BufferedImage maskedReference = ImageHelper.overlayMaskImage(reference, maskCopy, ImageHelper.BLACK.getRGB());
+        final BufferedImage maskedCompareImage = ImageHelper.overlayMaskImage(lastCompareImage, maskCopy, ImageHelper.BLACK.getRGB());
 
         switch (algorithm.getType())
         {
-            case EXACTMATCH:
-                lastDifferences = ImageHelper.compareImages(maskedReference, maskedCompareImage);
-                break;
+        case EXACTMATCH:
+            lastDifferences = ImageHelper.compareImages(maskedReference, maskedCompareImage);
+            break;
 
-            case COLORFUZZY:
-                lastDifferences = ImageHelper.colorFuzzyCompare(maskedReference, maskedCompareImage, algorithm.getColorTolerance());
-                break;
+        case COLORFUZZY:
+            lastDifferences = ImageHelper.colorFuzzyCompare(maskedReference, maskedCompareImage, algorithm.getColorTolerance());
+            break;
 
-            case PIXELFUZZY:
-                lastDifferences = ImageHelper.fuzzyCompare(maskedReference, maskedCompareImage, algorithm.getColorTolerance(),
-                                                           algorithm.getPixelTolerance(), algorithm.getFuzzyBlockSize());
-                break;
+        case PIXELFUZZY:
+            lastDifferences = ImageHelper.fuzzyCompare(maskedReference, maskedCompareImage, algorithm.getColorTolerance(),
+                    algorithm.getPixelTolerance(), algorithm.getFuzzyBlockSize());
+            break;
         }
 
         if (lastDifferences != null)
@@ -72,14 +72,16 @@ public class ImageComparison
         return true;
     }
 
-    public boolean isEqual(BufferedImage compareImage, ImageMask mask, ComparisonAlgorithm algorithm)
+    public boolean isEqual(final BufferedImage compareImage, final ImageMask mask, final ComparisonAlgorithm algorithm)
     {
         return isEqual(compareImage, mask.getMask(), algorithm);
     }
 
-    public BufferedImage getMarkedDifferencesImage(int markingSizeX, int markingSizeY, Color c)
+    public BufferedImage getMarkedDifferencesImage(final int markingSizeX, final int markingSizeY, final Color c)
     {
-        return ImageHelper.markDifferences(lastCompareImage, lastDifferences, markingSizeX, markingSizeY, c);
+        return ImageHelper.markDifferences(lastCompareImage, lastDifferences, markingSizeX, markingSizeY, 
+                new Color(228, 252, 90, 50), // yellow
+                new Color(228, 0, 0));
     }
 
     public BufferedImage getDifferenceImage()

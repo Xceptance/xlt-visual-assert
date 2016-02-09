@@ -275,7 +275,9 @@ public class VisualAssertion implements WebDriverCustomModule
                 mask.train(screenshot, algorithm, new RectangleMask(markBlockSizeX, markBlockSizeY));
 
                 if (closeMask)
+                {
                     mask.closeMask(closeMaskWidth, closeMaskHeight);
+                }
 
                 writeImage(mask.getMask(), maskImageFile);
             }
@@ -287,7 +289,9 @@ public class VisualAssertion implements WebDriverCustomModule
             if (!result)
             {
                 if (differenceImage)
+                {
                     writeImage(comperator.getDifferenceImage(), differenceImageFile);
+                }
 
                 writeImage(comperator.getMarkedDifferencesImage(markBlockSizeX, markBlockSizeY, null), markedImageFile);
             }
