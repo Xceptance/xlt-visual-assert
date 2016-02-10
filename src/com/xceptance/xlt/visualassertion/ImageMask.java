@@ -9,18 +9,18 @@ import com.xceptance.xlt.visualassertion.mask.RectangleMask;
 
 public class ImageMask
 {
-    private BufferedImage reference;
+    private final BufferedImage reference;
 
     private BufferedImage mask;
 
-    public ImageMask(BufferedImage referenceImage, BufferedImage maskImage)
+    public ImageMask(final BufferedImage referenceImage, final BufferedImage maskImage)
     {
         this.reference = ImageHelper.copyImage(referenceImage);
 
         if (maskImage == null)
         {
             // create a new mask with same dimensions as reference image
-            this.mask = ImageHelper.createEmptyImage(referenceImage);
+            this.mask = ImageHelper.createEmptyImage(referenceImage, BufferedImage.TYPE_INT_ARGB);
 
             // fill the mask with transparent white
             this.mask = ImageHelper.fillImage(this.mask, ImageHelper.WHITE_TRANSPARENT);
@@ -31,7 +31,7 @@ public class ImageMask
         }
     }
 
-    public ImageMask(BufferedImage referenceImage)
+    public ImageMask(final BufferedImage referenceImage)
     {
         this(referenceImage, null);
     }
@@ -41,24 +41,24 @@ public class ImageMask
         return ImageHelper.copyImage(mask);
     }
 
-    public void train(BufferedImage image, ComparisonAlgorithm algorithm, RectangleMask markerMask)
+    public void train(final BufferedImage image, final ComparisonAlgorithm algorithm, final RectangleMask markerMask)
     {
         int[][] differences = null;
 
         switch (algorithm.getType())
         {
-            case PIXELFUZZY:
-                differences = ImageHelper.fuzzyCompare(reference, image, algorithm.getColorTolerance(), algorithm.getPixelTolerance(),
-                                                       algorithm.getFuzzyBlockSize());
-                break;
+        case PIXELFUZZY:
+            differences = ImageHelper.fuzzyCompare(reference, image, algorithm.getColorTolerance(), algorithm.getPixelTolerance(),
+                    algorithm.getFuzzyBlockSize());
+            break;
 
-            case COLORFUZZY:
-                differences = ImageHelper.colorFuzzyCompare(reference, image, algorithm.getColorTolerance());
-                break;
+        case COLORFUZZY:
+            differences = ImageHelper.colorFuzzyCompare(reference, image, algorithm.getColorTolerance());
+            break;
 
-            case EXACTMATCH:
-                differences = ImageHelper.compareImages(reference, image);
-                break;
+        case EXACTMATCH:
+            differences = ImageHelper.compareImages(reference, image);
+            break;
         }
 
         mask = maskDifferences(mask, differences, markerMask, ImageHelper.BLACK);
@@ -72,9 +72,9 @@ public class ImageMask
      *            the array with the differences.
      * @return
      */
-    private BufferedImage maskDifferences(final BufferedImage image, final int[][] pixels, RectangleMask markerMask, Color maskingColor)
+    private BufferedImage maskDifferences(final BufferedImage image, final int[][] pixels, final RectangleMask markerMask, final Color maskingColor)
     {
-        BufferedImage copy = ImageHelper.copyImage(image);
+        final BufferedImage copy = ImageHelper.copyImage(image);
 
         if (pixels == null)
             return copy;
@@ -82,14 +82,14 @@ public class ImageMask
         // This method doesn't need a separate if for markingX/ markingY = 1,
         // the colorArea method works for them
 
-        int halfMarkingSizeX = markerMask.getWidth() / 2;
-        int halfMarkingSizeY = markerMask.getHeight() / 2;
+        final int halfMarkingSizeX = markerMask.getWidth() / 2;
+        final int halfMarkingSizeY = markerMask.getHeight() / 2;
 
-        int markerMaskWidth = markerMask.getWidth();
-        int markerMaskHeight = markerMask.getHeight();
+        final int markerMaskWidth = markerMask.getWidth();
+        final int markerMaskHeight = markerMask.getHeight();
 
         int x, y;
-        Graphics2D g = copy.createGraphics();
+        final Graphics2D g = copy.createGraphics();
         g.setColor(maskingColor);
 
         for (int i = 0; i < pixels.length; i++)
@@ -105,9 +105,9 @@ public class ImageMask
         return copy;
     }
 
-    public void closeMask(int structureElementWidth, int structureElementHeight)
+    public void closeMask(final int structureElementWidth, final int structureElementHeight)
     {
         mask = ImageHelper.closeImage(mask, structureElementWidth, structureElementHeight, ImageHelper.BLACK.getRGB(),
-                                      ImageHelper.WHITE_TRANSPARENT.getRGB());
+                ImageHelper.WHITE_TRANSPARENT.getRGB());
     }
 }

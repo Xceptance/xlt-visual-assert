@@ -44,14 +44,8 @@ public class ImageHelper
         return copy;
     }
 
-    protected static BufferedImage createEmptyImage(final BufferedImage source)
+    protected static BufferedImage createEmptyImage(final BufferedImage source, final int imageType)
     {
-        int imageType = source.getType();
-        if (imageType == 0)
-        {
-            imageType = BufferedImage.TYPE_INT_ARGB;
-        }
-
         return new BufferedImage(source.getWidth(), source.getHeight(), imageType);
     }
 
