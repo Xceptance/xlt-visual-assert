@@ -282,23 +282,26 @@ public class VisualAssertion implements WebDriverCustomModule
 
                 writeImage(mask.getMask(), maskImageFile);
             }
-
-            final ImageComparison comperator = new ImageComparison(reference);
-
-            final boolean result = comperator.isEqual(screenshot, mask, algorithm);
-
-            if (!result)
+            else
             {
-                if (differenceImage)
+                // if we train, we do not need to compare
+                final ImageComparison comperator = new ImageComparison(reference);
+
+                final boolean result = comperator.isEqual(screenshot, mask, algorithm);
+
+                if (!result)
                 {
-                    writeImage(comperator.getDifferenceImage(), differenceImageFile);
+                    if (differenceImage)
+                    {
+                        writeImage(comperator.getDifferenceImage(), differenceImageFile);
+                    }
+
+                    writeImage(comperator.getMarkedDifferencesImage(markBlockSizeX, markBlockSizeY, null), markedImageFile);
                 }
 
-                writeImage(comperator.getMarkedDifferencesImage(markBlockSizeX, markBlockSizeY, null), markedImageFile);
+                final String assertMessage = "Website does not match the reference screenshot: " + currentActionName;
+                Assert.assertTrue(assertMessage, result);
             }
-
-            final String assertMessage = "Website does not match the reference screenshot: " + currentActionName;
-            Assert.assertTrue(assertMessage, result);
         }
         catch (final IOException e)
         {
