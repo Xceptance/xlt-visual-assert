@@ -157,12 +157,13 @@ public class VisualAssertion implements WebDriverCustomModule
 
         // Get browsername for the correct subfolder
         final String browserName = getBrowserName(webdriver);
+        final String browserVersion = getBrowserVersion(webdriver);
 
         // get the current action for naming
         final String currentActionName = Session.getCurrent().getCurrentActionName();
 
         // Get path to the directory
-        final File targetDirectory = new File(new File(new File(resultDirectory, id), currentTestCaseName), browserName);
+        final File targetDirectory = new File(new File(new File(new File(resultDirectory, id), currentTestCaseName), browserVersion), browserName);
         targetDirectory.mkdirs();
 
         // retrieve current index counter
@@ -349,8 +350,23 @@ public class VisualAssertion implements WebDriverCustomModule
         final Capabilities capabilities = ((RemoteWebDriver) webDriver).getCapabilities();
         final String browserName = capabilities.getBrowserName();
 
-        return browserName;
+        return browserName == null ? "unknown" : browserName;
     }
+
+    /**
+     * Returns the browser version
+     * 
+     * @param webDriver
+     *            the WebDriver to query
+     * @return the browser name
+     */
+    private String getBrowserVersion(final WebDriver webDriver)
+    {
+        final Capabilities capabilities = ((RemoteWebDriver) webDriver).getCapabilities();
+        final String browserVersion = capabilities.getVersion();
+
+        return browserVersion == null ? "unknown" : browserVersion;
+    }    
 
     private void writeImage(final BufferedImage image, final File file)
     {
