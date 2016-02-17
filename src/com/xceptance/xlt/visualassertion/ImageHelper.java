@@ -712,9 +712,6 @@ public class ImageHelper
             return imageCopy;
         }
 
-        final int imageWidth = imageCopy.getWidth();
-        final int imageHeight = imageCopy.getHeight();
-
         final Graphics2D g = imageCopy.createGraphics();
         g.setColor(highlighterColor);
 
