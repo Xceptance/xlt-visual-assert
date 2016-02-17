@@ -78,8 +78,11 @@ public class VisualAssertion implements WebDriverCustomModule
     public final String PROPERTY_WAITING_TIME = PREFIX + "waitingTime";
 
     public final String PROPERTY_MARK_BLOCKSIZE_X = PREFIX + "mark.blocksize.x";
-
     public final String PROPERTY_MARK_BLOCKSIZE_Y = PREFIX + "mark.blocksize.y";
+    public final String PROPERTY_MARK_TYPE = PREFIX + "mark.type";
+
+    public final String MARK_WITH_BOXES = "box";
+    public final String MARK_WITH_A_MARKER = "marker";
 
     public final String PROPERTY_COLOR_TOLERANCE = PREFIX + "tolerance.colors";
 
@@ -100,9 +103,7 @@ public class VisualAssertion implements WebDriverCustomModule
     public final String PROPERTY_ALGORITHM = PREFIX + "algorithm";
 
     public final String PROPERTY_ALGORITHM_FUZZY = "FUZZY";
-
     public final String PROPERTY_ALGORITHM_COLORFUZZY = "COLORFUZZY";
-
     public final String PROPERTY_ALGORITHM_EXACTMATCH = "EXACT";
 
     @Override
@@ -119,6 +120,7 @@ public class VisualAssertion implements WebDriverCustomModule
         // markBlockX, markBlockY
         final int markBlockSizeX = props.getProperty(PROPERTY_MARK_BLOCKSIZE_X, MARK_BLOCKSIZE_X);
         final int markBlockSizeY = props.getProperty(PROPERTY_MARK_BLOCKSIZE_Y, MARK_BLOCKSIZE_Y);
+        final String markType = props.getProperty(PROPERTY_MARK_TYPE, MARK_WITH_BOXES);
 
         // pixelPerBlockXY, fuzzyness parameter
         final int pixelPerBlockXY = props.getProperty(PROPERTY_FUZZY_BLOCKSIZE_XY, FUZZY_BLOCKSIZE_XY);
@@ -296,11 +298,25 @@ public class VisualAssertion implements WebDriverCustomModule
                         writeImage(comperator.getDifferenceImage(), differenceImageFile);
                     }
 
-                    writeImage(comperator.getMarkedDifferencesImage(markBlockSizeX, markBlockSizeY, null), markedImageFile);
+                    BufferedImage markedImage = null;
+                    if (markType.equals(MARK_WITH_A_MARKER))
+                    {
+                        markedImage = comperator.getMarkedImageWithAMarker(markBlockSizeX, markBlockSizeY);
+                    }
+                    else if (markType.equals(MARK_WITH_BOXES))
+                    {
+                        markedImage = comperator.getMarkedImageWithBoxes(markBlockSizeX, markBlockSizeY);
+                    }
+                    else
+                    {
+                        // break
+                        Assert.fail(MessageFormat.format("Mark type '{0}' is not supported.", markType));
+                    }
+
+                    writeImage(markedImage, markedImageFile);
                 }
 
-                final String assertMessage = "Website does not match the reference screenshot: " + currentActionName;
-                Assert.assertTrue(assertMessage, result);
+                Assert.assertTrue(MessageFormat.format("Website does not match the reference screenshot: {0} ", currentActionName), result);
             }
         }
         catch (final IOException e)

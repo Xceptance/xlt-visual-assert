@@ -77,11 +77,14 @@ public class ImageComparison
         return isEqual(compareImage, mask.getMask(), algorithm);
     }
 
-    public BufferedImage getMarkedDifferencesImage(final int markingSizeX, final int markingSizeY, final Color c)
+    public BufferedImage getMarkedImageWithAMarker(final int markingSizeX, final int markingSizeY)
     {
-        return ImageHelper.markDifferences(lastCompareImage, lastDifferences, markingSizeX, markingSizeY, 
-                new Color(228, 252, 90, 50), // yellow
-                new Color(228, 0, 0));
+        return ImageHelper.markDifferencesWithAMarker(lastCompareImage, lastDifferences, markingSizeX, markingSizeY);
+    }
+
+    public BufferedImage getMarkedImageWithBoxes(final int markingSizeX, final int markingSizeY)
+    {
+        return ImageHelper.markDifferencesWithBoxes(lastCompareImage, lastDifferences, markingSizeX, markingSizeY);
     }
 
     public BufferedImage getDifferenceImage()

@@ -675,10 +675,11 @@ public class ImageHelper
         return img;
     }
 
+
     /**
      * Method to mark areas around the detected differences. Goes through every pixel that was different and marks the
      * marking block it is in, unless it was marked already. <br>
-     * If markingX of markingY are 1, it will simply mark the detected differences. Works directly on imgOut.
+     * If markingX of markingY are 1, it will simply mark the detected differences.
      * 
      * @param pixels
      *            the array with the differences.
@@ -686,15 +687,14 @@ public class ImageHelper
      * @param markingSizeY
      * @return
      */
-    protected static BufferedImage markDifferences(final BufferedImage image, final int[][] pixels, final int markingSizeX, final int markingSizeY,
-            final Color highlighterColor, final Color pixelEmphasizeColor)
+    protected static BufferedImage markDifferencesWithBoxes(final BufferedImage image, final int[][] pixels, final int markingSizeX, final int markingSizeY)
     {
         if (pixels == null)
         {
             return null;
         }
 
-        final BufferedImage imageCopy = copyImage(image);
+        final BufferedImage copy = copyImage(image);
 
         // Check if markingX or markingY are 1. If they are, just mark every
         // different pixel,
@@ -706,11 +706,64 @@ public class ImageHelper
             {
                 x = pixels[i][0];
                 y = pixels[i][1];
-                colorPixel(imageCopy, x, y, pixelEmphasizeColor);
+                colorPixel(copy, x, y, null);
             }
 
-            return imageCopy;
+            return copy;
         }
+
+        final int imageWidth = copy.getWidth();
+        final int imageHeight = copy.getHeight();
+        // And if markingX and markingY are above one, paint rectangles!
+        // Normal case
+        final int blocksX = imageWidth / markingSizeX;
+        final int blocksY = imageHeight / markingSizeY;
+
+        final boolean[][] markedBlocks = new boolean[blocksX + 1][blocksY + 1];
+
+        int xBlock, yBlock, subImageWidth, subImageHeight;
+
+        for (int x = 0; x < pixels.length; x++)
+        {
+            xBlock = pixels[x][0] / markingSizeX;
+            yBlock = pixels[x][1] / markingSizeY;
+
+            subImageWidth = calcPixSpan(markingSizeX, xBlock, imageWidth);
+            subImageHeight = calcPixSpan(markingSizeY, yBlock, imageHeight);
+
+            if (!markedBlocks[xBlock][yBlock])
+            {
+                drawBorders(copy, xBlock, yBlock, markingSizeX, markingSizeY, subImageWidth, subImageHeight, null);
+                markedBlocks[xBlock][yBlock] = true;
+            }
+        }
+
+        return copy;
+    }
+
+
+    /**
+     * Method to mark areas around the detected differences. Goes through every pixel that was different and marks the
+     * marking block it is in, unless it was marked already. <br>
+     * If markingX of markingY are 1, it will simply mark the detected differences.
+     * 
+     * @param pixels
+     *            the array with the differences.
+     * @param markingSizeX
+     * @param markingSizeY
+     * @return
+     */
+    protected static BufferedImage markDifferencesWithAMarker(final BufferedImage image, final int[][] pixels, final int markingSizeX, final int markingSizeY)
+    {
+        if (pixels == null)
+        {
+            return null;
+        }
+
+        final BufferedImage imageCopy = copyImage(image);
+
+        final Color highlighterColor = new Color(228, 252, 90, 50);
+        final Color pixelEmphasizeColor = new Color(228, 0, 0);
 
         final Graphics2D g = imageCopy.createGraphics();
         g.setColor(highlighterColor);
@@ -749,11 +802,11 @@ public class ImageHelper
      */
     protected static void colorPixel(final BufferedImage image, final int x, final int y, final Color c)
     {
-        final Color currentColor = new Color(image.getRGB(x, y));
         Color newColor;
 
         if (c == null)
         {
+            final Color currentColor = new Color(image.getRGB(x, y));
             newColor = getComplementary(currentColor);
         }
         else
