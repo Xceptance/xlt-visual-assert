@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testcase xmlns="http://xlt.xceptance.com/xlt-script/2" version="6" baseURL="http://localhost:8080/posters/">
-  <module name="posters.functional.modules.OpenHomepage"/>
-  <module name="posters.functional.modules.AssertVisually"/>
-  <module name="posters.functional.modules.VisualAssertion"/>
-  <command name="click" target="id=btnCarouselNext"/>
-  <module name="posters.functional.modules.AssertVisually"/>
-  <module name="posters.functional.modules.VisualAssertion"/>
-</testcase>

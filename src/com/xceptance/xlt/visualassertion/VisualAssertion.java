@@ -1,4 +1,4 @@
-package com.xceptance.xlt.visual.xltmodule;
+package com.xceptance.xlt.visualassertion;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -19,13 +19,11 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import com.xceptance.xlt.api.engine.Session;
 import com.xceptance.xlt.api.engine.scripting.WebDriverCustomModule;
 import com.xceptance.xlt.api.util.XltProperties;
-import com.xceptance.xlt.visual.ImageComparison;
-import com.xceptance.xlt.visual.ImageMask;
-import com.xceptance.xlt.visual.algorithm.ColorFuzzy;
-import com.xceptance.xlt.visual.algorithm.ComparisonAlgorithm;
-import com.xceptance.xlt.visual.algorithm.ExactMatch;
-import com.xceptance.xlt.visual.algorithm.PixelFuzzy;
-import com.xceptance.xlt.visual.mask.RectangleMask;
+import com.xceptance.xlt.visualassertion.algorithm.ColorFuzzy;
+import com.xceptance.xlt.visualassertion.algorithm.ComparisonAlgorithm;
+import com.xceptance.xlt.visualassertion.algorithm.ExactMatch;
+import com.xceptance.xlt.visualassertion.algorithm.PixelFuzzy;
+import com.xceptance.xlt.visualassertion.mask.RectangleMask;
 
 public class VisualAssertion implements WebDriverCustomModule
 {
@@ -39,6 +37,8 @@ public class VisualAssertion implements WebDriverCustomModule
 
     // the property defaults
     private final int WAITINGTIME = 300;
+
+    private final String ALL = "all";
 
     private final int MARK_BLOCKSIZE_X = 10;
 
@@ -73,12 +73,16 @@ public class VisualAssertion implements WebDriverCustomModule
 
     // the property names
     public final String PROPERTY_RESULT_DIRECTORY = PREFIX + "resultDirectory";
+    public final String PROPERTY_ID = PREFIX + "ID";
 
     public final String PROPERTY_WAITING_TIME = PREFIX + "waitingTime";
 
     public final String PROPERTY_MARK_BLOCKSIZE_X = PREFIX + "mark.blocksize.x";
-
     public final String PROPERTY_MARK_BLOCKSIZE_Y = PREFIX + "mark.blocksize.y";
+    public final String PROPERTY_MARK_TYPE = PREFIX + "mark.type";
+
+    public final String MARK_WITH_BOXES = "box";
+    public final String MARK_WITH_A_MARKER = "marker";
 
     public final String PROPERTY_COLOR_TOLERANCE = PREFIX + "tolerance.colors";
 
@@ -99,13 +103,11 @@ public class VisualAssertion implements WebDriverCustomModule
     public final String PROPERTY_ALGORITHM = PREFIX + "algorithm";
 
     public final String PROPERTY_ALGORITHM_FUZZY = "FUZZY";
-
     public final String PROPERTY_ALGORITHM_COLORFUZZY = "COLORFUZZY";
-
     public final String PROPERTY_ALGORITHM_EXACTMATCH = "EXACT";
 
     @Override
-    public void execute(WebDriver webdriver, String... arguments)
+    public void execute(final WebDriver webdriver, final String... arguments)
     {
         final XltProperties props = XltProperties.getInstance();
 
@@ -118,6 +120,7 @@ public class VisualAssertion implements WebDriverCustomModule
         // markBlockX, markBlockY
         final int markBlockSizeX = props.getProperty(PROPERTY_MARK_BLOCKSIZE_X, MARK_BLOCKSIZE_X);
         final int markBlockSizeY = props.getProperty(PROPERTY_MARK_BLOCKSIZE_Y, MARK_BLOCKSIZE_Y);
+        final String markType = props.getProperty(PROPERTY_MARK_TYPE, MARK_WITH_BOXES);
 
         // pixelPerBlockXY, fuzzyness parameter
         final int pixelPerBlockXY = props.getProperty(PROPERTY_FUZZY_BLOCKSIZE_XY, FUZZY_BLOCKSIZE_XY);
@@ -148,17 +151,21 @@ public class VisualAssertion implements WebDriverCustomModule
         // algorithm
         final String algorithmString = props.getProperty(PROPERTY_ALGORITHM, ALGORITHM).trim().toUpperCase();
 
+        // something to distinguish environments
+        final String id = props.getProperty(PROPERTY_ID, ALL);
+
         // Get testcasename for the correct folder
-        final String currentTestCaseName = Session.getCurrent().getUserID();
+        final String currentTestCaseName = Session.getCurrent().getUserName();
 
         // Get browsername for the correct subfolder
         final String browserName = getBrowserName(webdriver);
+        final String browserVersion = getBrowserVersion(webdriver);
 
         // get the current action for naming
-        final String currentActionName = Session.getCurrent().getWebDriverActionName();
+        final String currentActionName = Session.getCurrent().getCurrentActionName();
 
         // Get path to the directory
-        final File targetDirectory = new File(new File(resultDirectory, currentTestCaseName), browserName);
+        final File targetDirectory = new File(new File(new File(new File(resultDirectory, id), currentTestCaseName), browserVersion), browserName);
         targetDirectory.mkdirs();
 
         // retrieve current index counter
@@ -183,8 +190,8 @@ public class VisualAssertion implements WebDriverCustomModule
         final File referenceScreenShotFile = new File(resultDirectoryBaselinePath, screenshotName + ".png");
 
         // where the current screenshot goes
-        final File currentScreenShotPath = new File(new File(resultDirectoryBaselinePath, RESULT_DIRECTORY_RESULTS),
-                                                    Session.getCurrent().getID());
+        final File currentScreenShotPath = new File(new File(targetDirectory, RESULT_DIRECTORY_RESULTS),
+                Session.getCurrent().getID());
         currentScreenShotPath.mkdirs();
 
         final File currentScreenShotFile = new File(currentScreenShotPath, screenshotName + ".png");
@@ -201,7 +208,7 @@ public class VisualAssertion implements WebDriverCustomModule
 
         try
         {
-            BufferedImage screenshot = takeScreenshot(webdriver);
+            final BufferedImage screenshot = takeScreenshot(webdriver);
             if (screenshot == null)
             {
                 // webdriver cannot take screenshots, so leave here
@@ -240,17 +247,17 @@ public class VisualAssertion implements WebDriverCustomModule
             ComparisonAlgorithm algorithm = null;
             switch (algorithmString)
             {
-                case PROPERTY_ALGORITHM_COLORFUZZY:
-                    algorithm = new ColorFuzzy(colorTolerance);
-                    break;
+            case PROPERTY_ALGORITHM_COLORFUZZY:
+                algorithm = new ColorFuzzy(colorTolerance);
+                break;
 
-                case PROPERTY_ALGORITHM_EXACTMATCH:
-                    algorithm = new ExactMatch();
-                    break;
+            case PROPERTY_ALGORITHM_EXACTMATCH:
+                algorithm = new ExactMatch();
+                break;
 
-                case PROPERTY_ALGORITHM_FUZZY:
-                    algorithm = new PixelFuzzy(pixelTolerance, colorTolerance, pixelPerBlockXY);
-                    break;
+            case PROPERTY_ALGORITHM_FUZZY:
+                algorithm = new PixelFuzzy(pixelTolerance, colorTolerance, pixelPerBlockXY);
+                break;
             }
 
             ImageMask mask;
@@ -271,25 +278,46 @@ public class VisualAssertion implements WebDriverCustomModule
                 mask.train(screenshot, algorithm, new RectangleMask(markBlockSizeX, markBlockSizeY));
 
                 if (closeMask)
+                {
                     mask.closeMask(closeMaskWidth, closeMaskHeight);
+                }
 
                 writeImage(mask.getMask(), maskImageFile);
             }
-
-            ImageComparison comperator = new ImageComparison(reference);
-
-            boolean result = comperator.isEqual(screenshot, mask, algorithm);
-
-            if (!result)
+            else
             {
-                if (differenceImage)
-                    writeImage(comperator.getDifferenceImage(), differenceImageFile);
+                // if we train, we do not need to compare
+                final ImageComparison comperator = new ImageComparison(reference);
 
-                writeImage(comperator.getMarkedDifferencesImage(markBlockSizeX, markBlockSizeY, null), markedImageFile);
+                final boolean result = comperator.isEqual(screenshot, mask, algorithm);
+
+                if (!result)
+                {
+                    if (differenceImage)
+                    {
+                        writeImage(comperator.getDifferenceImage(), differenceImageFile);
+                    }
+
+                    BufferedImage markedImage = null;
+                    if (markType.equals(MARK_WITH_A_MARKER))
+                    {
+                        markedImage = comperator.getMarkedImageWithAMarker(markBlockSizeX, markBlockSizeY);
+                    }
+                    else if (markType.equals(MARK_WITH_BOXES))
+                    {
+                        markedImage = comperator.getMarkedImageWithBoxes(markBlockSizeX, markBlockSizeY);
+                    }
+                    else
+                    {
+                        // break
+                        Assert.fail(MessageFormat.format("Mark type '{0}' is not supported.", markType));
+                    }
+
+                    writeImage(markedImage, markedImageFile);
+                }
+
+                Assert.assertTrue(MessageFormat.format("Website does not match the reference screenshot: {0} ", currentActionName), result);
             }
-
-            final String assertMessage = "Website does not match the reference screenshot: " + currentActionName;
-            Assert.assertTrue(assertMessage, result);
         }
         catch (final IOException e)
         {
@@ -318,7 +346,7 @@ public class VisualAssertion implements WebDriverCustomModule
             {
                 return ImageIO.read(new ByteArrayInputStream(bytes));
             }
-            catch (IOException e)
+            catch (final IOException e)
             {
                 throw new RuntimeException(e);
             }
@@ -341,16 +369,31 @@ public class VisualAssertion implements WebDriverCustomModule
         final Capabilities capabilities = ((RemoteWebDriver) webDriver).getCapabilities();
         final String browserName = capabilities.getBrowserName();
 
-        return browserName;
+        return browserName == null ? "unknown" : browserName;
     }
 
-    private void writeImage(BufferedImage image, File file)
+    /**
+     * Returns the browser version
+     * 
+     * @param webDriver
+     *            the WebDriver to query
+     * @return the browser name
+     */
+    private String getBrowserVersion(final WebDriver webDriver)
+    {
+        final Capabilities capabilities = ((RemoteWebDriver) webDriver).getCapabilities();
+        final String browserVersion = capabilities.getVersion();
+
+        return browserVersion == null ? "unknown" : browserVersion;
+    }    
+
+    private void writeImage(final BufferedImage image, final File file)
     {
         try
         {
             ImageIO.write(image, "PNG", file);
         }
-        catch (IOException e)
+        catch (final IOException e)
         {
             throw new RuntimeException(e);
         }

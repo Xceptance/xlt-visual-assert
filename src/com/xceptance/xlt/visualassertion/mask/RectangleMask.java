@@ -1,4 +1,4 @@
-package com.xceptance.xlt.visual.mask;
+package com.xceptance.xlt.visualassertion.mask;
 
 public class RectangleMask
 {

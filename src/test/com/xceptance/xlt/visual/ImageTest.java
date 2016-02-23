@@ -18,36 +18,46 @@ public abstract class ImageTest
         return new File("src/" + path + "/" + name);
     }
 
-    protected BufferedImage load(File f)
+    protected BufferedImage load(final File f)
     {
         try
         {
             return ImageIO.read(f);
         }
-        catch (IOException e)
+        catch (final IOException e)
         {
             throw new RuntimeException("File " + f.getAbsolutePath() + " not found!", e);
         }
     }
 
-    protected void write(BufferedImage image, String fileName)
+    private void write(final BufferedImage image, final String type, final File file)
     {
         try
         {
-            ImageIO.write(image, "PNG", new File("c:/temp/" + fileName));
+            ImageIO.write(image, type, file);
         }
-        catch (IOException e)
+        catch (final IOException e)
         {
             throw new RuntimeException(e);
         }
     }
 
-    protected BufferedImage load(String f)
+    protected void write(final BufferedImage image, final String fileName)
+    {
+        write(image, "PNG", new File(fileName));
+    }
+
+    protected void writeToTmp(final BufferedImage image, final String fileName)
+    {
+        write(image, "PNG", new File(new File(System.getProperty("java.io.tmpdir")), fileName));
+    }
+
+    protected BufferedImage load(final String f)
     {
         return load(resolveFile(f));
     }
 
-    protected boolean imageEqual(BufferedImage img1, BufferedImage img2)
+    protected boolean imageEqual(final BufferedImage img1, final BufferedImage img2)
     {
         if (img1 == null && img2 == null)
             return true;

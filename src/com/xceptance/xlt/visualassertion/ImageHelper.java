@@ -1,4 +1,4 @@
-package com.xceptance.xlt.visual;
+package com.xceptance.xlt.visualassertion;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -24,7 +24,7 @@ public class ImageHelper
      *            the image to copy
      * @return a copy of that image
      */
-    protected static BufferedImage copyImage(BufferedImage source)
+    protected static BufferedImage copyImage(final BufferedImage source)
     {
         // Creates a fresh BufferedImage that has the same size and content of
         // the source image
@@ -36,30 +36,24 @@ public class ImageHelper
             imageType = BufferedImage.TYPE_INT_ARGB;
         }
 
-        BufferedImage copy = new BufferedImage(source.getWidth(), source.getHeight(), imageType);
-        Graphics g = copy.getGraphics();
+        final BufferedImage copy = new BufferedImage(source.getWidth(), source.getHeight(), imageType);
+        final Graphics g = copy.getGraphics();
         g.drawImage(source, 0, 0, null);
         g.dispose();
 
         return copy;
     }
 
-    protected static BufferedImage createEmptyImage(BufferedImage source)
+    protected static BufferedImage createEmptyImage(final BufferedImage source, final int imageType)
     {
-        int imageType = source.getType();
-        if (imageType == 0)
-        {
-            imageType = BufferedImage.TYPE_INT_ARGB;
-        }
-
         return new BufferedImage(source.getWidth(), source.getHeight(), imageType);
     }
 
-    protected static BufferedImage drawRect(BufferedImage image, Color c, int fromX, int fromY, int width, int height)
+    protected static BufferedImage drawRect(final BufferedImage image, final int fromX, final int fromY, final int width, final int height, final Color c)
     {
-        BufferedImage copy = copyImage(image);
+        final BufferedImage copy = copyImage(image);
 
-        Graphics2D g = copy.createGraphics();
+        final Graphics2D g = copy.createGraphics();
         g.setColor(c);
         g.fillRect(fromX, fromY, width, height);
         g.dispose();
@@ -67,9 +61,17 @@ public class ImageHelper
         return copy;
     }
 
-    protected static BufferedImage fillImage(BufferedImage image, Color c)
+    protected static void drawFilledRect(final BufferedImage image, final int fromX, final int fromY, final int width, final int height, final Color c)
     {
-        return drawRect(image, c, 0, 0, image.getWidth(), image.getHeight());
+        final Graphics2D g = image.createGraphics();
+        g.setColor(c);
+        g.fillRect(fromX, fromY, width, height);
+        g.dispose();
+    }    
+
+    protected static BufferedImage fillImage(final BufferedImage image, final Color c)
+    {
+        return drawRect(image, 0, 0, image.getWidth(), image.getHeight(), c);
     }
 
     /**
@@ -113,7 +115,7 @@ public class ImageHelper
 
     protected static int[][] convertCoordinateListsTo2dArray(final ArrayList<Integer> xCoords, final ArrayList<Integer> yCoords)
     {
-        int s = xCoords.size();
+        final int s = xCoords.size();
 
         int[][] pixels = null;
         if (s > 0)
@@ -144,7 +146,9 @@ public class ImageHelper
     protected static int calcPixSpan(final int pixelPerBlock, final int n, final int overallSpan)
     {
         if (pixelPerBlock * (n + 1) > overallSpan)
+        {
             return overallSpan % pixelPerBlock;
+        }
 
         return pixelPerBlock;
     }
@@ -156,7 +160,7 @@ public class ImageHelper
      * @param img2
      * @return {@link int[][]} or null where int[i][0] = x, int[i][1] = y
      */
-    protected static int[][] imageCompare(final BufferedImage img1, final BufferedImage img2)
+    protected static int[][] compareImages(final BufferedImage img1, final BufferedImage img2)
     {
         final ArrayList<Integer> xCoords = new ArrayList<Integer>();
         final ArrayList<Integer> yCoords = new ArrayList<Integer>();
@@ -188,7 +192,7 @@ public class ImageHelper
      * @return an array with the coordinates of the pixels where there were differences, null if there were no
      *         differences
      */
-    protected static int[][] colorFuzzyCompare(final BufferedImage img1, final BufferedImage img2, double colorTolerance)
+    protected static int[][] colorFuzzyCompare(final BufferedImage img1, final BufferedImage img2, final double colorTolerance)
     {
         final ArrayList<Integer> xCoords = new ArrayList<Integer>();
         final ArrayList<Integer> yCoords = new ArrayList<Integer>();
@@ -227,8 +231,8 @@ public class ImageHelper
      * @return an array with the coordinates of the pixels where there were differences, null if there were no
      *         differences
      */
-    protected static int[][] fuzzyCompare(final BufferedImage img1, final BufferedImage img2, double colorTolerance, double pixelTolerance,
-                                          int fuzzyBlockDimension)
+    protected static int[][] fuzzyCompare(final BufferedImage img1, final BufferedImage img2, final double colorTolerance, final double pixelTolerance,
+            final int fuzzyBlockDimension)
     {
         /* Method for the regular fuzzy comparison */
 
@@ -309,8 +313,8 @@ public class ImageHelper
      * @param rgbForegroundColor
      * @return the scaled image
      */
-    protected static BufferedImage scaleDownMaskImage(final BufferedImage img, final int newWidth, final int newHeight, int scalingFactor,
-                                                      int rgbForegroundColor)
+    protected static BufferedImage scaleDownMaskImage(final BufferedImage img, final int newWidth, final int newHeight, final int scalingFactor,
+            final int rgbForegroundColor)
     {
 
         final BufferedImage scaledImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
@@ -366,7 +370,7 @@ public class ImageHelper
      * @return the scaled image
      */
     protected static BufferedImage scaleUpMaskImage(final BufferedImage img, final int newWidth, final int newHeight,
-                                                    int rgbForegroundColor, int scalingFactor)
+            final int rgbForegroundColor, final int scalingFactor)
     {
 
         final BufferedImage scaledImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
@@ -433,7 +437,7 @@ public class ImageHelper
         return newImg;
     }
 
-    protected static BufferedImage adeptImageSize(BufferedImage img, int width, int height)
+    protected static BufferedImage adaptImageSize(final BufferedImage img, final int width, final int height)
     {
         if (img.getWidth() != width || img.getHeight() != height)
         {
@@ -452,9 +456,9 @@ public class ImageHelper
      * @param rgbForegroundColor
      * @return
      */
-    protected static BufferedImage overlayMaskImage(final BufferedImage image, final BufferedImage overlay, int rgbForegroundColor)
+    protected static BufferedImage overlayMaskImage(final BufferedImage image, final BufferedImage overlay, final int rgbForegroundColor)
     {
-        BufferedImage copy = copyImage(image);
+        final BufferedImage copy = copyImage(image);
 
         // Go through every pixel of the image
         for (int x = 0; x < copy.getWidth(); x++)
@@ -487,7 +491,7 @@ public class ImageHelper
      * @return the eroded image
      */
     protected static BufferedImage erodeImage(final BufferedImage img, int structElementWidth, int structElementHeight,
-                                              int rgbForegroundColor, int rgbBackgroundColor)
+            final int rgbForegroundColor, final int rgbBackgroundColor)
     {
 
         final BufferedImage erosionedImage = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -571,7 +575,7 @@ public class ImageHelper
      * @return the dilated image
      */
     protected static BufferedImage dilateImage(final BufferedImage img, int structElementWidth, int structElementHeight,
-                                               int rgbForegroundColor, int rgbBackgroundColor)
+            final int rgbForegroundColor, final int rgbBackgroundColor)
     {
 
         final BufferedImage dilationImage = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -653,7 +657,7 @@ public class ImageHelper
      * @return the closed image
      */
     protected static BufferedImage closeImage(BufferedImage img, final int structElementWidth, final int structElementHeight,
-                                              int rgbForegroundColor, int rgbBackgroundColor)
+            final int rgbForegroundColor, final int rgbBackgroundColor)
     {
 
         final int scaledWidth = (int) Math.ceil(img.getWidth() / SCALING_FACTOR);
@@ -671,10 +675,11 @@ public class ImageHelper
         return img;
     }
 
+
     /**
      * Method to mark areas around the detected differences. Goes through every pixel that was different and marks the
      * marking block it is in, unless it was marked already. <br>
-     * If markingX of markingY are 1, it will simply mark the detected differences. Works directly on imgOut.
+     * If markingX of markingY are 1, it will simply mark the detected differences.
      * 
      * @param pixels
      *            the array with the differences.
@@ -682,13 +687,14 @@ public class ImageHelper
      * @param markingSizeY
      * @return
      */
-    protected static BufferedImage markDifferences(final BufferedImage image, final int[][] pixels, int markingSizeX, int markingSizeY,
-                                                   Color c)
+    protected static BufferedImage markDifferencesWithBoxes(final BufferedImage image, final int[][] pixels, final int markingSizeX, final int markingSizeY)
     {
-        BufferedImage copy = copyImage(image);
-
         if (pixels == null)
+        {
             return null;
+        }
+
+        final BufferedImage copy = copyImage(image);
 
         // Check if markingX or markingY are 1. If they are, just mark every
         // different pixel,
@@ -700,7 +706,7 @@ public class ImageHelper
             {
                 x = pixels[i][0];
                 y = pixels[i][1];
-                colorPixel(copy, x, y, c);
+                colorPixel(copy, x, y, null);
             }
 
             return copy;
@@ -727,12 +733,63 @@ public class ImageHelper
 
             if (!markedBlocks[xBlock][yBlock])
             {
-                drawBorders(copy, xBlock, yBlock, markingSizeX, markingSizeY, subImageWidth, subImageHeight, c);
+                drawBorders(copy, xBlock, yBlock, markingSizeX, markingSizeY, subImageWidth, subImageHeight, null);
                 markedBlocks[xBlock][yBlock] = true;
             }
         }
 
         return copy;
+    }
+
+
+    /**
+     * Method to mark areas around the detected differences. Goes through every pixel that was different and marks the
+     * marking block it is in, unless it was marked already. <br>
+     * If markingX of markingY are 1, it will simply mark the detected differences.
+     * 
+     * @param pixels
+     *            the array with the differences.
+     * @param markingSizeX
+     * @param markingSizeY
+     * @return
+     */
+    protected static BufferedImage markDifferencesWithAMarker(final BufferedImage image, final int[][] pixels, final int markingSizeX, final int markingSizeY)
+    {
+        if (pixels == null)
+        {
+            return null;
+        }
+
+        final BufferedImage imageCopy = copyImage(image);
+
+        final Color highlighterColor = new Color(228, 252, 90, 50);
+        final Color pixelEmphasizeColor = new Color(228, 0, 0);
+
+        final Graphics2D g = imageCopy.createGraphics();
+        g.setColor(highlighterColor);
+
+        for (int i = 0; i < pixels.length; i++)
+        {
+            // the middle of the block should be our pixel to make it marker like
+            int x = pixels[i][0] - (markingSizeX / 2);
+            int y = pixels[i][1] - (markingSizeY / 2);
+
+            // avoid negative values
+            x = x < 0 ? x = 0 : x;
+            y = y < 0 ? y = 0 : y;
+
+            g.fillRect(x, y, markingSizeX, markingSizeY);
+        }
+
+        g.dispose();
+
+        // mark the pixels on the new background
+        for (int i = 0; i < pixels.length; i++)
+        {
+            imageCopy.setRGB(pixels[i][0], pixels[i][1], pixelEmphasizeColor.getRGB());
+        }
+
+        return imageCopy;
     }
 
     /**
@@ -743,13 +800,13 @@ public class ImageHelper
      * @param y
      *            the y coordinate of the pixel to color
      */
-    protected static void colorPixel(final BufferedImage image, final int x, final int y, Color c)
+    protected static void colorPixel(final BufferedImage image, final int x, final int y, final Color c)
     {
-        Color currentColor = new Color(image.getRGB(x, y));
         Color newColor;
 
         if (c == null)
         {
+            final Color currentColor = new Color(image.getRGB(x, y));
             newColor = getComplementary(currentColor);
         }
         else
@@ -779,7 +836,7 @@ public class ImageHelper
      * @param subImageHeight
      */
     protected static void drawBorders(final BufferedImage image, final int currentX, final int currentY, final int width, final int height,
-                                      int subImageWidth, int subImageHeight, Color c)
+            final int subImageWidth, final int subImageHeight, final Color c)
     {
         int x, y;
 
@@ -852,7 +909,7 @@ public class ImageHelper
      */
     protected static BufferedImage markImageBorders(final BufferedImage img, final int startW, final int startH)
     {
-        BufferedImage copy = copyImage(img);
+        final BufferedImage copy = copyImage(img);
 
         final Color markTransparentWhite = new Color(255, 255, 255, 0);
         final Graphics2D g = copy.createGraphics();
