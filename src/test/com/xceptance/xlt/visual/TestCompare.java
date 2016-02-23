@@ -1,23 +1,23 @@
 package test.com.xceptance.xlt.visual;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.text.MessageFormat;
 
 import org.junit.Assert;
 
-import com.xceptance.xlt.visual.ImageComaprison;
-import com.xceptance.xlt.visual.ImageMask;
-import com.xceptance.xlt.visual.alogrithm.ComparisonAlgorithm;
-import com.xceptance.xlt.visual.alogrithm.ExactMatch;
-import com.xceptance.xlt.visual.mask.RectangleMask;
+import com.xceptance.xlt.visualassertion.ImageComparison;
+import com.xceptance.xlt.visualassertion.ImageMask;
+import com.xceptance.xlt.visualassertion.algorithm.ComparisonAlgorithm;
+import com.xceptance.xlt.visualassertion.algorithm.ExactMatch;
+import com.xceptance.xlt.visualassertion.mask.RectangleMask;
 
 public class TestCompare extends ImageTest
 {
-    private RectangleMask differenceMarker;
+    private final RectangleMask differenceMarker;
 
-    private ComparisonAlgorithm algorithm;
+    private final ComparisonAlgorithm algorithm;
 
-    private ImageComaprison comperator;
+    private ImageComparison comperator;
 
     private ImageMask masker;
 
@@ -35,7 +35,7 @@ public class TestCompare extends ImageTest
         this.differenceMarker = new RectangleMask(10, 10);
     }
 
-    public TestCompare(ComparisonAlgorithm algorithm, RectangleMask differenceMarker, int markingSizeX, int markingSizeY)
+    public TestCompare(final ComparisonAlgorithm algorithm, final RectangleMask differenceMarker, final int markingSizeX, final int markingSizeY)
     {
         this.algorithm = algorithm;
         this.differenceMarker = differenceMarker;
@@ -43,12 +43,12 @@ public class TestCompare extends ImageTest
         this.markingSizeY = markingSizeY;
     }
 
-    public TestCompare match(String referenceImageFile)
+    public TestCompare match(final String referenceImageFile)
     {
         return match(load(referenceImageFile));
     }
 
-    public TestCompare match(BufferedImage referenceImage)
+    public TestCompare match(final BufferedImage referenceImage)
     {
         this.referenceImage = referenceImage;
         masker = new ImageMask(this.referenceImage);
@@ -56,15 +56,15 @@ public class TestCompare extends ImageTest
         return this;
     }
 
-    public TestCompare to(String comparisonImageFile)
+    public TestCompare to(final String comparisonImageFile)
     {
         return to(load(comparisonImageFile));
     }
 
-    public TestCompare to(BufferedImage comparisonImage)
+    public TestCompare to(final BufferedImage comparisonImage)
     {
         this.comparisonImage = comparisonImage;
-        comperator = new ImageComaprison(referenceImage);
+        comperator = new ImageComparison(referenceImage);
 
         return this;
     }
@@ -81,35 +81,29 @@ public class TestCompare extends ImageTest
         return this;
     }
 
-    public TestCompare train(String trainImageFile)
+    public TestCompare train(final String trainImageFile)
     {
         return train(load(trainImageFile));
     }
 
-    public TestCompare train(BufferedImage trainImage)
+    public TestCompare train(final BufferedImage trainImage)
     {
         masker.train(trainImage, algorithm, differenceMarker);
         return this;
     }
 
-    public TestCompare hasMarking(String markingFile)
+    public TestCompare hasMarking(final String markingFile)
     {
         return hasMarking(load(markingFile));
     }
 
-    public TestCompare hasMarking(String markingFile, Color c)
+    public TestCompare hasMarking(final BufferedImage marking)
     {
-        return hasMarking(load(markingFile), c);
-    }
+        final BufferedImage comperatorDifference = comperator.getMarkedImageWithBoxes(markingSizeX, markingSizeY);
 
-    public TestCompare hasMarking(BufferedImage marking)
-    {
-        return hasMarking(marking, null);
-    }
-
-    public TestCompare hasMarking(BufferedImage marking, Color c)
-    {
-        BufferedImage comperatorDifference = comperator.getMarkedDifferencesImage(markingSizeX, markingSizeY, c);
+        final long now = System.currentTimeMillis();
+        writeToTmp(comperatorDifference, MessageFormat.format("actual.{0}.png", String.valueOf(now)));
+        writeToTmp(marking, MessageFormat.format("expected.{0}.png", String.valueOf(now)));
         Assert.assertTrue(imageEqual(comperatorDifference, marking));
 
         return this;
@@ -117,7 +111,7 @@ public class TestCompare extends ImageTest
 
     public TestCompare hasNoMarking()
     {
-        BufferedImage comperatorDifference = comperator.getMarkedDifferencesImage(markingSizeX, markingSizeY, null);
+        final BufferedImage comperatorDifference = comperator.getMarkedImageWithBoxes(markingSizeX, markingSizeY);
         Assert.assertNull(comperatorDifference);
 
         return this;
@@ -128,7 +122,7 @@ public class TestCompare extends ImageTest
         return masker;
     }
 
-    public ImageComaprison getComperator()
+    public ImageComparison getComperator()
     {
         return comperator;
     }

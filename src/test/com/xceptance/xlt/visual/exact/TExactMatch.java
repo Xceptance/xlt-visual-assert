@@ -3,9 +3,9 @@ package test.com.xceptance.xlt.visual.exact;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.xceptance.xlt.visual.alogrithm.ComparisonAlgorithm;
-import com.xceptance.xlt.visual.alogrithm.ExactMatch;
-import com.xceptance.xlt.visual.mask.RectangleMask;
+import com.xceptance.xlt.visualassertion.algorithm.ComparisonAlgorithm;
+import com.xceptance.xlt.visualassertion.algorithm.ExactMatch;
+import com.xceptance.xlt.visualassertion.mask.RectangleMask;
 
 import test.com.xceptance.xlt.visual.ImageTest;
 import test.com.xceptance.xlt.visual.TestCompare;

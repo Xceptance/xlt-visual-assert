@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testcase xmlns="http://xlt.xceptance.com/xlt-script/2" version="6" baseURL="http://localhost:8080">
   <description>Simulates browsing the catalog, adding product(s) to the cart, checkout as guest and place the order.</description>
+  <command name="store" target="A${RANDOM.String(6,10)}" value="firstName"/>
+  <command name="store" target="P${RANDOM.String(5,10)}" value="name"/>
+  <command name="store" target="${RANDOM.Number(5)}${RANDOM.Number(5)}${RANDOM.Number(5)}${RANDOM.Number(5)}${RANDOM.Number(5)}" value="zip"/>
   <module name="posters.functional.modules.OpenHomepage"/>
-  <module name="posters.functional.modules.AssertVisually"/>
+  <module name="posters.functional.modules.VisualAssertion"/>
   <module name="posters.functional.modules.AddToCart"/>
+  <module name="posters.functional.modules.VisualAssertion"/>
   <action name="OpenCartOverview"/>
   <command name="clickAndWait" target="id=headerCartOverview"/>
   <action name="StartCheckout"/>
@@ -43,6 +47,7 @@
     <parameter name="year" value="${expDateYear}"/>
   </module>
   <command name="clickAndWait" target="id=btnAddPayment"/>
+  <module name="posters.functional.modules.VisualAssertion"/>
   <action name="Order"/>
   <module name="posters.functional.modules.VerifyOrderOverview">
     <parameter name="index" value="0"/>
@@ -66,4 +71,5 @@
   <command name="clickAndWait" target="id=btnOrder"/>
   <command name="assertElementPresent" target="id=successMessage"/>
   <command name="assertText" target="id=btnCartOverview" value="regexp:.*0.*0.*"/>
+  <module name="posters.functional.modules.VisualAssertion"/>
 </testcase>
