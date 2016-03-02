@@ -72,6 +72,7 @@ public class VisualAssertion implements WebDriverCustomModule
     private final String RESULT_DIRECTORY_RESULTS = "results";  // all live screenshots go here
 
     // the property names
+    public final String PROPERTY_ENABLED = PREFIX + "enabled";
     public final String PROPERTY_RESULT_DIRECTORY = PREFIX + "resultDirectory";
     public final String PROPERTY_ID = PREFIX + "ID";
 
@@ -110,6 +111,14 @@ public class VisualAssertion implements WebDriverCustomModule
     public void execute(final WebDriver webdriver, final String... arguments)
     {
         final XltProperties props = XltProperties.getInstance();
+
+        // check if we have to do anything?
+        final boolean enabled = props.getProperty(PROPERTY_ENABLED, true);
+        if (!enabled)
+        {
+            // skipped silently
+            return;
+        }
 
         // Get Properties and convert them from String if necessary
         final String resultDirectory = props.getProperty(PROPERTY_RESULT_DIRECTORY, RESULT_DIRECTORY);
