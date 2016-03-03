@@ -25,6 +25,15 @@ import com.xceptance.xlt.visualassertion.algorithm.ExactMatch;
 import com.xceptance.xlt.visualassertion.algorithm.PixelFuzzy;
 import com.xceptance.xlt.visualassertion.mask.RectangleMask;
 
+/**
+ * Module for the visual assertion of changes in a browser page. The module is called in an
+ * action and takes a screenshot of the current page. This screenshot is then compared to already taken
+ * reference images of the same page.
+ *
+ * The configurations for this module are done in the visualassertion.properties under /config
+ * There are different algorithms that can be used for the comparison of the images and different ways to
+ * visualize those differences for the evaluation.
+ */
 public class VisualAssertion implements WebDriverCustomModule
 {
 
@@ -33,7 +42,7 @@ public class VisualAssertion implements WebDriverCustomModule
     /**
      * Counter for the current screenshots
      */
-    private static ThreadLocal<Integer> indexCounter = new ThreadLocal<Integer>();
+    private static ThreadLocal<Integer> indexCounter = new ThreadLocal<>();
 
     // the property defaults
     private final int WAITINGTIME = 300;
@@ -120,64 +129,83 @@ public class VisualAssertion implements WebDriverCustomModule
             return;
         }
 
+        //--------------------------------------------------------------------------------
         // Get Properties and convert them from String if necessary
+        //--------------------------------------------------------------------------------
+
+        // Parent directory of the visual assertion results
         final String resultDirectory = props.getProperty(PROPERTY_RESULT_DIRECTORY, RESULT_DIRECTORY);
 
-        // waitTime
+        // Wait time for the page to load completely
         final int waitTime = props.getProperty(PROPERTY_WAITING_TIME, WAITINGTIME);
 
-        // markBlockX, markBlockY
+        // Block size for the visual marking of differences in the snapshot
         final int markBlockSizeX = props.getProperty(PROPERTY_MARK_BLOCKSIZE_X, MARK_BLOCKSIZE_X);
         final int markBlockSizeY = props.getProperty(PROPERTY_MARK_BLOCKSIZE_Y, MARK_BLOCKSIZE_Y);
+        // Marking type that is used for the test
         final String markType = props.getProperty(PROPERTY_MARK_TYPE, MARK_WITH_BOXES);
 
+        // TODO Find out what this does exactly
         // pixelPerBlockXY, fuzzyness parameter
         final int pixelPerBlockXY = props.getProperty(PROPERTY_FUZZY_BLOCKSIZE_XY, FUZZY_BLOCKSIZE_XY);
 
-        // colTolerance
+        // Tolerance value for differences in color
         final String colorToleranceValue = props.getProperty(PROPERTY_COLOR_TOLERANCE, COLOR_TOLERANCE);
         final double colorTolerance = Double.parseDouble(colorToleranceValue);
 
-        // pixTolerance
+        // Tolerance value for differences between specific pixels
         final String pixelToleranceValue = props.getProperty(PROPERTY_PIXEL_TOLERANCE, PIXEL_TOLERANCE);
         final double pixelTolerance = Double.parseDouble(pixelToleranceValue);
 
-        // trainingMode
+        // Flag whether the training mode is enabled
         final boolean trainingsModeEnabled = props.getProperty(PROPERTY_TRAININGSMODE, TRAININGSMODE);
 
-        // closeMask
+        // Flag whether masks should be closed to make the covered area larger
         final boolean closeMask = props.getProperty(PROPERTY_MASK_CLOSE, ATTEMPT_TO_CLOSE_MASK);
 
-        // closeWidth
+        // Width of the mask close
         final int closeMaskWidth = props.getProperty(PROPERTY_MASK_CLOSE_GAP_WIDTH, MASK_CLOSE_GAP_WIDTH);
 
-        // closeHeight
+        // Height of the mask close
         final int closeMaskHeight = props.getProperty(PROPERTY_MASK_CLOSE_GAP_HEIGHT, MASK_CLOSE_GAP_HEIGHT);
 
-        // differenceImage
-        final boolean differenceImage = props.getProperty(PROPERTY_CREATE_DIFFERENCEIMAGE, CREATE_DIFFERENCE_IMAGE);
+        // Flag whether a pixel difference image should be created
+        final boolean createDifferenceImage = props.getProperty(PROPERTY_CREATE_DIFFERENCEIMAGE, CREATE_DIFFERENCE_IMAGE);
 
-        // algorithm
+        // Selector for the algorithm that shall be used
         final String algorithmString = props.getProperty(PROPERTY_ALGORITHM, ALGORITHM).trim().toUpperCase();
 
-        // something to distinguish environments
+        // Identification of the current environment for this test
         final String id = props.getProperty(PROPERTY_ID, ALL);
 
-        // Get testcasename for the correct folder
+
+        //--------------------------------------------------------------------------------
+        // Get the current environment
+        //--------------------------------------------------------------------------------
+
+        // Get the name of the test case for the correct folder identifier
         final String currentTestCaseName = Session.getCurrent().getUserName();
 
-        // Get browsername for the correct subfolder
+        // Get browsername and browserversion for the subfolders
         final String browserName = getBrowserName(webdriver);
         final String browserVersion = getBrowserVersion(webdriver);
 
-        // get the current action for naming
+        // Get the name of the action that called the visual assertion
         final String currentActionName = Session.getCurrent().getCurrentActionName();
 
-        // Get path to the directory
-        final File targetDirectory = new File(new File(new File(new File(resultDirectory, id), currentTestCaseName), browserVersion), browserName);
+
+        //--------------------------------------------------------------------------------
+        // Initialize the directory and file paths, create the directories if necessary
+        //--------------------------------------------------------------------------------
+
+        // Generate the child directories for the current environment in the parent result folder
+        final File targetDirectory = new File(new File(new File(new File(resultDirectory, id),
+                                                                currentTestCaseName),
+                                                                browserName),
+                                                                browserVersion);
         targetDirectory.mkdirs();
 
-        // retrieve current index counter
+        // Retrieve current index counter for the image file names
         Integer index = indexCounter.get();
         if (index == null)
         {
@@ -187,25 +215,43 @@ public class VisualAssertion implements WebDriverCustomModule
         {
             index = index + 1;
         }
+        // Update the index
         indexCounter.set(index);
 
-        // Set name of the screenshot
+        // Name of the image file for the screenshot
         final String screenshotName = String.format("%03d", index) + "-" + currentActionName;
 
-        // where the reference is
-        final File resultDirectoryBaselinePath = new File(targetDirectory, RESULT_DIRECTORY_BASELINE);
-        resultDirectoryBaselinePath.mkdirs();
+        // Directory for the reference images
+        final File baselineDirectory = new File(targetDirectory, RESULT_DIRECTORY_BASELINE);
+        baselineDirectory.mkdirs();
 
-        final File referenceScreenShotFile = new File(resultDirectoryBaselinePath, screenshotName + ".png");
+        // Path of the reference image for this assertion
+        final File referenceScreenShotFile = new File(baselineDirectory, screenshotName + ".png");
 
-        // where the current screenshot goes
-        final File currentScreenShotPath = new File(new File(targetDirectory, RESULT_DIRECTORY_RESULTS),
-                Session.getCurrent().getID());
-        currentScreenShotPath.mkdirs();
+        // Directory for the results of the current test run
+        final File testRunDirectory = new File(new File(targetDirectory, RESULT_DIRECTORY_RESULTS),
+                                                    Session.getCurrent().getID());
+        testRunDirectory.mkdirs();
 
-        final File currentScreenShotFile = new File(currentScreenShotPath, screenshotName + ".png");
+        // Path of the screenshot image file
+        final File currentScreenShotFile = new File(testRunDirectory, screenshotName + ".png");
 
-        // Wait a few miliseconds so the website is fully loaded
+        // Initialize markedImageFile
+        final File markedImageFile = new File(testRunDirectory, screenshotName + "-marked" + ".png");
+
+        // Initialize maskImageFile
+        final File maskDirectoryPath = new File(targetDirectory, RESULT_DIRECTORY_MASKS);
+        maskDirectoryPath.mkdirs();
+        final File maskImageFile = new File(maskDirectoryPath, screenshotName + ".png");
+
+        // the difference image file
+        final File differenceImageFile = new File(testRunDirectory, screenshotName + "-difference" + ".png");
+
+
+        //--------------------------------------------------------------------------------
+        // Wait for the page to fully load, so that a correct screenshot can be taken
+        //--------------------------------------------------------------------------------
+
         try
         {
             TimeUnit.MILLISECONDS.sleep(waitTime);
@@ -215,47 +261,56 @@ public class VisualAssertion implements WebDriverCustomModule
             Thread.currentThread().interrupt();
         }
 
+
+        //--------------------------------------------------------------------------------
+        // Make the screenshot and load the reference image
+        //--------------------------------------------------------------------------------
+
         try
         {
             final BufferedImage screenshot = takeScreenshot(webdriver);
             if (screenshot == null)
             {
-                // webdriver cannot take screenshots, so leave here
+                // TODO Has this to be handled in a different way?
+                // webdriver cannot take the screenshot -> RETURN
                 return;
             }
+            // Save the screenshot
             writeImage(screenshot, currentScreenShotFile);
 
-            // If there's no other screenshot, just copy this as baseline
+            // If there's no reference screenshot yet -> save screenshot as reference image in baseline
             if (!referenceScreenShotFile.isFile())
             {
                 writeImage(screenshot, referenceScreenShotFile);
-
-                // because we have not done anything before, we leave and hope of
-                // another round where we can compare stuff
+                // There is no reference for the comparison -> RETURN
                 return;
             }
 
-            // ok, get serious about comparing and so on
-
-            // Initialize referenceImage, screenshotImage, delete
-            // screenshotImageFile
+            // Load the reference image
             final BufferedImage reference = ImageIO.read(referenceScreenShotFile);
 
-            // Initialize markedImageFile and maskImageFile
-            final File markedImageFile = new File(currentScreenShotPath, screenshotName + "-marked" + ".png");
+            // Mask for the image comparison
+            ImageMask mask;
+            // If a mask already exists load it, else create a new one
+            if (maskImageFile.exists())
+            {
+                mask = new ImageMask(reference, ImageIO.read(maskImageFile));
+            }
+            else
+            {
+                mask = new ImageMask(reference);
+                writeImage(mask.getMask(), maskImageFile);
+            }
 
-            final File maskDirectoryPath = new File(targetDirectory, RESULT_DIRECTORY_MASKS);
-            maskDirectoryPath.mkdirs();
 
-            // the mask image file
-            final File maskImageFile = new File(maskDirectoryPath, screenshotName + ".png");
-
-            // the difference image file
-            final File differenceImageFile = new File(currentScreenShotPath, screenshotName + "-difference" + ".png");
+            //--------------------------------------------------------------------------------
+            // Select the configured algorithm
+            //--------------------------------------------------------------------------------
 
             ComparisonAlgorithm algorithm = null;
             switch (algorithmString)
             {
+                // TODO: Add comments that describe the algorithms
             case PROPERTY_ALGORITHM_COLORFUZZY:
                 algorithm = new ColorFuzzy(colorTolerance);
                 break;
@@ -269,52 +324,54 @@ public class VisualAssertion implements WebDriverCustomModule
                 break;
             }
 
-            ImageMask mask;
-            // if a mask already exists load it else create a new one
-            if (maskImageFile.exists())
-            {
-                mask = new ImageMask(reference, ImageIO.read(maskImageFile));
-            }
-            else
-            {
-                mask = new ImageMask(reference);
-                writeImage(mask.getMask(), maskImageFile);
-            }
+
+            //--------------------------------------------------------------------------------
+            // If training is enabled adjust the mask, else compare the screenshot to the
+            // reference image
+            //--------------------------------------------------------------------------------
 
             if (trainingsModeEnabled)
             {
-                // train the mask and save it
+                // Train the mask to take the current difference between the reference image and screenshot into account
                 mask.train(screenshot, algorithm, new RectangleMask(markBlockSizeX, markBlockSizeY));
 
+                // Close the mask to cover a bigger area
                 if (closeMask)
                 {
                     mask.closeMask(closeMaskWidth, closeMaskHeight);
                 }
 
+                // Save the trained mask
                 writeImage(mask.getMask(), maskImageFile);
             }
             else
             {
-                // if we train, we do not need to compare
-                final ImageComparison comperator = new ImageComparison(reference);
+                // Initialize the comparator
+                final ImageComparison comparator = new ImageComparison(reference);
 
-                final boolean result = comperator.isEqual(screenshot, mask, algorithm);
+                // Result of the comparison whether the images are similar
+                final boolean result = comparator.isEqual(screenshot, mask, algorithm);
 
+                // If the two images don't match..
                 if (!result)
                 {
-                    if (differenceImage)
+                    if (createDifferenceImage)
                     {
-                        writeImage(comperator.getDifferenceImage(), differenceImageFile);
+                        // Create a image of the pixel differences
+                        writeImage(comparator.getDifferenceImage(), differenceImageFile);
                     }
 
+                    // Create a new image in which the differences are marked
                     BufferedImage markedImage = null;
                     if (markType.equals(MARK_WITH_A_MARKER))
                     {
-                        markedImage = comperator.getMarkedImageWithAMarker(markBlockSizeX, markBlockSizeY);
+                        // Highlight the differences in the image with red and yellow
+                        markedImage = comparator.getMarkedImageWithAMarker(markBlockSizeX, markBlockSizeY);
                     }
                     else if (markType.equals(MARK_WITH_BOXES))
                     {
-                        markedImage = comperator.getMarkedImageWithBoxes(markBlockSizeX, markBlockSizeY);
+                        // Surround the differences with red boxes
+                        markedImage = comparator.getMarkedImageWithBoxes(markBlockSizeX, markBlockSizeY);
                     }
                     else
                     {
@@ -322,9 +379,11 @@ public class VisualAssertion implements WebDriverCustomModule
                         Assert.fail(MessageFormat.format("Mark type '{0}' is not supported.", markType));
                     }
 
+                    // Save the marked image
                     writeImage(markedImage, markedImageFile);
                 }
 
+                // Assert the result of the comparison
                 Assert.assertTrue(MessageFormat.format("Website does not match the reference screenshot: {0} ", currentActionName), result);
             }
         }
@@ -340,11 +399,9 @@ public class VisualAssertion implements WebDriverCustomModule
      * 
      * @param webDriver
      *            the web driver to use
-     * @param pngFile
-     *            the file to write to
-     * @return {@link BufferedImage} if webdriver support taking screenshotss, null otherwise
+     * @return {@link BufferedImage} if the webdriver supports taking screenshots, null otherwise
      * @throws IOException
-     *             in case the files cannot be written
+     *             In case the files cannot be written
      */
     private BufferedImage takeScreenshot(final WebDriver webDriver)
     {
@@ -394,8 +451,13 @@ public class VisualAssertion implements WebDriverCustomModule
         final String browserVersion = capabilities.getVersion();
 
         return browserVersion == null ? "unknown" : browserVersion;
-    }    
+    }
 
+    /**
+     * Write the image into the filepath given by file
+     * @param image that should be saved
+     * @param file path where the image shall be saved
+     */
     private void writeImage(final BufferedImage image, final File file)
     {
         try
