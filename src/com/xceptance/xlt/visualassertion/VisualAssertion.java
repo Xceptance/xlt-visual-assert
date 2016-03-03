@@ -224,28 +224,27 @@ public class VisualAssertion implements WebDriverCustomModule
         // Directory for the reference images
         final File baselineDirectory = new File(targetDirectory, RESULT_DIRECTORY_BASELINE);
         baselineDirectory.mkdirs();
-
         // Path of the reference image for this assertion
-        final File referenceScreenShotFile = new File(baselineDirectory, screenshotName + ".png");
+        final File referenceImageFile = new File(baselineDirectory, screenshotName + ".png");
+
 
         // Directory for the results of the current test run
-        final File testRunDirectory = new File(new File(targetDirectory, RESULT_DIRECTORY_RESULTS),
+        final File testInstanceDirectory = new File(new File(targetDirectory, RESULT_DIRECTORY_RESULTS),
                                                     Session.getCurrent().getID());
-        testRunDirectory.mkdirs();
-
+        testInstanceDirectory.mkdirs();
         // Path of the screenshot image file
-        final File currentScreenShotFile = new File(testRunDirectory, screenshotName + ".png");
+        final File currentScreenShotFile = new File(testInstanceDirectory, screenshotName + ".png");
+        // Path of the marked image file
+        final File markedImageFile = new File(testInstanceDirectory, screenshotName + "-marked" + ".png");
+        // Path of the difference image file
+        final File differenceImageFile = new File(testInstanceDirectory, screenshotName + "-difference" + ".png");
 
-        // Initialize markedImageFile
-        final File markedImageFile = new File(testRunDirectory, screenshotName + "-marked" + ".png");
 
-        // Initialize maskImageFile
+        // Directory of the mask images
         final File maskDirectoryPath = new File(targetDirectory, RESULT_DIRECTORY_MASKS);
         maskDirectoryPath.mkdirs();
+        // Path of the mask image file
         final File maskImageFile = new File(maskDirectoryPath, screenshotName + ".png");
-
-        // the difference image file
-        final File differenceImageFile = new File(testRunDirectory, screenshotName + "-difference" + ".png");
 
 
         //--------------------------------------------------------------------------------
@@ -279,15 +278,15 @@ public class VisualAssertion implements WebDriverCustomModule
             writeImage(screenshot, currentScreenShotFile);
 
             // If there's no reference screenshot yet -> save screenshot as reference image in baseline
-            if (!referenceScreenShotFile.isFile())
+            if (!referenceImageFile.isFile())
             {
-                writeImage(screenshot, referenceScreenShotFile);
+                writeImage(screenshot, referenceImageFile);
                 // There is no reference for the comparison -> RETURN
                 return;
             }
 
             // Load the reference image
-            final BufferedImage reference = ImageIO.read(referenceScreenShotFile);
+            final BufferedImage reference = ImageIO.read(referenceImageFile);
 
             // Mask for the image comparison
             ImageMask mask;
