@@ -1,13 +1,13 @@
 package com.xceptance.xlt.visualassertion.util;
 
-import java.awt.Color;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 import com.xceptance.xlt.visualassertion.algorithm.ComparisonAlgorithm;
 
 public class ImageComparison
 {
-    private int[][] lastDifferences = null;
+    private Point[] lastDifferences = null;
 
     private BufferedImage reference;
 
@@ -100,10 +100,10 @@ public class ImageComparison
         Color greyscale;
         int x, y, diffColor;
         double pixelColorDiff;
-        for (int i = 0; i < lastDifferences.length; i++)
+        for (Point point : lastDifferences)
         {
-            x = lastDifferences[i][0];
-            y = lastDifferences[i][1];
+            x = point.x;
+            y = point.y;
             pixelColorDiff = ImageHelper.calculatePixelRGBDiff(reference.getRGB(x, y), lastCompareImage.getRGB(x, y));
 
             diffColor = (int) Math.round(255 * pixelColorDiff);

@@ -1,9 +1,6 @@
 package com.xceptance.xlt.visualassertion.util;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
@@ -78,7 +75,7 @@ public class ImageHelper
      */
     protected static double calculatePixelRGBDiff(final int rgb1, final int rgb2)
     {
-        final double MAXDIFF = 721.2489168102785;
+        final double MAX = 721.2489168102785;
 
         // Initialize the red, green, blue values
         final int r1 = (rgb1 >> 16) & 0xFF;
@@ -99,9 +96,7 @@ public class ImageHelper
 
         final double cDiff = Math.sqrt(rWeight * rDiff * rDiff + gWeight * gDiff * gDiff + bWeight * bDiff * bDiff);
 
-        final double cDiffInPercent = cDiff / MAXDIFF;
-
-        return cDiffInPercent;
+        return cDiff / MAX;
     }
 
     protected static int[][] convertCoordinateListsTo2dArray(final ArrayList<Integer> xCoords, final ArrayList<Integer> yCoords)
@@ -114,8 +109,8 @@ public class ImageHelper
             pixels = new int[s][2];
             for (int i = 0; i < s; i++)
             {
-                pixels[i][0] = xCoords.get(i).intValue();
-                pixels[i][1] = yCoords.get(i).intValue();
+                pixels[i][0] = xCoords.get(i);
+                pixels[i][1] = yCoords.get(i);
             }
         }
 
@@ -151,10 +146,9 @@ public class ImageHelper
      * @param img2
      * @return {@link int[][]} or null where int[i][0] = x, int[i][1] = y
      */
-    protected static int[][] compareImages(final BufferedImage img1, final BufferedImage img2)
+    protected static Point[] compareImages(final BufferedImage img1, final BufferedImage img2)
     {
-        final ArrayList<Integer> xCoords = new ArrayList<Integer>();
-        final ArrayList<Integer> yCoords = new ArrayList<Integer>();
+        ArrayList<Point> pixels = new ArrayList<>();
 
         for (int x = 0; x < img1.getWidth(); x++)
         {
@@ -163,13 +157,12 @@ public class ImageHelper
                 // if the RGB values of 2 pixels differ
                 if (img1.getRGB(x, y) != img2.getRGB(x, y))
                 {
-                    xCoords.add(x);
-                    yCoords.add(y);
+                    pixels.add(new Point(x,y));
                 }
             }
         }
 
-        return convertCoordinateListsTo2dArray(xCoords, yCoords);
+        return pixels.toArray(new Point[pixels.size()]);
     }
 
     /**
@@ -183,10 +176,9 @@ public class ImageHelper
      * @return an array with the coordinates of the pixels where there were differences, null if there were no
      *         differences
      */
-    protected static int[][] colorFuzzyCompare(final BufferedImage img1, final BufferedImage img2, final double colorTolerance)
+    protected static Point[] colorFuzzyCompare(final BufferedImage img1, final BufferedImage img2, final double colorTolerance)
     {
-        final ArrayList<Integer> xCoords = new ArrayList<Integer>();
-        final ArrayList<Integer> yCoords = new ArrayList<Integer>();
+        ArrayList<Point> pixels = new ArrayList<>();
 
         final int imagewidth = img1.getWidth();
         final int imageheight = img1.getHeight();
@@ -201,13 +193,12 @@ public class ImageHelper
                 final double difference = calculatePixelRGBDiff(img1.getRGB(x, y), img2.getRGB(x, y));
                 if (difference > colorTolerance)
                 {
-                    xCoords.add(x);
-                    yCoords.add(y);
+                    pixels.add(new Point(x,y));
                 }
             }
         }
 
-        return convertCoordinateListsTo2dArray(xCoords, yCoords);
+        return pixels.toArray(new Point[pixels.size()]);
     }
 
     /**
@@ -222,29 +213,25 @@ public class ImageHelper
      * @return an array with the coordinates of the pixels where there were differences, null if there were no
      *         differences
      */
-    protected static int[][] fuzzyCompare(final BufferedImage img1, final BufferedImage img2, final double colorTolerance, final double pixelTolerance,
+    protected static Point[] fuzzyCompare(final BufferedImage img1, final BufferedImage img2, final double colorTolerance, final double pixelTolerance,
             final int fuzzyBlockDimension)
     {
         /* Method for the regular fuzzy comparison */
 
-        final ArrayList<Integer> xCoords = new ArrayList<Integer>();
-        final ArrayList<Integer> yCoords = new ArrayList<Integer>();
-        final ArrayList<Integer> xCoordsTemp = new ArrayList<Integer>();
-        final ArrayList<Integer> yCoordsTemp = new ArrayList<Integer>();
+        final ArrayList<Point> pixels = new ArrayList<>();
+        final ArrayList<Point> tempCoordinates = new ArrayList<>();
 
-        final int imageWidth = img1.getWidth();
-        final int imageHeight = img1.getHeight();
 
         // Create blocks, go through every block
-        final int xBlock = imageWidth / fuzzyBlockDimension;
-        final int yBlock = imageHeight / fuzzyBlockDimension;
+        final int xBlock = img1.getWidth() / fuzzyBlockDimension;
+        final int yBlock = img1.getHeight() / fuzzyBlockDimension;
 
         for (int x = 0; x < xBlock; x++)
         {
             for (int y = 0; y < yBlock; y++)
             {
-                final int subImageWidth = calcPixSpan(fuzzyBlockDimension, x, imageWidth);
-                final int subImageHeight = calcPixSpan(fuzzyBlockDimension, y, imageHeight);
+                final int subImageWidth = calcPixSpan(fuzzyBlockDimension, x, img1.getWidth());
+                final int subImageHeight = calcPixSpan(fuzzyBlockDimension, y, img1.getHeight());
                 final int differencesAllowed = (int) Math.floor(subImageWidth * subImageHeight * pixelTolerance);
                 int differencesPerBlock = 0;
 
@@ -268,8 +255,7 @@ public class ImageHelper
                             // coordinates to the
                             // temporary arraylists
                             differencesPerBlock++;
-                            xCoordsTemp.add(xCoord);
-                            yCoordsTemp.add(yCoord);
+                            tempCoordinates.add(new Point(xCoord,yCoord));
                         }
                     }
                 }
@@ -278,17 +264,15 @@ public class ImageHelper
                 // Write the temporary coordinates to the permanent ones
                 if (differencesPerBlock > differencesAllowed)
                 {
-                    xCoords.addAll(xCoordsTemp);
-                    yCoords.addAll(yCoordsTemp);
+                    pixels.addAll(tempCoordinates);
                 }
 
                 // clear the temporary coordinates
-                xCoordsTemp.clear();
-                yCoordsTemp.clear();
+                tempCoordinates.clear();
             }
         }
 
-        return convertCoordinateListsTo2dArray(xCoords, yCoords);
+        return pixels.toArray(new Point[pixels.size()]);
     }
 
     /**
@@ -677,7 +661,7 @@ public class ImageHelper
      * @param markingSizeY
      * @return
      */
-    protected static BufferedImage markDifferencesWithBoxes(final BufferedImage image, final int[][] pixels, final int markingSizeX, final int markingSizeY)
+    protected static BufferedImage markDifferencesWithBoxes(final BufferedImage image, final Point[] pixels, final int markingSizeX, final int markingSizeY)
     {
         if (pixels == null)
         {
@@ -691,12 +675,9 @@ public class ImageHelper
         // don't bother with rectangles
         if (markingSizeX == 1 || markingSizeY == 1)
         {
-            int x, y;
-            for (int i = 0; i < pixels.length; i++)
+            for (Point pixel : pixels)
             {
-                x = pixels[i][0];
-                y = pixels[i][1];
-                colorPixel(copy, x, y, null);
+                colorPixel(copy, pixel.x, pixel.y, null);
             }
 
             return copy;
@@ -713,10 +694,10 @@ public class ImageHelper
 
         int xBlock, yBlock, subImageWidth, subImageHeight;
 
-        for (int x = 0; x < pixels.length; x++)
+        for (Point pixel : pixels)
         {
-            xBlock = pixels[x][0] / markingSizeX;
-            yBlock = pixels[x][1] / markingSizeY;
+            xBlock = pixel.x / markingSizeX;
+            yBlock = pixel.y / markingSizeY;
 
             subImageWidth = calcPixSpan(markingSizeX, xBlock, imageWidth);
             subImageHeight = calcPixSpan(markingSizeY, yBlock, imageHeight);
@@ -743,7 +724,7 @@ public class ImageHelper
      * @param markingSizeY
      * @return
      */
-    protected static BufferedImage markDifferencesWithAMarker(final BufferedImage image, final int[][] pixels, final int markingSizeX, final int markingSizeY)
+    protected static BufferedImage markDifferencesWithAMarker(final BufferedImage image, final Point[] pixels, final int markingSizeX, final int markingSizeY)
     {
         if (pixels == null)
         {
@@ -758,11 +739,11 @@ public class ImageHelper
         final Graphics2D g = imageCopy.createGraphics();
         g.setColor(highlighterColor);
 
-        for (int i = 0; i < pixels.length; i++)
+        for (Point pixel : pixels)
         {
             // the middle of the block should be our pixel to make it marker like
-            int x = pixels[i][0] - (markingSizeX / 2);
-            int y = pixels[i][1] - (markingSizeY / 2);
+            int x = pixel.x - (markingSizeX / 2);
+            int y = pixel.y - (markingSizeY / 2);
 
             // avoid negative values
             x = x < 0 ? x = 0 : x;
@@ -774,9 +755,9 @@ public class ImageHelper
         g.dispose();
 
         // mark the pixels on the new background
-        for (int i = 0; i < pixels.length; i++)
+        for (Point pixel : pixels)
         {
-            imageCopy.setRGB(pixels[i][0], pixels[i][1], pixelEmphasizeColor.getRGB());
+            imageCopy.setRGB(pixel.x, pixel.y, pixelEmphasizeColor.getRGB());
         }
 
         return imageCopy;

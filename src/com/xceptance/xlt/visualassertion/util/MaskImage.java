@@ -1,7 +1,6 @@
 package com.xceptance.xlt.visualassertion.util;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 import com.sun.istack.internal.Nullable;
@@ -70,7 +69,7 @@ public class MaskImage
      */
     public void train(final BufferedImage image, final ComparisonAlgorithm algorithm, final RectangleMask markerMask)
     {
-        int[][] differences = null;
+        Point[] differences = null;
 
         switch (algorithm.getType())
         {
@@ -98,7 +97,7 @@ public class MaskImage
      * @param pixels pixel positions of the pixels that where detected as different
      * @return A BufferedImage in which the pixels at the given positions have been marked in BLACK
      */
-    private BufferedImage maskDifferences(final BufferedImage image, final int[][] pixels,
+    private BufferedImage maskDifferences(final BufferedImage image, final Point[] pixels,
                                           final RectangleMask markerMask, final Color maskingColor)
     {
         final BufferedImage copy = ImageHelper.copyImage(image);
@@ -110,10 +109,10 @@ public class MaskImage
         g.setColor(maskingColor);
 
         //TODO: Check pixel array out
-        for (int i = 0; i < pixels.length; i++)
+        for (Point pixel : pixels)
         {
-            int x = Math.max(0, pixels[i][0] - markerMask.getXDistance());
-            int y = Math.max(0, pixels[i][1] - markerMask.getYDistance());
+            int x = Math.max(0, pixel.x - markerMask.getXDistance());
+            int y = Math.max(0, pixel.y - markerMask.getYDistance());
 
             g.fillRect(x, y, markerMask.getWidth(), markerMask.getHeight());
         }
