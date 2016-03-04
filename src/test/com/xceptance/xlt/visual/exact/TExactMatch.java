@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import com.xceptance.xlt.visualassertion.algorithm.ComparisonAlgorithm;
 import com.xceptance.xlt.visualassertion.algorithm.ExactMatch;
-import com.xceptance.xlt.visualassertion.mask.RectangleMask;
+import com.xceptance.xlt.visualassertion.util.Rectangle;
 
 import test.com.xceptance.xlt.visual.ImageTest;
 import test.com.xceptance.xlt.visual.TestCompare;
@@ -15,7 +15,7 @@ public class TExactMatch extends ImageTest
     ComparisonAlgorithm a = new ExactMatch();
 
     // how should a difference maSked during training
-    RectangleMask m = new RectangleMask(10, 10);
+    Rectangle m = new Rectangle(10, 10);
 
     // how difference should maRked in difference file
     int mX = 10;

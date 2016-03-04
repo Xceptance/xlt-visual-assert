@@ -5,15 +5,15 @@ import java.text.MessageFormat;
 
 import org.junit.Assert;
 
-import com.xceptance.xlt.visualassertion.ImageComparison;
-import com.xceptance.xlt.visualassertion.ImageMask;
+import com.xceptance.xlt.visualassertion.util.ImageComparison;
+import com.xceptance.xlt.visualassertion.util.ImageMask;
 import com.xceptance.xlt.visualassertion.algorithm.ComparisonAlgorithm;
 import com.xceptance.xlt.visualassertion.algorithm.ExactMatch;
-import com.xceptance.xlt.visualassertion.mask.RectangleMask;
+import com.xceptance.xlt.visualassertion.util.Rectangle;
 
 public class TestCompare extends ImageTest
 {
-    private final RectangleMask differenceMarker;
+    private final Rectangle differenceMarker;
 
     private final ComparisonAlgorithm algorithm;
 
@@ -32,10 +32,10 @@ public class TestCompare extends ImageTest
     public TestCompare()
     {
         this.algorithm = new ExactMatch();
-        this.differenceMarker = new RectangleMask(10, 10);
+        this.differenceMarker = new Rectangle(10, 10);
     }
 
-    public TestCompare(final ComparisonAlgorithm algorithm, final RectangleMask differenceMarker, final int markingSizeX, final int markingSizeY)
+    public TestCompare(final ComparisonAlgorithm algorithm, final Rectangle differenceMarker, final int markingSizeX, final int markingSizeY)
     {
         this.algorithm = algorithm;
         this.differenceMarker = differenceMarker;

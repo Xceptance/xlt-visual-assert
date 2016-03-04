@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<javamodule xmlns="http://xlt.xceptance.com/xlt-script/2" version="6" class="com.xceptance.xlt.visualassertion.VisualAssertion"/>
+<javamodule xmlns="http://xlt.xceptance.com/xlt-script/2" version="6" class="com.xceptance.xlt.visualassertion.util.VisualAssertion"/>

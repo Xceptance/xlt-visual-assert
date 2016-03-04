@@ -1,4 +1,4 @@
-package com.xceptance.xlt.visualassertion;
+package com.xceptance.xlt.visualassertion.util;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -6,7 +6,6 @@ import java.awt.image.BufferedImage;
 
 import com.sun.istack.internal.Nullable;
 import com.xceptance.xlt.visualassertion.algorithm.ComparisonAlgorithm;
-import com.xceptance.xlt.visualassertion.mask.RectangleMask;
 
 /**
  * Mask image that is used in the comparison of two pictures. The mask is trained with
@@ -30,7 +29,7 @@ public class ImageMask
         if (maskImage == null)
         {
             // create a new mask with same dimensions as reference image
-            this.mask = ImageHelper.createEmptyImage(referenceImage, BufferedImage.TYPE_INT_ARGB);
+            this.mask = new BufferedImage(referenceImage.getWidth(),referenceImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
             // fill the mask with transparent white
             this.mask = ImageHelper.fillImage(this.mask, ImageHelper.WHITE_TRANSPARENT);
@@ -69,7 +68,7 @@ public class ImageMask
      * @param algorithm The algorithm that calculates the differences between the two images
      * @param markerMask The size of the area that will be marked around a detected difference
      */
-    public void train(final BufferedImage image, final ComparisonAlgorithm algorithm, final RectangleMask markerMask)
+    public void train(final BufferedImage image, final ComparisonAlgorithm algorithm, final Rectangle markerMask)
     {
         int[][] differences = null;
 
@@ -100,7 +99,7 @@ public class ImageMask
      * @return A BufferedImage in which the pixels at the given positions have been marked in BLACK
      */
     private BufferedImage maskDifferences(final BufferedImage image, final int[][] pixels,
-                                          final RectangleMask markerMask, final Color maskingColor)
+                                          final Rectangle markerMask, final Color maskingColor)
     {
         final BufferedImage copy = ImageHelper.copyImage(image);
 
