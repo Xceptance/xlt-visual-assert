@@ -144,9 +144,8 @@ public class VisualAssertion implements WebDriverCustomModule
         // Marking type that is used for the test
         final String markType = props.getProperty(PROPERTY_MARK_TYPE, MARK_WITH_BOXES);
 
-        // TODO Find out what this does exactly
-        // pixelPerBlockXY, fuzzyness parameter
-        final int pixelPerBlockXY = props.getProperty(PROPERTY_FUZZY_BLOCKSIZE_XY, FUZZY_BLOCKSIZE_XY);
+        // fuzzyBlockLength, fuzzyness parameter
+        final int fuzzyBlockLength = props.getProperty(PROPERTY_FUZZY_BLOCKSIZE_XY, FUZZY_BLOCKSIZE_XY);
 
         // Tolerance value for differences in color
         final String colorToleranceValue = props.getProperty(PROPERTY_COLOR_TOLERANCE, COLOR_TOLERANCE);
@@ -315,7 +314,7 @@ public class VisualAssertion implements WebDriverCustomModule
                 algorithm = new ExactMatch();
                 break;
             case PROPERTY_ALGORITHM_FUZZY:
-                algorithm = new PixelFuzzy(pixelTolerance, colorTolerance, pixelPerBlockXY);
+                algorithm = new PixelFuzzy(pixelTolerance, colorTolerance, fuzzyBlockLength);
                 break;
             }
 

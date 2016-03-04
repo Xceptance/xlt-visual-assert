@@ -108,7 +108,6 @@ public class MaskImage
         final Graphics2D g = copy.createGraphics();
         g.setColor(maskingColor);
 
-        //TODO: Check pixel array out
         for (Point pixel : pixels)
         {
             int x = Math.max(0, pixel.x - markerMask.getXDistance());

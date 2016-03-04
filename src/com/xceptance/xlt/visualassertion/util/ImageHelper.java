@@ -213,6 +213,7 @@ public class ImageHelper
         final int horizontalBlockCount = img1.getWidth() / fuzzyBlockDimension;
         final int verticalBlockCount = img1.getHeight() / fuzzyBlockDimension;
 
+        // For each block
         for (int x = 0; x < horizontalBlockCount; x++)
         {
             for (int y = 0; y < verticalBlockCount; y++)
@@ -223,7 +224,7 @@ public class ImageHelper
                 final int differencesAllowed = (int) Math.floor(horizontalBlockWidth * verticalBlockHeight * pixelTolerance);
                 int differencesPerBlock = 0;
 
-                // Go through every pixel in that block
+                // For each pixel in this block, check for differences
                 for (int w = 0; w < horizontalBlockWidth; w++)
                 {
                     for (int h = 0; h < verticalBlockHeight; h++)
@@ -248,8 +249,8 @@ public class ImageHelper
                     }
                 }
 
-                // If differencesPerBlock is above pixTolerance
-                // Write the temporary coordinates to the permanent ones
+                // If the number of differences exceeds the threshold, save the coordinates of the pixels
+                // that are different
                 if (differencesPerBlock > differencesAllowed)
                 {
                     pixels.addAll(tempCoordinates);
