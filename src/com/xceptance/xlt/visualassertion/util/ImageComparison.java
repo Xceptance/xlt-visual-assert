@@ -72,7 +72,7 @@ public class ImageComparison
         return true;
     }
 
-    public boolean isEqual(final BufferedImage compareImage, final ImageMask mask, final ComparisonAlgorithm algorithm)
+    public boolean isEqual(final BufferedImage compareImage, final MaskImage mask, final ComparisonAlgorithm algorithm)
     {
         return isEqual(compareImage, mask.getMask(), algorithm);
     }

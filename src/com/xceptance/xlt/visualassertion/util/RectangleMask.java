@@ -3,17 +3,17 @@ package com.xceptance.xlt.visualassertion.util;
 /**
  * Represents a mask in form of a rectangle given by width and height.
  */
-public class Rectangle
+public class RectangleMask
 {
     private int width;
     private int height;
 
     /**
-     * Constructs a Rectangle with the given width and height.
+     * Constructs a RectangleMask with the given width and height.
      * @param width Width of the rectangle
      * @param height Height of the rectangle
      */
-    public Rectangle(int width, int height)
+    public RectangleMask(int width, int height)
     {
         this.width = width;
         this.height = height;

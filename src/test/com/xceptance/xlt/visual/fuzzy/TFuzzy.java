@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import com.xceptance.xlt.visualassertion.algorithm.ComparisonAlgorithm;
 import com.xceptance.xlt.visualassertion.algorithm.PixelFuzzy;
-import com.xceptance.xlt.visualassertion.util.Rectangle;
+import com.xceptance.xlt.visualassertion.util.RectangleMask;
 
 import test.com.xceptance.xlt.visual.ImageTest;
 import test.com.xceptance.xlt.visual.TestCompare;
@@ -17,7 +17,7 @@ public class TFuzzy extends ImageTest
     ComparisonAlgorithm a = new PixelFuzzy(0.1, 0.1, 10);
 
     // how should a difference maSked during training
-    Rectangle m = new Rectangle(10, 10);
+    RectangleMask m = new RectangleMask(10, 10);
 
     // how difference should maRked in difference file
     int mX = 10;

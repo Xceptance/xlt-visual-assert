@@ -6,20 +6,20 @@ import java.text.MessageFormat;
 import org.junit.Assert;
 
 import com.xceptance.xlt.visualassertion.util.ImageComparison;
-import com.xceptance.xlt.visualassertion.util.ImageMask;
+import com.xceptance.xlt.visualassertion.util.MaskImage;
 import com.xceptance.xlt.visualassertion.algorithm.ComparisonAlgorithm;
 import com.xceptance.xlt.visualassertion.algorithm.ExactMatch;
-import com.xceptance.xlt.visualassertion.util.Rectangle;
+import com.xceptance.xlt.visualassertion.util.RectangleMask;
 
 public class TestCompare extends ImageTest
 {
-    private final Rectangle differenceMarker;
+    private final RectangleMask differenceMarker;
 
     private final ComparisonAlgorithm algorithm;
 
     private ImageComparison comperator;
 
-    private ImageMask masker;
+    private MaskImage masker;
 
     private BufferedImage referenceImage;
 
@@ -32,10 +32,10 @@ public class TestCompare extends ImageTest
     public TestCompare()
     {
         this.algorithm = new ExactMatch();
-        this.differenceMarker = new Rectangle(10, 10);
+        this.differenceMarker = new RectangleMask(10, 10);
     }
 
-    public TestCompare(final ComparisonAlgorithm algorithm, final Rectangle differenceMarker, final int markingSizeX, final int markingSizeY)
+    public TestCompare(final ComparisonAlgorithm algorithm, final RectangleMask differenceMarker, final int markingSizeX, final int markingSizeY)
     {
         this.algorithm = algorithm;
         this.differenceMarker = differenceMarker;
@@ -51,7 +51,7 @@ public class TestCompare extends ImageTest
     public TestCompare match(final BufferedImage referenceImage)
     {
         this.referenceImage = referenceImage;
-        masker = new ImageMask(this.referenceImage);
+        masker = new MaskImage(this.referenceImage);
 
         return this;
     }
@@ -117,7 +117,7 @@ public class TestCompare extends ImageTest
         return this;
     }
 
-    public ImageMask getMasker()
+    public MaskImage getMasker()
     {
         return masker;
     }

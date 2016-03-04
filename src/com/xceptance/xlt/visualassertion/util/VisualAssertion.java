@@ -288,15 +288,15 @@ public class VisualAssertion implements WebDriverCustomModule
             final BufferedImage reference = ImageIO.read(referenceImageFile);
 
             // Mask for the image comparison
-            ImageMask mask;
+            MaskImage mask;
             // If a mask already exists load it, else create a new one
             if (maskImageFile.exists())
             {
-                mask = new ImageMask(reference, ImageIO.read(maskImageFile));
+                mask = new MaskImage(reference, ImageIO.read(maskImageFile));
             }
             else
             {
-                mask = new ImageMask(reference);
+                mask = new MaskImage(reference);
                 writeImage(mask.getMask(), maskImageFile);
             }
 
@@ -328,7 +328,7 @@ public class VisualAssertion implements WebDriverCustomModule
             if (trainingsModeEnabled)
             {
                 // Train the mask to take the current difference between the reference image and screenshot into account
-                mask.train(screenshot, algorithm, new Rectangle(markBlockSizeX, markBlockSizeY));
+                mask.train(screenshot, algorithm, new RectangleMask(markBlockSizeX, markBlockSizeY));
 
                 // Close the mask to cover a bigger area
                 if (closeMask)

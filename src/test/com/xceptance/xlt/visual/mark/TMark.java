@@ -8,7 +8,7 @@ import org.junit.Test;
 import com.xceptance.xlt.visualassertion.algorithm.ColorFuzzy;
 import com.xceptance.xlt.visualassertion.algorithm.ComparisonAlgorithm;
 import com.xceptance.xlt.visualassertion.algorithm.ExactMatch;
-import com.xceptance.xlt.visualassertion.util.Rectangle;
+import com.xceptance.xlt.visualassertion.util.RectangleMask;
 
 import test.com.xceptance.xlt.visual.ImageTest;
 import test.com.xceptance.xlt.visual.TestCompare;
@@ -18,7 +18,7 @@ public class TMark extends ImageTest
     ComparisonAlgorithm a = new ColorFuzzy(0.1);
 
     // how should a difference maSked during training
-    Rectangle m = new Rectangle(10, 10);
+    RectangleMask m = new RectangleMask(10, 10);
 
     // how difference should maRked in difference file
     int mX = 10;

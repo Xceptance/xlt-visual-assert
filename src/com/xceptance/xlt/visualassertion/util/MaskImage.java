@@ -12,7 +12,7 @@ import com.xceptance.xlt.visualassertion.algorithm.ComparisonAlgorithm;
  * permitted differences between the two pictures, so that those difference will be ignored in
  * the actual comparison.
  */
-public class ImageMask
+public class MaskImage
 {
     private final BufferedImage reference;
     private BufferedImage mask;
@@ -22,7 +22,7 @@ public class ImageMask
      * @param referenceImage The reference image for the mask training
      * @param maskImage The mask image, @Nullable -> Creates a blank mask image with the dimensions of the reference image
      */
-    public ImageMask(final BufferedImage referenceImage, @Nullable final BufferedImage maskImage)
+    public MaskImage(final BufferedImage referenceImage, @Nullable final BufferedImage maskImage)
     {
         this.reference = ImageHelper.copyImage(referenceImage);
 
@@ -43,11 +43,11 @@ public class ImageMask
     /**
      * Initializes the mask with the given reference image, a blank mask image is created with the dimensions of
      * the reference image.
-     * <br>Calls ImageMask(referenceImage, null)<br>
+     * <br>Calls MaskImage(referenceImage, null)<br>
      * @param referenceImage The reference image for the mask training
      *
      */
-    public ImageMask(final BufferedImage referenceImage)
+    public MaskImage(final BufferedImage referenceImage)
     {
         this(referenceImage, null);
     }
@@ -68,7 +68,7 @@ public class ImageMask
      * @param algorithm The algorithm that calculates the differences between the two images
      * @param markerMask The size of the area that will be marked around a detected difference
      */
-    public void train(final BufferedImage image, final ComparisonAlgorithm algorithm, final Rectangle markerMask)
+    public void train(final BufferedImage image, final ComparisonAlgorithm algorithm, final RectangleMask markerMask)
     {
         int[][] differences = null;
 
@@ -99,7 +99,7 @@ public class ImageMask
      * @return A BufferedImage in which the pixels at the given positions have been marked in BLACK
      */
     private BufferedImage maskDifferences(final BufferedImage image, final int[][] pixels,
-                                          final Rectangle markerMask, final Color maskingColor)
+                                          final RectangleMask markerMask, final Color maskingColor)
     {
         final BufferedImage copy = ImageHelper.copyImage(image);
 
