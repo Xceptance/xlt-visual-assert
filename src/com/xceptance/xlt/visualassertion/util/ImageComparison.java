@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 import com.xceptance.xlt.visualassertion.algorithm.ComparisonAlgorithm;
+import org.junit.Assert;
 
 public class ImageComparison
 {
@@ -64,7 +65,11 @@ public class ImageComparison
             break;
         }
 
-        if (lastDifferences != null)
+        if(lastDifferences == null){
+            Assert.fail("The dimensions of the two images don't match!");
+        }
+
+        if (lastDifferences.length != 0)
         {
             return false;
         }
@@ -89,12 +94,11 @@ public class ImageComparison
 
     public BufferedImage getDifferenceImage()
     {
-        if (lastDifferences == null)
+        if (lastDifferences.length == 0)
             return null;
 
         // create a difference picture based on reference and paint it black
-        BufferedImage difference = ImageHelper.copyImage(reference);
-        difference = ImageHelper.createPlainImage(difference, Color.BLACK);
+        BufferedImage difference = ImageHelper.createPlainImage(reference, Color.BLACK);
 
         // mark differences in greyscale
         Color greyscale;

@@ -55,7 +55,7 @@ public class ImageHelper
 
         final Graphics2D g = copy.createGraphics();
         g.setColor(c);
-        g.drawRect(0, 0, copy.getWidth(), copy.getHeight());
+        g.fillRect(0, 0, image.getWidth(), image.getHeight());
         g.dispose();
 
         return copy;
@@ -99,55 +99,43 @@ public class ImageHelper
         return cDiff / MAX;
     }
 
-    protected static int[][] convertCoordinateListsTo2dArray(final ArrayList<Integer> xCoords, final ArrayList<Integer> yCoords)
-    {
-        final int s = xCoords.size();
 
-        int[][] pixels = null;
-        if (s > 0)
-        {
-            pixels = new int[s][2];
-            for (int i = 0; i < s; i++)
-            {
-                pixels[i][0] = xCoords.get(i);
-                pixels[i][1] = yCoords.get(i);
-            }
-        }
-
-        return pixels;
-    }
 
     /**
-     * Calculates how many pixel there can be in the current block. Necessary in case the block would go over the
-     * border.
+     * Calculates whether the current block exceeds either the x or y coordinates of the image.
+     * Checks one axis of the image at a time.
      * 
-     * @param pixelPerBlock
-     *            how many pixels every block has
+     * @param axisPixelCount
+     *            The number of pixels in this block for axis that should be checked
      * @param n
-     *            the block we're currently in
-     * @param overallSpan
-     *            the width/ height that shoudn't be passed
-     * @return
+     *            index of the current block
+     * @param imageSpan
+     *            the width/ height of the image
+     * @return The number of pixels that can be used for the mask either in the x or y axis
      */
-    protected static int calcPixSpan(final int pixelPerBlock, final int n, final int overallSpan)
+    protected static int calcBlockLength(final int axisPixelCount, final int n, final int imageSpan)
     {
-        if (pixelPerBlock * (n + 1) > overallSpan)
+        if (axisPixelCount * (n + 1) > imageSpan)
         {
-            return overallSpan % pixelPerBlock;
+            return imageSpan % axisPixelCount;
         }
 
-        return pixelPerBlock;
+        return axisPixelCount;
     }
 
     /**
      * Exact pixel by pixel compare. Images must have the same size
      * 
-     * @param img1
-     * @param img2
-     * @return {@link int[][]} or null where int[i][0] = x, int[i][1] = y
+     * @param img1 First image for the comparison
+     * @param img2 Second image for the comparison
+     * @return Point[] array that contains the coordinates of pixels that are different
      */
     protected static Point[] compareImages(final BufferedImage img1, final BufferedImage img2)
     {
+        if(img1.getWidth() != img2.getWidth() || img1.getHeight() != img2.getHeight()){
+            return null;
+        }
+
         ArrayList<Point> pixels = new ArrayList<>();
 
         for (int x = 0; x < img1.getWidth(); x++)
@@ -166,26 +154,26 @@ public class ImageHelper
     }
 
     /**
-     * Method for the pixel based comparison with colTolerance. So it will compare pixel by pixel, but it will have a
-     * certain tolerance for color differences.
+     * Method for the color based comparison of pixels. The method compares pixel by pixel with a threshold
+     * for the difference in color. Small deviations are permitted.
      * 
      * @param img1
-     *            the reference image
+     *            The first image for the comparison
      * @param img2
-     *            the image that will be compared with the reference image
-     * @return an array with the coordinates of the pixels where there were differences, null if there were no
-     *         differences
+     *            The second image for the comparison
+     * @return Point[] array that contains the coordinates of pixels that are different
      */
     protected static Point[] colorFuzzyCompare(final BufferedImage img1, final BufferedImage img2, final double colorTolerance)
     {
+        if(img1.getWidth() != img2.getWidth() || img1.getHeight() != img2.getHeight()){
+            return null;
+        }
+
         ArrayList<Point> pixels = new ArrayList<>();
 
-        final int imagewidth = img1.getWidth();
-        final int imageheight = img1.getHeight();
-
-        for (int x = 0; x < imagewidth; x++)
+        for (int x = 0; x < img1.getWidth(); x++)
         {
-            for (int y = 0; y < imageheight; y++)
+            for (int y = 0; y < img2.getHeight(); y++)
             {
                 // calculates difference and adds the coordinates to
                 // the relevant ArrayList if the difference is above the
@@ -202,43 +190,43 @@ public class ImageHelper
     }
 
     /**
-     * Compares the img2 image to the img1 image using the fuzzyness parameters defined in the ImageComparison
-     * constructor. Uses pixelPerBlockXY, pixTolerance and colTolerance.
+     * Compares two images by partitioning them into blocks and checking the number of different pixels
+     * in each block. Therefore the difference in color with the given color threshold is calculated.
+     * If the number of pixels that are found as different in one block exceeds a number threshold the images
+     * are treated as differently and the pixel coordinates are saved as Point objects.
      * 
      * @param img1
-     *            the reference image
+     *            The first image for the comparison
      * @param img2
-     *            the image that will be compared with the reference image
-     * @param pixelTolerance
-     * @return an array with the coordinates of the pixels where there were differences, null if there were no
-     *         differences
+     *            The second image for the comparison
+     * @param colorTolerance A threshold value that calculates the allowed difference in color between two pixels
+     * @param pixelTolerance A threshold value that calculates the allowed number of different pixels per block
+     * @param fuzzyBlockDimension The x and y dimension of one block of pixels, which are validated together
+     * @return Point[] array that contains the coordinates of pixels that are different
      */
-    protected static Point[] fuzzyCompare(final BufferedImage img1, final BufferedImage img2, final double colorTolerance, final double pixelTolerance,
-            final int fuzzyBlockDimension)
+    protected static Point[] fuzzyCompare(final BufferedImage img1, final BufferedImage img2, final double colorTolerance,
+                                          final double pixelTolerance, final int fuzzyBlockDimension)
     {
-        /* Method for the regular fuzzy comparison */
-
         final ArrayList<Point> pixels = new ArrayList<>();
-        final ArrayList<Point> tempCoordinates = new ArrayList<>();
 
+        // Calculate the number of blocks for each axis
+        final int horizontalBlockCount = img1.getWidth() / fuzzyBlockDimension;
+        final int verticalBlockCount = img1.getHeight() / fuzzyBlockDimension;
 
-        // Create blocks, go through every block
-        final int xBlock = img1.getWidth() / fuzzyBlockDimension;
-        final int yBlock = img1.getHeight() / fuzzyBlockDimension;
-
-        for (int x = 0; x < xBlock; x++)
+        for (int x = 0; x < horizontalBlockCount; x++)
         {
-            for (int y = 0; y < yBlock; y++)
+            for (int y = 0; y < verticalBlockCount; y++)
             {
-                final int subImageWidth = calcPixSpan(fuzzyBlockDimension, x, img1.getWidth());
-                final int subImageHeight = calcPixSpan(fuzzyBlockDimension, y, img1.getHeight());
-                final int differencesAllowed = (int) Math.floor(subImageWidth * subImageHeight * pixelTolerance);
+                final ArrayList<Point> tempCoordinates = new ArrayList<>();
+                final int horizontalBlockWidth = calcBlockLength(fuzzyBlockDimension, x, img1.getWidth());
+                final int verticalBlockHeight = calcBlockLength(fuzzyBlockDimension, y, img1.getHeight());
+                final int differencesAllowed = (int) Math.floor(horizontalBlockWidth * verticalBlockHeight * pixelTolerance);
                 int differencesPerBlock = 0;
 
                 // Go through every pixel in that block
-                for (int w = 0; w < subImageWidth; w++)
+                for (int w = 0; w < horizontalBlockWidth; w++)
                 {
-                    for (int h = 0; h < subImageHeight; h++)
+                    for (int h = 0; h < verticalBlockHeight; h++)
                     {
                         final int xCoord = x * fuzzyBlockDimension + w;
                         final int yCoord = y * fuzzyBlockDimension + h;
@@ -699,8 +687,8 @@ public class ImageHelper
             xBlock = pixel.x / markingSizeX;
             yBlock = pixel.y / markingSizeY;
 
-            subImageWidth = calcPixSpan(markingSizeX, xBlock, imageWidth);
-            subImageHeight = calcPixSpan(markingSizeY, yBlock, imageHeight);
+            subImageWidth = calcBlockLength(markingSizeX, xBlock, imageWidth);
+            subImageHeight = calcBlockLength(markingSizeY, yBlock, imageHeight);
 
             if (!markedBlocks[xBlock][yBlock])
             {
