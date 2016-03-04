@@ -5,13 +5,11 @@ package com.xceptance.xlt.visualassertion.util;
  */
 public class Rectangle
 {
-    private int x;
-    private int y;
     private int width;
     private int height;
 
     /**
-     * Constructs a Rectangle with the given width and height. The coordinates are set to [0,0]
+     * Constructs a Rectangle with the given width and height.
      * @param width Width of the rectangle
      * @param height Height of the rectangle
      */
@@ -19,23 +17,8 @@ public class Rectangle
     {
         this.width = width;
         this.height = height;
-        this.x = 0;
-        this.y = 0;
     }
 
-    /**
-     * Constructs a Rectangle with the given coordinates x and y, as well as the given width and height.
-     * @param x X coordinate
-     * @param y Y coordinate
-     * @param width Width of the rectangle
-     * @param height Height of the rectangle
-     */
-    public Rectangle(int x, int y, int width, int height){
-        this.width = width;
-        this.height = height;
-        this.x = x;
-        this.y = y;
-    }
 
     public int getWidth()
     {
@@ -47,11 +30,19 @@ public class Rectangle
         return height;
     }
 
-    public int getX() {
-        return x;
+    /**
+     * Returns the relative x distance to the middle of the mask
+     * @return width/2 as int
+     */
+    public int getXDistance() {
+        return width / 2;
     }
 
-    public int getY() {
-        return y;
+    /**
+     * Returns the relative y distance to the middle of the mask
+     * @return height/2 as int
+     */
+    public int getYDistance() {
+        return height / 2;
     }
 }

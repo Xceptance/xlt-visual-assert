@@ -32,7 +32,7 @@ public class ImageMask
             this.mask = new BufferedImage(referenceImage.getWidth(),referenceImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
             // fill the mask with transparent white
-            this.mask = ImageHelper.fillImage(this.mask, ImageHelper.WHITE_TRANSPARENT);
+            this.mask = ImageHelper.createPlainImage(this.mask, ImageHelper.WHITE_TRANSPARENT);
         }
         else
         {
@@ -106,26 +106,16 @@ public class ImageMask
         if (pixels == null)
             return copy;
 
-        // This method doesn't need a separate if for markingX/ markingY = 1,
-        // the colorArea method works for them
-
-        final int halfMarkingSizeX = markerMask.getWidth() / 2;
-        final int halfMarkingSizeY = markerMask.getHeight() / 2;
-
-        final int markerMaskWidth = markerMask.getWidth();
-        final int markerMaskHeight = markerMask.getHeight();
-
-        int x, y;
         final Graphics2D g = copy.createGraphics();
         g.setColor(maskingColor);
 
+        //TODO: Check pixel array out
         for (int i = 0; i < pixels.length; i++)
         {
-            x = Math.max(0, pixels[i][0] - halfMarkingSizeX);
-            y = Math.max(0, pixels[i][1] - halfMarkingSizeY);
+            int x = Math.max(0, pixels[i][0] - markerMask.getXDistance());
+            int y = Math.max(0, pixels[i][1] - markerMask.getYDistance());
 
-            g.fillRect(x, y, markerMaskWidth, markerMaskHeight);
-
+            g.fillRect(x, y, markerMask.getWidth(), markerMask.getHeight());
         }
         g.dispose();
 
@@ -134,8 +124,8 @@ public class ImageMask
 
     /**
      * Closes the mask to better cover an area that is allowed to be different
-     * @param structureElementWidth
-     * @param structureElementHeight
+     * @param structureElementWidth Width of the structure element
+     * @param structureElementHeight Height of the structure element
      */
     public void closeMask(final int structureElementWidth, final int structureElementHeight)
     {

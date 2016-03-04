@@ -5,6 +5,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.WritableRaster;
 import java.util.ArrayList;
 
 /**
@@ -47,29 +48,23 @@ public class ImageHelper
 
 
     /**
-     * Returns a copy of the image, where the rectangle is drawn into with the given color
-     * @param image The image where the rectangle should be drawn into
-     * @param rect The rectangle will be drawn
-     * @param c The color of the rectangle
-     * @return The new BufferedImage containing the rectangle
+     * Returns a image of the same size as the given image filled with the given color
+     * @param image Image which sets the size for the new image
+     * @param c Color for the image
+     * @return A monochrome BufferedImage with the given color
      */
-    protected static BufferedImage drawRect(final BufferedImage image, Rectangle rect, final Color c)
+    protected static BufferedImage createPlainImage(final BufferedImage image, final Color c)
     {
         final BufferedImage copy = copyImage(image);
 
         final Graphics2D g = copy.createGraphics();
         g.setColor(c);
-        g.fillRect(rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight());
+        g.drawRect(0, 0, copy.getWidth(), copy.getHeight());
         g.dispose();
 
         return copy;
     }
 
-
-    protected static BufferedImage fillImage(final BufferedImage image, final Color c)
-    {
-        return drawRect(image, new Rectangle(0, 0 ,image.getWidth(), image.getHeight()), c);
-    }
 
     /**
      * The method weights the red, green and blue values and determines the difference as humans would see it. Based on

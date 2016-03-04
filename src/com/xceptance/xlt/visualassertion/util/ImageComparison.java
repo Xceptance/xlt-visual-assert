@@ -94,7 +94,7 @@ public class ImageComparison
 
         // create a difference picture based on reference and paint it black
         BufferedImage difference = ImageHelper.copyImage(reference);
-        difference = ImageHelper.fillImage(difference, Color.BLACK);
+        difference = ImageHelper.createPlainImage(difference, Color.BLACK);
 
         // mark differences in greyscale
         Color greyscale;
