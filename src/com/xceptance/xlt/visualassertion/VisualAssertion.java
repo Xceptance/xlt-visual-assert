@@ -28,7 +28,7 @@ import com.xceptance.xlt.visualassertion.mask.RectangleMask;
 /**
  * Module for the visual assertion of changes in a browser page. The module is called in an
  * action and takes a screenshot of the current page. This screenshot is then compared to already taken
- * reference images of the same page.
+ * reference images of the same page, or stored as reference image.
  *
  * The configurations for this module are done in the visualassertion.properties under /config
  * There are different algorithms that can be used for the comparison of the images and different ways to
@@ -303,21 +303,18 @@ public class VisualAssertion implements WebDriverCustomModule
 
 
             //--------------------------------------------------------------------------------
-            // Select the configured algorithm
+            // Initialize the configured algorithm
             //--------------------------------------------------------------------------------
 
             ComparisonAlgorithm algorithm = null;
             switch (algorithmString)
             {
-                // TODO: Add comments that describe the algorithms
             case PROPERTY_ALGORITHM_COLORFUZZY:
                 algorithm = new ColorFuzzy(colorTolerance);
                 break;
-
             case PROPERTY_ALGORITHM_EXACTMATCH:
                 algorithm = new ExactMatch();
                 break;
-
             case PROPERTY_ALGORITHM_FUZZY:
                 algorithm = new PixelFuzzy(pixelTolerance, colorTolerance, pixelPerBlockXY);
                 break;
@@ -356,11 +353,10 @@ public class VisualAssertion implements WebDriverCustomModule
                 {
                     if (createDifferenceImage)
                     {
-                        // Create a image of the pixel differences
+                        // Create a image of the pixel differences and save it
                         writeImage(comparator.getDifferenceImage(), differenceImageFile);
                     }
 
-                    // Create a new image in which the differences are marked
                     BufferedImage markedImage = null;
                     if (markType.equals(MARK_WITH_A_MARKER))
                     {

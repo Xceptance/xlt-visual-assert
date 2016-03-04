@@ -7,22 +7,26 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
+/**
+ * Util class which provides the necessary function to manipulate and create images for the comparison
+ * algorithms.
+ */
 public class ImageHelper
 {
     // transparent white
-    protected static Color WHITE_TRANSPARENT = new Color(255, 255, 255, 0);
+    protected final static Color WHITE_TRANSPARENT = new Color(255, 255, 255, 0);
 
     // black
-    protected static Color BLACK = new Color(0, 0, 0);
+    protected final static Color BLACK = new Color(0, 0, 0);
 
-    protected static int SCALING_FACTOR = 10;
+    protected final static int SCALING_FACTOR = 10;
 
     /**
      * Creates another image, which is a copy of the source image
      * 
      * @param source
      *            the image to copy
-     * @return a copy of that image
+     * @return a copy of that image as <b>BufferedImage</b>
      */
     protected static BufferedImage copyImage(final BufferedImage source)
     {
