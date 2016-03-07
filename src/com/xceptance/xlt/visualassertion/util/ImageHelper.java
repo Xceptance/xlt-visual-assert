@@ -161,6 +161,7 @@ public class ImageHelper
      *            The first image for the comparison
      * @param img2
      *            The second image for the comparison
+     * @param colorTolerance A threshold value that calculates the allowed difference in color between two pixels [0-1[
      * @return Point[] array that contains the coordinates of pixels that are different
      */
     protected static Point[] colorFuzzyCompare(final BufferedImage img1, final BufferedImage img2, final double colorTolerance)
@@ -199,9 +200,9 @@ public class ImageHelper
      *            The first image for the comparison
      * @param img2
      *            The second image for the comparison
-     * @param colorTolerance A threshold value that calculates the allowed difference in color between two pixels
-     * @param pixelTolerance A threshold value that calculates the allowed number of different pixels per block
-     * @param fuzzyBlockDimension The x and y dimension of one block of pixels, which are validated together
+     * @param colorTolerance A threshold value that calculates the allowed difference in color between two pixels [0-1[
+     * @param pixelTolerance A threshold value that calculates the allowed number of different pixels per block [0-1[
+     * @param fuzzyBlockDimension The x and y dimension d of one block of pixels(d*d), which are validated together
      * @return Point[] array that contains the coordinates of pixels that are different
      */
     protected static Point[] fuzzyCompare(final BufferedImage img1, final BufferedImage img2, final double colorTolerance,
@@ -265,7 +266,7 @@ public class ImageHelper
     }
 
     /**
-     * Scales a binary image up to the given size. Does not innately preserve Width/ Height ratio. Used in closeImage.
+     * Scales a binary image down to the given size. Does not innately preserve Width/ Height ratio. Used in closeImage.
      * Divides the bigger image into blocks. If there are some pixels leftover, the last blocks gets them, no matter how
      * many they are. It sets a pixel to the foreground color if any any pixel in the corresponding block had the
      * foreground color.
@@ -277,8 +278,8 @@ public class ImageHelper
      * @param rgbForegroundColor
      * @return the scaled image
      */
-    protected static BufferedImage scaleDownMaskImage(final BufferedImage img, final int newWidth, final int newHeight, final int scalingFactor,
-            final int rgbForegroundColor)
+    protected static BufferedImage scaleDownMaskImage(final BufferedImage img, final int newWidth, final int newHeight,
+                                                      final int scalingFactor, final int rgbForegroundColor)
     {
 
         final BufferedImage scaledImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
@@ -615,8 +616,8 @@ public class ImageHelper
      *            the width of the structure element for dilation and erosion
      * @param structElementHeight
      *            the height of the structure element for dilation and erosion
-     * @param rgbForegroundColor
-     * @param rgbBackgroundColor
+     * @param rgbForegroundColor The foreground color for the marking
+     * @param rgbBackgroundColor The background color for the marking
      * @return the closed image
      */
     protected static BufferedImage closeImage(BufferedImage img, final int structElementWidth, final int structElementHeight,
@@ -646,9 +647,9 @@ public class ImageHelper
      * 
      * @param pixels
      *            the array with the differences.
-     * @param markingSizeX
-     * @param markingSizeY
-     * @return
+     * @param markingSizeX Length of the marker on the x axis
+     * @param markingSizeY Length of the marker on the y axis
+     * @return Copy of the original image with marked pixels
      */
     protected static BufferedImage markDifferencesWithBoxes(final BufferedImage image, final Point[] pixels, final int markingSizeX, final int markingSizeY)
     {
@@ -709,11 +710,12 @@ public class ImageHelper
      * 
      * @param pixels
      *            the array with the differences.
-     * @param markingSizeX
-     * @param markingSizeY
-     * @return
+     * @param markingSizeX Length of the marker on the x axis
+     * @param markingSizeY Length of the marker on the y axis
+     * @return Copy of the original image with marked pixels
      */
-    protected static BufferedImage markDifferencesWithAMarker(final BufferedImage image, final Point[] pixels, final int markingSizeX, final int markingSizeY)
+    protected static BufferedImage markDifferencesWithAMarker(final BufferedImage image, final Point[] pixels,
+                                                              final int markingSizeX, final int markingSizeY)
     {
         if (pixels == null)
         {
@@ -735,8 +737,8 @@ public class ImageHelper
             int y = pixel.y - (markingSizeY / 2);
 
             // avoid negative values
-            x = x < 0 ? x = 0 : x;
-            y = y < 0 ? y = 0 : y;
+            x = x < 0 ? 0 : x;
+            y = y < 0 ? 0 : y;
 
             g.fillRect(x, y, markingSizeX, markingSizeY);
         }
@@ -767,7 +769,19 @@ public class ImageHelper
         if (c == null)
         {
             final Color currentColor = new Color(image.getRGB(x, y));
-            newColor = getComplementary(currentColor);
+            final double redLimit = 0.8;
+
+            final int nonRedSum = currentColor.getGreen() + currentColor.getBlue();
+
+            if ((currentColor.getRed() / nonRedSum) > redLimit)
+            {
+                // red is strong in that one
+                newColor = Color.GREEN;
+            }
+            else
+            {
+                newColor = Color.RED;
+            }
         }
         else
         {
@@ -795,8 +809,8 @@ public class ImageHelper
      * @param subImageWidth
      * @param subImageHeight
      */
-    protected static void drawBorders(final BufferedImage image, final int currentX, final int currentY, final int width, final int height,
-            final int subImageWidth, final int subImageHeight, final Color c)
+    protected static void drawBorders(BufferedImage image, final int currentX, final int currentY, final int width,
+                                      final int height, final int subImageWidth, final int subImageHeight, final Color c)
     {
         int x, y;
 
@@ -821,39 +835,6 @@ public class ImageHelper
         }
     }
 
-    /**
-     * Returns red unless the currentColor is mainly red. Used to determine the marking color. The names not really
-     * right.
-     * 
-     * @param currentColor
-     * @return the color with which to mark
-     */
-    protected static Color getComplementary(final Color currentColor)
-    {
-        final double redLimit = 0.8;
-
-        final int nonRedSum = currentColor.getGreen() + currentColor.getBlue();
-
-        if (nonRedSum == 0)
-        {
-            // only red
-            return Color.RED;
-        }
-        if (currentColor.getRed() < currentColor.getBlue() || currentColor.getRed() < currentColor.getGreen())
-        {
-            // red does not dominate
-            return Color.RED;
-        }
-        else if ((currentColor.getRed() / nonRedSum) > redLimit)
-        {
-            // red is strong in that one
-            return Color.GREEN;
-        }
-        else
-        {
-            return Color.RED;
-        }
-    }
 
     /**
      * Fully marks the bottom and right borders of an image transparent (transparent white). Used in isEqual to mark the
