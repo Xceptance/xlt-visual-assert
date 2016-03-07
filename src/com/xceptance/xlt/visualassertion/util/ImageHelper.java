@@ -403,7 +403,7 @@ public class ImageHelper
     }
 
     /**
-     * // TODO Change code, deprecated?
+     * TODO Change code, deprecated?
      * Creates a new image with a changed image size if it doesn't match the given width and height
      * @param img The original image
      * @param width The width that the image should have
@@ -422,7 +422,7 @@ public class ImageHelper
 
     /**
      * Overlays the black areas of one image over another image. Doesn't actually use transparency.
-     * // TODO Check functionality, this method might not be necessary -> Switch out with copy?
+     * TODO Check functionality, this method might not be necessary -> Switch out with copy?
      * @param image The original image
      * @param overlay
      *            the image that will be placed over the original image
