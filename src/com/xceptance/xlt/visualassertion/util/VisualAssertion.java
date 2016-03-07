@@ -356,20 +356,19 @@ public class VisualAssertion implements WebDriverCustomModule
                     }
 
                     BufferedImage markedImage = null;
-                    if (markType.equals(MARK_WITH_A_MARKER))
-                    {
-                        // Highlight the differences in the image with red and yellow
-                        markedImage = comparator.getMarkedImageWithAMarker(markBlockSizeX, markBlockSizeY);
-                    }
-                    else if (markType.equals(MARK_WITH_BOXES))
-                    {
-                        // Surround the differences with red boxes
-                        markedImage = comparator.getMarkedImageWithBoxes(markBlockSizeX, markBlockSizeY);
-                    }
-                    else
-                    {
-                        // break
-                        Assert.fail(MessageFormat.format("Mark type '{0}' is not supported.", markType));
+                    switch (markType) {
+                        case MARK_WITH_A_MARKER:
+                            // Highlight the differences in the image with red and yellow
+                            markedImage = comparator.getMarkedImageWithAMarker(markBlockSizeX, markBlockSizeY);
+                            break;
+                        case MARK_WITH_BOXES:
+                            // Surround the differences with red boxes
+                            markedImage = comparator.getMarkedImageWithBoxes(markBlockSizeX, markBlockSizeY);
+                            break;
+                        default:
+                            // break
+                            Assert.fail(MessageFormat.format("Mark type '{0}' is not supported.", markType));
+                            break;
                     }
 
                     // Save the marked image
@@ -393,7 +392,7 @@ public class VisualAssertion implements WebDriverCustomModule
      * @param webDriver
      *            the web driver to use
      * @return {@link BufferedImage} if the webdriver supports taking screenshots, null otherwise
-     * @throws IOException
+     * @throws RuntimeException
      *             In case the files cannot be written
      */
     private BufferedImage takeScreenshot(final WebDriver webDriver)
@@ -417,7 +416,7 @@ public class VisualAssertion implements WebDriverCustomModule
     }
 
     /**
-     * Returns the browsername using Selenium methods
+     * Returns the browser name using Selenium methods
      * 
      * @param webDriver
      *            the WebDriver to query

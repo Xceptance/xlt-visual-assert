@@ -17,6 +17,10 @@ public class ImageComparison
     private boolean resized = false;
 
 
+    /**
+     * Creates a new instance of ImageComparison that uses the given reference image
+     * @param reference Reference image for all comparison functions
+     */
     public ImageComparison(final BufferedImage reference)
     {
         this.reference = reference;
@@ -115,8 +119,8 @@ public class ImageComparison
     }
 
     /**
-     * Creates a new image in which only the found differences are displayed in grey on a black background.
-     * The differences are drawn in the exact locations where they where found in the original image
+     * Creates a new image in which only the found differences are displayed on a black background.
+     * The differences are drawn in the exact locations where they were found in the original image
      * @return BufferedImage with differences in grey on a black background
      */
     public BufferedImage getDifferenceImage()
