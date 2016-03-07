@@ -93,6 +93,11 @@ public class VisualAssertion implements WebDriverCustomModule
     public final String MARK_WITH_BOXES = "box";
     public final String MARK_WITH_A_MARKER = "marker";
 
+    public final String PROPERTY_ALGORITHM = PREFIX + "algorithm";
+    public final String PROPERTY_ALGORITHM_FUZZY = "FUZZY";
+    public final String PROPERTY_ALGORITHM_COLORFUZZY = "COLORFUZZY";
+    public final String PROPERTY_ALGORITHM_EXACTMATCH = "EXACT";
+
     public final String PROPERTY_COLOR_TOLERANCE = PREFIX + "tolerance.colors";
 
     public final String PROPERTY_PIXEL_TOLERANCE = PREFIX + "tolerance.pixels";
@@ -109,11 +114,8 @@ public class VisualAssertion implements WebDriverCustomModule
 
     public final String PROPERTY_MASK_CLOSE_GAP_HEIGHT = PREFIX + "mask.close.height";
 
-    public final String PROPERTY_ALGORITHM = PREFIX + "algorithm";
 
-    public final String PROPERTY_ALGORITHM_FUZZY = "FUZZY";
-    public final String PROPERTY_ALGORITHM_COLORFUZZY = "COLORFUZZY";
-    public final String PROPERTY_ALGORITHM_EXACTMATCH = "EXACT";
+
 
     @Override
     public void execute(final WebDriver webdriver, final String... arguments)
