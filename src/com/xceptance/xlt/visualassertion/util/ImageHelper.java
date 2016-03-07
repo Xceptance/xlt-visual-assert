@@ -458,11 +458,11 @@ public class ImageHelper
      * 
      * @param img
      *            the image to erode
-     * @param structElementWidth
-     * @param structElementHeight
-     * @param rgbForegroundColor
-     * @param rgbBackgroundColor
-     * @return the eroded image
+     * @param structElementWidth Width of the structure element mask
+     * @param structElementHeight Height of the structure element mask
+     * @param rgbForegroundColor Foreground color
+     * @param rgbBackgroundColor Background color
+     * @return The eroded image as BufferedImage
      */
     protected static BufferedImage erodeImage(final BufferedImage img, int structElementWidth, int structElementHeight,
             final int rgbForegroundColor, final int rgbBackgroundColor)
@@ -542,11 +542,11 @@ public class ImageHelper
      * 
      * @param img
      *            the image to dilate
-     * @param structElementWidth
-     * @param structElementHeight
-     * @param rgbForegroundColor
-     * @param rgbBackgroundColor
-     * @return the dilated image
+     * @param structElementWidth the width of the structure element mask
+     * @param structElementHeight the height of the structure element mask
+     * @param rgbForegroundColor the foreground color
+     * @param rgbBackgroundColor the background color
+     * @return the dilated image as BufferedImage
      */
     protected static BufferedImage dilateImage(final BufferedImage img, int structElementWidth, int structElementHeight,
             final int rgbForegroundColor, final int rgbBackgroundColor)
@@ -653,14 +653,16 @@ public class ImageHelper
      * Method to mark areas around the detected differences. Goes through every pixel that was different and marks the
      * marking block it is in, unless it was marked already. <br>
      * If markingX of markingY are 1, it will simply mark the detected differences.
-     * 
+     *
+     * @param image the original image for which the differences were found
      * @param pixels
      *            the array with the differences.
      * @param markingSizeX Length of the marker on the x axis
      * @param markingSizeY Length of the marker on the y axis
      * @return Copy of the original image with marked pixels
      */
-    protected static BufferedImage markDifferencesWithBoxes(final BufferedImage image, final Point[] pixels, final int markingSizeX, final int markingSizeY)
+    protected static BufferedImage markDifferencesWithBoxes(final BufferedImage image, final Point[] pixels,
+                                                            final int markingSizeX, final int markingSizeY)
     {
         if (pixels == null)
         {
@@ -716,7 +718,8 @@ public class ImageHelper
      * Method to mark areas around the detected differences. Goes through every pixel that was different and marks the
      * marking block it is in, unless it was marked already. <br>
      * If markingX of markingY are 1, it will simply mark the detected differences.
-     * 
+     *
+     * @param image the original image for which the differences were found
      * @param pixels
      *            the array with the differences.
      * @param markingSizeX Length of the marker on the x axis
@@ -815,8 +818,8 @@ public class ImageHelper
      *            Vertical length of the rectangle to mark
      * @param height
      *            Horizontal length of the rectangle to mark
-     * @param subImageWidth
-     * @param subImageHeight
+     * @param subImageWidth the width of the partial image
+     * @param subImageHeight the height of the partial image
      */
     protected static void drawBorders(BufferedImage image, final int currentX, final int currentY, final int width,
                                       final int height, final int subImageWidth, final int subImageHeight, final Color c)
