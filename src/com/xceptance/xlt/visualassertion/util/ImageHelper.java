@@ -271,12 +271,12 @@ public class ImageHelper
      * many they are. It sets a pixel to the foreground color if any any pixel in the corresponding block had the
      * foreground color.
      * 
-     * @param img
-     * @param newWidth
-     * @param newHeight
-     * @param scalingFactor
-     * @param rgbForegroundColor
-     * @return the scaled image
+     * @param img The original image
+     * @param newWidth The width of the new image after scaling
+     * @param newHeight The height of the new image after scaling
+     * @param scalingFactor The scaling factor for the image size
+     * @param rgbForegroundColor The foreground color
+     * @return A downscaled BufferedImage copy of the original image
      */
     protected static BufferedImage scaleDownMaskImage(final BufferedImage img, final int newWidth, final int newHeight,
                                                       final int scalingFactor, final int rgbForegroundColor)
@@ -327,15 +327,15 @@ public class ImageHelper
      * corresponding pixel has the foreground color. If there are some pixels leftover, the last blocks gets them, no
      * matter how many there are.
      * 
-     * @param img
-     * @param newWidth
-     * @param newHeight
-     * @param rgbForegroundColor
-     * @param scalingFactor
-     * @return the scaled image
+     * @param img The original image
+     * @param newWidth The width of the new image after scaling
+     * @param newHeight The height of the new image after scaling
+     * @param scalingFactor The scaling factor for the image size
+     * @param rgbForegroundColor The foreground color
+     * @return A upscaled BufferedImage copy of the original image
      */
     protected static BufferedImage scaleUpMaskImage(final BufferedImage img, final int newWidth, final int newHeight,
-            final int rgbForegroundColor, final int scalingFactor)
+                                                    final int scalingFactor, final int rgbForegroundColor)
     {
 
         final BufferedImage scaledImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
@@ -372,10 +372,10 @@ public class ImageHelper
      * Increases an images width and height, the old image will be in the top left corner of the new image; the rest
      * will be transparent black
      * 
-     * @param img
-     * @param width
-     * @param height
-     * @return the resulting image
+     * @param img The original image
+     * @param width The width of the new image
+     * @param height The height of the new image
+     * @return A new BufferedImage that holds the original image in the top left corner and the rest is filled with black
      */
     protected static BufferedImage increaseImageSize(final BufferedImage img, final int width, final int height)
     {
@@ -402,6 +402,14 @@ public class ImageHelper
         return newImg;
     }
 
+    /**
+     * // TODO Change code, deprecated?
+     * Creates a new image with a changed image size if it doesn't match the given width and height
+     * @param img The original image
+     * @param width The width that the image should have
+     * @param height The height that the image should have
+     * @return A BufferedImage copy of the original image that has been adjusted to the given width and height
+     */
     protected static BufferedImage adaptImageSize(final BufferedImage img, final int width, final int height)
     {
         if (img.getWidth() != width || img.getHeight() != height)
@@ -414,14 +422,15 @@ public class ImageHelper
 
     /**
      * Overlays the black areas of one image over another image. Doesn't actually use transparency.
-     * 
-     * @param image
+     * // TODO Check functionality, this method might not be necessary -> Switch out with copy?
+     * @param image The original image
      * @param overlay
-     *            the image that will be layed over the other image
-     * @param rgbForegroundColor
-     * @return
+     *            the image that will be placed over the original image
+     * @param rgbForegroundColor The color that is used for the originally black areas
+     * @return A BufferedImage copy of the original image in which the black areas of the overlay are marked
      */
-    protected static BufferedImage overlayMaskImage(final BufferedImage image, final BufferedImage overlay, final int rgbForegroundColor)
+    protected static BufferedImage overlayMaskImage(final BufferedImage image, final BufferedImage overlay,
+                                                    final int rgbForegroundColor)
     {
         final BufferedImage copy = copyImage(image);
 
@@ -441,7 +450,7 @@ public class ImageHelper
     }
 
     /**
-     * Creates and returns an erosion image, using the alorithm from morphological image processing.
+     * Creates and returns an erosion image, using the algorithm from morphological image processing.
      * <p>
      * Assumes the structuring element is filled with ones and thereby only needs it's width and height. The origin is
      * placed in the middle of the structuring element. If width and/ or height are even, they are incremented to make
