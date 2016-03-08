@@ -37,8 +37,10 @@ public class ImageHelper
             imageType = BufferedImage.TYPE_INT_ARGB;
         }
 
-        BufferedImage copy = new BufferedImage(source.getWidth(), source.getHeight(), imageType);
-        copy.setData(source.getData());
+        final BufferedImage copy = new BufferedImage(source.getWidth(), source.getHeight(), imageType);
+        final Graphics g = copy.getGraphics();
+        g.drawImage(source, 0, 0, null);
+        g.dispose();
         return copy;
     }
 
@@ -643,10 +645,10 @@ public class ImageHelper
         shrunkImg = dilateImage(shrunkImg, structElementWidth, structElementHeight, rgbForegroundColor, rgbBackgroundColor);
         shrunkImg = erodeImage(shrunkImg, structElementWidth, structElementHeight, rgbForegroundColor, rgbBackgroundColor);
         // Scale the image back
-        img = scaleUpMaskImage(shrunkImg, img.getWidth(), img.getHeight(), rgbForegroundColor, SCALING_FACTOR);
-
+        img = scaleUpMaskImage(shrunkImg, img.getWidth(), img.getHeight(), SCALING_FACTOR, rgbForegroundColor);
         return img;
     }
+
 
 
     /**
