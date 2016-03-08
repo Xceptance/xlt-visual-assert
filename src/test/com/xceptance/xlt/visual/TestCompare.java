@@ -5,11 +5,11 @@ import java.text.MessageFormat;
 
 import org.junit.Assert;
 
-import com.xceptance.xlt.visualassertion.ImageComparison;
-import com.xceptance.xlt.visualassertion.ImageMask;
+import com.xceptance.xlt.visualassertion.util.ImageComparison;
+import com.xceptance.xlt.visualassertion.util.MaskImage;
 import com.xceptance.xlt.visualassertion.algorithm.ComparisonAlgorithm;
 import com.xceptance.xlt.visualassertion.algorithm.ExactMatch;
-import com.xceptance.xlt.visualassertion.mask.RectangleMask;
+import com.xceptance.xlt.visualassertion.util.RectangleMask;
 
 public class TestCompare extends ImageTest
 {
@@ -19,7 +19,7 @@ public class TestCompare extends ImageTest
 
     private ImageComparison comperator;
 
-    private ImageMask masker;
+    private MaskImage masker;
 
     private BufferedImage referenceImage;
 
@@ -51,7 +51,7 @@ public class TestCompare extends ImageTest
     public TestCompare match(final BufferedImage referenceImage)
     {
         this.referenceImage = referenceImage;
-        masker = new ImageMask(this.referenceImage);
+        masker = new MaskImage(this.referenceImage);
 
         return this;
     }
@@ -117,7 +117,7 @@ public class TestCompare extends ImageTest
         return this;
     }
 
-    public ImageMask getMasker()
+    public MaskImage getMasker()
     {
         return masker;
     }

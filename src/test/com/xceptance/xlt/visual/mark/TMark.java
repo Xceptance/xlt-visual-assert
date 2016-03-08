@@ -8,7 +8,7 @@ import org.junit.Test;
 import com.xceptance.xlt.visualassertion.algorithm.ColorFuzzy;
 import com.xceptance.xlt.visualassertion.algorithm.ComparisonAlgorithm;
 import com.xceptance.xlt.visualassertion.algorithm.ExactMatch;
-import com.xceptance.xlt.visualassertion.mask.RectangleMask;
+import com.xceptance.xlt.visualassertion.util.RectangleMask;
 
 import test.com.xceptance.xlt.visual.ImageTest;
 import test.com.xceptance.xlt.visual.TestCompare;

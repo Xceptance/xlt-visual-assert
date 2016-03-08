@@ -12,7 +12,7 @@ import test.com.xceptance.xlt.visual.TestCompare;
 
 import com.xceptance.xlt.visualassertion.algorithm.ColorFuzzy;
 import com.xceptance.xlt.visualassertion.algorithm.ComparisonAlgorithm;
-import com.xceptance.xlt.visualassertion.mask.RectangleMask;
+import com.xceptance.xlt.visualassertion.util.RectangleMask;
 
 public class TColorFuzzy extends ImageTest
 {

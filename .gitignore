@@ -1,3 +1,6 @@
 bin
 classes
 results
+.idea
+xlt-visual-assert.iml
+out
