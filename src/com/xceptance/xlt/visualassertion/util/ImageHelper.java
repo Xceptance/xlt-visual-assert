@@ -382,22 +382,10 @@ public class ImageHelper
     protected static BufferedImage increaseImageSize(final BufferedImage img, final int width, final int height)
     {
         final BufferedImage newImg = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        // final int[] newImgArray = ((DataBufferInt) newImg.getRaster().getDataBuffer()).getData();
-        // int index;
-        // for (int w = img.getWidth(); w <= width; w++)
-        // {
-        // for (int h = img.getHeight(); h <= height; h++)
-        // {
-        // index = (h - 1) * newImg.getWidth() + w - 1;
-        // newImgArray[index] = 0;
-        // }
-        // }
         final Graphics g = newImg.createGraphics();
 
-        // TODO: START untested filling method, compare with commented out code above
         g.setColor(new Color(0, 0, 0, 0));
         g.fillRect(0, 0, width, height);
-        // TODO: END
 
         g.drawImage(img, 0, 0, null);
         g.dispose();
@@ -405,7 +393,6 @@ public class ImageHelper
     }
 
     /**
-     * TODO Change code, deprecated?
      * Creates a new image with a changed image size if it doesn't match the given width and height
      * @param img The original image
      * @param width The width that the image should have
@@ -424,7 +411,6 @@ public class ImageHelper
 
     /**
      * Overlays the black areas of one image over another image. Doesn't actually use transparency.
-     * TODO Check functionality, this method might not be necessary -> Switch out with copy?
      * @param image The original image
      * @param overlay
      *            the image that will be placed over the original image
