@@ -40,6 +40,17 @@ There are likely some pixels that have not been masked in the first run, but wil
 some red stripes or different text content in the same spot. 
 
 
+**How to get started**
+
+This module is still work in progress and is implemented in a script testcase for the posters webshop. The posters testshop local server for the test can be found 
+under .\samples\app-server\bin of your XLT folder. After running the server you can run the TGuestOrder script test case in your IDE, which calls the module in 4 different actions. 
+Running it the first time creates the result folder structure in your visualassertion project folder. 
+Running it the second time will make the first comparison, which will probably fail because the mask has not been trained yet. You can enable mask training and adjust the configuration 
+of the test case edit the visualassertion.properties file under /config in your project folder. While the mask training is enabled no assertion will be made, but found differences will be
+saved in the mask images. The masked areas will then be ignored in the comparison, after the trainingMode has been disabled. See the properties file for additional information about
+the different configurations. 
+
+
 **Noteworthy tips, tricks and interactions:**
 
 The firefox webdriver takes screenshots of the full website, the chrome driver does not.  
@@ -62,3 +73,10 @@ Even small changes in text, including formatting, font, size and style can't be 
 
 The pixelPerBlockXY parameter determines the size of the blocks. Their position is determined by their size (first block in the top left corner, the second block below it …). 
 Therefore, the pixelPerBlockXY implicitly determines the blocks position. When it changes, their position shifts, which may result in changes.
+
+
+**Project outlook**
+
+Future adaptions and aditions to the comparison algorithms are planned, which allow for a more consistent page comparison, that adjusts better to dynamic content changes. 
+This is still one of the main problems, because at the moment changes in a webpage might get asserted as error, even though it is a valid layout/content change. 
+E.g. additional products in the product grid, change of page size, because of additional text, changed text content.... 
