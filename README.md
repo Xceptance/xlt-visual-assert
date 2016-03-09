@@ -2,8 +2,8 @@
 
 **Why Screenshot Comparison:**
 The screenshot comparison validates the correctness of a page by it's visual appearance. This can be used for additional test automation of websites, 
-because some changes e.g. the displacement of page elements are not detected by normal automation. The module should not mereley detect changes, but 
-determine, whether those changes break the layout of the page, or are due to legit content changes.
+because some changes, e.g. the displacement of page elements, are not detected by normal automation. The module should not mereley detect changes, but 
+determine if those changes break the layout of the page, or are due to dynamic content changes.
 
 
 **What does the visualassertion do:**  
@@ -26,15 +26,15 @@ This means the program will create a mask image for every screenshot. Detected d
 ignored in later comparisons, the rest of the mask is transparent. If more differences are detected in later training runs, they will also be painted black in addition to the already 
 found ones. This means additional training runs adjust the mask further, they will never reset it. Masked areas are painted black in the marked image.
 
-It is possible to manually edit the mask image. You can set areas black in the mask image to mask them or set them transparent to unmask them. If the closeMask property 
+It is possible to manually edit the mask image. You can set areas black in the mask image to mask them, or set them transparent to unmask them. If the closeMask property 
 is true, small gaps between already marked areas in the maskImage will be filled and the ignored area is increased. For example, you test a homepage with dynamic content 
 and let the screenshot comparison run once with training mode on. There are likely some pixels that have not been masked in the first run, but will change with future runs, 
-e.g. dynamic text, that contains the user name and/or address. 
+e.g. dynamic text that contains the user name and/or address. 
 
 
 **How to get started**
-This module is still a work in progress and is implemented in a script testcase for the posters webshop. The posters testshop local server for the test can be found 
-under .\samples\app-server\bin of your XLT folder. After running the server you can run the TGuestOrder script test case in your IDE, which runs the module in different actions. 
+This module is still a work in progress and is implemented in a script testcase for the posters webshop. The posters local server for the test can be found 
+under .\samples\app-server\bin of your XLT folder. After running the server you can run the TGuestOrder script test case in your IDE, which contains the module in different actions. 
 Running it the first time creates the result folder structure in your visualassertion project folder. Running it the second time will make the first comparison, 
 which will probably fail because the mask has not been trained yet and there is some dynamic content. You can enable mask training and adjust the configuration of the test case 
 in the visualassertion.properties file under /config in your project folder. While the mask training is enabled no assertion will be made, but found differences will be
