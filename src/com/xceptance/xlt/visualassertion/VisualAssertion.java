@@ -1,4 +1,4 @@
-package com.xceptance.xlt.visualassertion.util;
+package com.xceptance.xlt.visualassertion;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -23,6 +23,9 @@ import com.xceptance.xlt.visualassertion.algorithm.ColorFuzzy;
 import com.xceptance.xlt.visualassertion.algorithm.ComparisonAlgorithm;
 import com.xceptance.xlt.visualassertion.algorithm.ExactMatch;
 import com.xceptance.xlt.visualassertion.algorithm.PixelFuzzy;
+import com.xceptance.xlt.visualassertion.util.ImageComparison;
+import com.xceptance.xlt.visualassertion.util.MaskImage;
+import com.xceptance.xlt.visualassertion.util.RectangleMask;
 
 /**
  * Module for the visual assertion of changes in a browser page. The module is called in an
