@@ -1,10 +1,12 @@
 package com.xceptance.xlt.visualassertion.util;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 
-import com.xceptance.xlt.visualassertion.algorithm.ComparisonAlgorithm;
 import org.junit.Assert;
+
+import com.xceptance.xlt.visualassertion.algorithm.ComparisonAlgorithm;
 
 public class ImageComparison
 {
@@ -54,6 +56,7 @@ public class ImageComparison
             maskCopy = ImageHelper.adaptImageSize(maskCopy, maxWidth, maxHeight);
 
         }
+
         final BufferedImage maskedReference = ImageHelper.overlayMaskImage(reference, maskCopy, ImageHelper.BLACK.getRGB());
         final BufferedImage maskedCompareImage = ImageHelper.overlayMaskImage(lastCompareImage, maskCopy, ImageHelper.BLACK.getRGB());
 
@@ -73,7 +76,8 @@ public class ImageComparison
             break;
         }
 
-        if(lastDifferences == null){
+        if(lastDifferences == null)
+        {
             Assert.fail("The dimensions of the two images don't match!");
         }
 
@@ -135,7 +139,7 @@ public class ImageComparison
         Color greyscale;
         int x, y, diffColor;
         double pixelColorDiff;
-        for (Point point : lastDifferences)
+        for (final Point point : lastDifferences)
         {
             x = point.x;
             y = point.y;
