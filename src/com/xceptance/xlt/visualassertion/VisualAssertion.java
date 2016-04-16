@@ -117,9 +117,6 @@ public class VisualAssertion implements WebDriverCustomModule
 
     public final String PROPERTY_MASK_CLOSE_GAP_HEIGHT = PREFIX + "mask.close.height";
 
-
-
-
     @Override
     public void execute(final WebDriver webdriver, final String... arguments)
     {
@@ -203,9 +200,9 @@ public class VisualAssertion implements WebDriverCustomModule
 
         // Generate the child directories for the current environment in the parent result folder
         final File targetDirectory = new File(new File(new File(new File(resultDirectory, id),
-                                                                currentTestCaseName),
-                                                                browserName),
-                                                                browserVersion);
+                currentTestCaseName),
+                browserName),
+                browserVersion);
         targetDirectory.mkdirs();
 
         // Retrieve current index counter for the image file names
@@ -233,7 +230,7 @@ public class VisualAssertion implements WebDriverCustomModule
 
         // Directory for the results of the current test run
         final File testInstanceDirectory = new File(new File(targetDirectory, RESULT_DIRECTORY_RESULTS),
-                                                    Session.getCurrent().getID());
+                Session.getCurrent().getID());
         testInstanceDirectory.mkdirs();
         // Path of the screenshot image file
         final File currentScreenShotFile = new File(testInstanceDirectory, screenshotName + ".png");
@@ -362,18 +359,18 @@ public class VisualAssertion implements WebDriverCustomModule
 
                     BufferedImage markedImage = null;
                     switch (markType) {
-                        case MARK_WITH_A_MARKER:
-                            // Highlight the differences in the image with red and yellow
-                            markedImage = comparator.getMarkedImageWithAMarker(markBlockSizeX, markBlockSizeY);
-                            break;
-                        case MARK_WITH_BOXES:
-                            // Surround the differences with red boxes
-                            markedImage = comparator.getMarkedImageWithBoxes(markBlockSizeX, markBlockSizeY);
-                            break;
-                        default:
-                            // break
-                            Assert.fail(MessageFormat.format("Mark type '{0}' is not supported.", markType));
-                            break;
+                    case MARK_WITH_A_MARKER:
+                        // Highlight the differences in the image with red and yellow
+                        markedImage = comparator.getMarkedImageWithAMarker(markBlockSizeX, markBlockSizeY);
+                        break;
+                    case MARK_WITH_BOXES:
+                        // Surround the differences with red boxes
+                        markedImage = comparator.getMarkedImageWithBoxes(markBlockSizeX, markBlockSizeY);
+                        break;
+                    default:
+                        // break
+                        Assert.fail(MessageFormat.format("Mark type '{0}' is not supported.", markType));
+                        break;
                     }
 
                     // Save the marked image
