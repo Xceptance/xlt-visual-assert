@@ -1,6 +1,10 @@
 package com.xceptance.xlt.visualassertion.util;
 
-import java.awt.*;
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
@@ -138,7 +142,7 @@ public class ImageHelper
             return null;
         }
 
-        ArrayList<Point> pixels = new ArrayList<>();
+        final ArrayList<Point> pixels = new ArrayList<>();
 
         for (int x = 0; x < img1.getWidth(); x++)
         {
@@ -172,7 +176,7 @@ public class ImageHelper
             return null;
         }
 
-        ArrayList<Point> pixels = new ArrayList<>();
+        final ArrayList<Point> pixels = new ArrayList<>();
 
         for (int x = 0; x < img1.getWidth(); x++)
         {
@@ -208,7 +212,7 @@ public class ImageHelper
      * @return Point[] array that contains the coordinates of pixels that are different
      */
     protected static Point[] fuzzyCompare(final BufferedImage img1, final BufferedImage img2, final double colorTolerance,
-                                          final double pixelTolerance, final int fuzzyBlockDimension)
+            final double pixelTolerance, final int fuzzyBlockDimension)
     {
         final ArrayList<Point> pixels = new ArrayList<>();
 
@@ -281,7 +285,7 @@ public class ImageHelper
      * @return A downscaled BufferedImage copy of the original image
      */
     protected static BufferedImage scaleDownMaskImage(final BufferedImage img, final int newWidth, final int newHeight,
-                                                      final int scalingFactor, final int rgbForegroundColor)
+            final int scalingFactor, final int rgbForegroundColor)
     {
 
         final BufferedImage scaledImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
@@ -337,7 +341,7 @@ public class ImageHelper
      * @return A upscaled BufferedImage copy of the original image
      */
     protected static BufferedImage scaleUpMaskImage(final BufferedImage img, final int newWidth, final int newHeight,
-                                                    final int scalingFactor, final int rgbForegroundColor)
+            final int scalingFactor, final int rgbForegroundColor)
     {
 
         final BufferedImage scaledImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
@@ -418,7 +422,7 @@ public class ImageHelper
      * @return A BufferedImage copy of the original image in which the black areas of the overlay are marked
      */
     protected static BufferedImage overlayMaskImage(final BufferedImage image, final BufferedImage overlay,
-                                                    final int rgbForegroundColor)
+            final int rgbForegroundColor)
     {
         final BufferedImage copy = copyImage(image);
 
@@ -650,7 +654,7 @@ public class ImageHelper
      * @return Copy of the original image with marked pixels
      */
     protected static BufferedImage markDifferencesWithBoxes(final BufferedImage image, final Point[] pixels,
-                                                            final int markingSizeX, final int markingSizeY)
+            final int markingSizeX, final int markingSizeY)
     {
         if (pixels == null)
         {
@@ -664,7 +668,7 @@ public class ImageHelper
         // don't bother with rectangles
         if (markingSizeX == 1 || markingSizeY == 1)
         {
-            for (Point pixel : pixels)
+            for (final Point pixel : pixels)
             {
                 colorPixel(copy, pixel.x, pixel.y, null);
             }
@@ -683,7 +687,7 @@ public class ImageHelper
 
         int xBlock, yBlock, subImageWidth, subImageHeight;
 
-        for (Point pixel : pixels)
+        for (final Point pixel : pixels)
         {
             xBlock = pixel.x / markingSizeX;
             yBlock = pixel.y / markingSizeY;
@@ -715,7 +719,7 @@ public class ImageHelper
      * @return Copy of the original image with marked pixels
      */
     protected static BufferedImage markDifferencesWithAMarker(final BufferedImage image, final Point[] pixels,
-                                                              final int markingSizeX, final int markingSizeY)
+            final int markingSizeX, final int markingSizeY)
     {
         if (pixels == null)
         {
@@ -730,7 +734,7 @@ public class ImageHelper
         final Graphics2D g = imageCopy.createGraphics();
         g.setColor(highlighterColor);
 
-        for (Point pixel : pixels)
+        for (final Point pixel : pixels)
         {
             // the middle of the block should be our pixel to make it marker like
             int x = pixel.x - (markingSizeX / 2);
@@ -746,7 +750,7 @@ public class ImageHelper
         g.dispose();
 
         // mark the pixels on the new background
-        for (Point pixel : pixels)
+        for (final Point pixel : pixels)
         {
             imageCopy.setRGB(pixel.x, pixel.y, pixelEmphasizeColor.getRGB());
         }
@@ -772,8 +776,9 @@ public class ImageHelper
             final double redLimit = 0.8;
 
             final int nonRedSum = currentColor.getGreen() + currentColor.getBlue();
+            final double results = nonRedSum > 0 ? currentColor.getRed() / nonRedSum : 0;
 
-            if ((currentColor.getRed() / nonRedSum) > redLimit)
+            if (results > redLimit)
             {
                 // red is strong in that one
                 newColor = Color.GREEN;
@@ -809,8 +814,8 @@ public class ImageHelper
      * @param subImageWidth the width of the partial image
      * @param subImageHeight the height of the partial image
      */
-    protected static void drawBorders(BufferedImage image, final int currentX, final int currentY, final int width,
-                                      final int height, final int subImageWidth, final int subImageHeight, final Color c)
+    protected static void drawBorders(final BufferedImage image, final int currentX, final int currentY, final int width,
+            final int height, final int subImageWidth, final int subImageHeight, final Color c)
     {
         int x, y;
 
