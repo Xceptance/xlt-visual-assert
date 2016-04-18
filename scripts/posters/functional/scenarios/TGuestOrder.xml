@@ -10,9 +10,11 @@
   <module name="posters.functional.modules.VisualAssertion"/>
   <action name="OpenCartOverview"/>
   <command name="clickAndWait" target="id=headerCartOverview"/>
+  <module name="posters.functional.modules.VisualAssertion"/>
   <action name="StartCheckout"/>
   <command name="storeText" target="id=totalPrice" value="totalPrice"/>
   <command name="clickAndWait" target="id=btnStartCheckout"/>
+  <module name="posters.functional.modules.VisualAssertion"/>
   <action name="EnterShippingAddress"/>
   <command name="assertElementPresent" target="id=titleDelAddr"/>
   <module name="posters.functional.modules.FillInAddressForm">
@@ -26,6 +28,7 @@
   </module>
   <command name="check" target="id=billEqualShipp-No"/>
   <command name="clickAndWait" target="id=btnAddDelAddr"/>
+  <module name="posters.functional.modules.VisualAssertion"/>
   <action name="EnterBillingAddress"/>
   <command name="assertElementPresent" target="id=titleBillAddr"/>
   <module name="posters.functional.modules.FillInAddressForm">
@@ -38,6 +41,7 @@
     <parameter name="country" value="${country}"/>
   </module>
   <command name="clickAndWait" target="id=btnAddBillAddr"/>
+  <module name="posters.functional.modules.VisualAssertion"/>
   <action name="EnterPaymentMethod"/>
   <command name="assertElementPresent" target="id=titlePayment"/>
   <module name="posters.functional.modules.FillInPaymentForm">
