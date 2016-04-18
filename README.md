@@ -105,7 +105,7 @@ Basic Usage
 ### General
 To best utilize visual verification, we suggest to either create a dedicated test case or copy one of your most important ones and modify it. Most important is that you add dedicated points where visual verification should take place.
 
-??? These places should symbolize typical screens and don't (cover?) too much data (that?) moves visually, such as sliders or tickers. Please keep in mind that the screenshots and the comparisons take time, hence, do not add too many verification points.
+These places should symbolize typical screens. Avoid screens that are dynamic in the sense of animations. Please keep in mind that the screenshots and the comparisons take time, hence, do not add too many verification points.
 
 ### Dry-Run
 After the first training round, you should verify the screen shots taken and see if there are roughly correct. Visually inspect them before you start to train the masks.
