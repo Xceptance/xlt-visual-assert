@@ -4,6 +4,9 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -20,8 +23,10 @@ import com.xceptance.xlt.ai.machine_learning.ActivationNetwork;
 import com.xceptance.xlt.ai.machine_learning.BipolarSigmoidFunction;
 import com.xceptance.xlt.ai.pre_processing.ImageTransformation;
 import com.xceptance.xlt.ai.machine_learning.PerceptronLearning;
+import com.xceptance.xlt.ai.image.FastBitmap;
 import com.xceptance.xlt.ai.image.PatternHelper;
 import com.xceptance.xlt.ai.util.Constants;
+import com.xceptance.xlt.ai.util.Helper;
 import com.xceptance.xlt.api.engine.Session;
 import com.xceptance.xlt.api.engine.scripting.WebDriverCustomModule;
 import com.xceptance.xlt.api.util.XltProperties;
@@ -149,19 +154,18 @@ public class AI implements WebDriverCustomModule
         final String screenshotName = String.format("%03d", index) + "-" + currentActionName;
 
         // Directory for the training images
-        final File trainingDirectory = new File(targetDirectory, RESULT_DIRECTORY_TRAINING);
+        final File trainingDirectory = new File(new File(targetDirectory, RESULT_DIRECTORY_TRAINING), screenshotName);
         trainingDirectory.mkdirs();
-        // Path of the training images for the ai algorithm
-//        final File referenceImageFile = new File(trainingDirectory, screenshotName + ".png");
 
-        // Directory for the results of the current test run
-        final File testInstanceDirectory = new File(new File(targetDirectory, RESULT_DIRECTORY_TRAINING),
-                screenshotName);
-        testInstanceDirectory.mkdirs();
-        // Path of the screenshot image file
-        final File currentScreenShotFile = new File(testInstanceDirectory, screenshotName + Session.getCurrent().getID() + ".png");
-        // Path of the difference image file
-//        final File differenceImageFile = new File(testInstanceDirectory, screenshotName + "-difference" + ".png");
+        // Directory for the unrecognized images of the current test run
+        final File testInstanceDirectory = new File(new File(targetDirectory, RESULT_DIRECTORY_UNRECOGNIZED), screenshotName);
+        
+//        // Path of the screenshot image file
+        final String exactScreenshotName = screenshotName + Session.getCurrent().getID() + ".png";
+        final File currentScreenShotFile = new File(trainingDirectory, exactScreenshotName);
+//        
+        // Path of the unrecognized image file
+        final File differenceImageFile = new File(testInstanceDirectory, screenshotName + "-unrecognized" + ".png");
         // Directory of the network file
         final File networkDirectoryPath = new File(targetDirectory, RESULT_DIRECTORY_NETWORKS);
         networkDirectoryPath.mkdirs();
@@ -185,20 +189,15 @@ public class AI implements WebDriverCustomModule
         // Make the screenshot and load the network
         //--------------------------------------------------------------------------------
 
-            final BufferedImage screenshot = takeScreenshot(webdriver);
+            final FastBitmap screenshot = new FastBitmap(takeScreenshot(webdriver), exactScreenshotName);
             if (screenshot == null)
             {
                 // TODO Has this to be handled in a different way?
                 // webdriver cannot take the screenshot -> RETURN
                 return;
             }
-            // Save the screenshot
-            writeImage(screenshot, currentScreenShotFile);
-
-            // If there's no reference screenshot yet -> save screenshot as reference image in baseline
-//            writeImage(screenshot, referenceImageFile);
-
-            // Mask for the image comparison
+           
+            // initialization 
             ActivationNetwork an = new ActivationNetwork(new BipolarSigmoidFunction(), 1); 
             ImageTransformation im;
             ArrayList<PatternHelper> patternList = new ArrayList<>();
@@ -206,22 +205,35 @@ public class AI implements WebDriverCustomModule
             if (networkFile.exists())
             {
             	an = (ActivationNetwork) an.Load(networkFile.getPath());
+            	ArrayList<FastBitmap> imgList = new ArrayList<>();
+            	imgList.add(screenshot);
+            	imgList.addAll(an.scanFolderForChanges(currentScreenShotFile.getParent(), exactScreenshotName, useOriginalSize, an.getReferenceImageWidth(), an.getReferenceimageHeight()));
+            	
+            	// transform the new screenshot
                 im = new ImageTransformation(
-                		screenshot,
-                		screenshotName,
+                		imgList,                		
                 		an.getAverageMetric(), 
                 		an.getModusFlag(), 
                 		useOriginalSize, 
-                		an.getReferenceImageWidth(), 
+                		an.getReferenceImageWidth(),  
                 		an.getReferenceimageHeight());
+                
+                imgList = null;
             }
             else
-            {
-                im = new ImageTransformation(currentScreenShotFile.getParent(), screenshotName, useOriginalSize, imageWidth, imageHeight);
+            {   
+            	an.scanFolderForChanges(currentScreenShotFile.getParent(), exactScreenshotName, useOriginalSize, Constants.IMAGE_WIDTH, Constants.IMAGE_HEIGHT);
+            	// load all images from the directory
+                im = new ImageTransformation(
+                		screenshot,
+                		currentScreenShotFile.getParent(),                		
+                		useOriginalSize,
+                		imageWidth,
+                		imageHeight);
             }
             
             patternList = im.computeAverageMetric(percentageDifferenceValue, useColorForComparison, useOriginalSize);
-            // internal list in network for self testing and image confirmation 
+            // internal list in network for self testing and image confirmation        
             an.setInternalList(patternList);            
     		PerceptronLearning pl = new PerceptronLearning(an, learningRate);
     		pl.setLearningRate(learningRate);	
@@ -231,29 +243,37 @@ public class AI implements WebDriverCustomModule
 				pl.Run(pattern.getPatternList());
 			}
 					
-			boolean selfTest = an.onSelfTest(patternList ,indentedPercentageMatch);
+			boolean selfTest = an.onSelfTest(indentedPercentageMatch);
 			
-			double result = 0.0;
+			double result = 2.0;
 			
-			if (selfTest)
-			{				
-				for (PatternHelper pattern : patternList)
-				{
-					result += an.checkForRecognitionAsDouble(pattern.getPatternList());
-				}
-				result /= patternList.size();
+			if (!selfTest)
+			{	
+				result = an.checkForRecognitionAsDouble(patternList.get(0).getPatternList());
 			}
 			
-			an.Save(networkFile.toString(), im.getAverageMetric(), imageWidth, imageHeight);
-
-			if (selfTest)
+			if (!selfTest)
 			{
 				System.out.println("Network result: " + result);
-                Assert.assertTrue(indentedPercentageMatch < result);
+                //Assert.assertTrue(indentedPercentageMatch < result);
 			}
 			else
 			{
 				System.out.println("Network not ready");
+				System.out.println("result: " + result);
+			}
+			
+			// Save the network
+			an.Save(networkFile.toString(), im.getAverageMetric(), imageWidth, imageHeight);
+			// Save the screenshot
+			if (indentedPercentageMatch > result && !selfTest)
+			{
+				testInstanceDirectory.mkdirs();
+				Helper.saveImage(screenshot.toBufferedImage(), differenceImageFile, Constants.FORMAT);
+			}
+			else if (indentedPercentageMatch < result)
+			{				
+				Helper.saveImage(screenshot.toBufferedImage(), currentScreenShotFile, Constants.FORMAT);				
 			}
     }
 

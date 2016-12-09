@@ -21,6 +21,8 @@
 
 package com.xceptance.xlt.ai.machine_learning;
 
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -28,13 +30,21 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.Buffer;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 import com.xceptance.xlt.ai.image.AverageMetric;
+import com.xceptance.xlt.ai.image.FastBitmap;
 import com.xceptance.xlt.ai.image.PatternHelper;
+import com.xceptance.xlt.ai.util.Constants;
 import com.xceptance.xlt.ai.util.Helper;
+import com.xceptance.xlt.report.providers.SlowestRequestsTracker;
 
 /**
  * Base neural network class.
@@ -104,6 +114,8 @@ public abstract class Network implements Serializable
         // create collection of layers
         this.layer = Layer.getInstance(inputsCount);
         internalList = new ArrayList<>();
+        overwatchList = new ArrayList<>();
+        selfTest = true;
     }
     
     /**
@@ -173,31 +185,58 @@ public abstract class Network implements Serializable
      * @param input
      * @return
      */
-    public boolean onSelfTest(ArrayList<PatternHelper> input ,double intendedPercentageMatch)
-    {     
-    	if (input.size() >= 5)
-    	{
-			Random rand = new Random();
-			ArrayList<PatternHelper> selfTestList = new ArrayList<>();
-			
-			for (int ind = 0; ind < Math.floor(input.size() / 3); ind++)
-			{
-				selfTestList.add(input.get(rand.nextInt(input.size())));
-			}			
-			
-    		double result = 0.0;
-	    	for (int index = 0; index < selfTestList.size(); ++index)
+    public boolean onSelfTest(double intendedPercentageMatch)
+    { 
+	    	if (internalList.size() >= 5 && selfTest)
 	    	{
-	    		result += layer.computeSum(selfTestList.get(index).getPatternList());
-	    	}	    	
-	    	if ((result / selfTestList.size()) > intendedPercentageMatch)
-    		{
-    			trainingMode = false;
-    			return true;
-    		}  
-    	}
-    	trainingMode = true;
-    	return false;
+				Random rand = new Random();
+	
+	    		double result = 0.0;
+	    		int size = internalList.size() / 3;
+		    	for (int index = 0; index < size; ++index)
+		    	{
+		    		result += layer.computeSum(internalList.get(rand.nextInt(internalList.size())).getPatternList());
+		    	}	    	
+		    	if ((result / size) > intendedPercentageMatch)
+	    		{
+	    			trainingMode = false;
+	    			selfTest = false;
+	    			return true;
+	    		}  
+	    	}
+	    	trainingMode = true;
+	    	return false;
+    }
+    
+    public ArrayList<FastBitmap> scanFolderForChanges(String path, String screenshotName, boolean useOriginalSize, int width, int height)
+    {
+    	ArrayList<FastBitmap> result = new ArrayList<>();
+    	
+    	File test = new File(path);
+		File[] list = test.listFiles(Helper.IMAGE_FILTER);
+		ArrayList<Integer> tempList = new ArrayList<>();
+		
+		for (File element : list)
+		{
+			if (!overwatchList.contains(element.getName().hashCode()))
+			{
+				if(useOriginalSize)
+				{
+					result.add(Helper.loadImage_FastBitmap(element.getAbsolutePath()));
+				}
+				else
+				{
+					result.add(Helper.loadImageScaled_FastBitmap(element.getAbsolutePath(), height, width));
+				}
+			}
+			tempList.add(element.getName().hashCode());
+		}		
+		
+		overwatchList.clear();		
+		overwatchList.add(screenshotName.hashCode());
+		overwatchList.addAll(tempList);
+		
+    	return result;
     }
     
     /**
@@ -205,11 +244,14 @@ public abstract class Network implements Serializable
      * @param list
      */
     public void setInternalList(ArrayList<PatternHelper> list)
-    {    	
-    	for (int index = 0; index < list.size(); index++)
+    { 
+    	if (selfTest)
     	{
-    		if (!internalList.contains(list.get(index).gethashCode(index)))
-    			internalList.add(list.get(index).gethashCode(index));        	
+		   	for (PatternHelper element : list)
+		   	{
+		   		if (!internalList.contains(element))
+		   			internalList.add(element);        	
+		    }
     	}
     }
     
@@ -222,7 +264,7 @@ public abstract class Network implements Serializable
     {
     	this.averMet 				= averMetric;
     	this.referenceImageWidth 	= width;
-    	this.referenceImageHeight 	= height;    	
+    	this.referenceImageHeight 	= height;
         try 
         {        	
         	ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName));
@@ -268,17 +310,24 @@ public abstract class Network implements Serializable
         return network;
     }
     	
-    /***
+    /**
      * Saved average metric of all seen Images.
      */
 	private Map<Integer, AverageMetric> averMet;	
 	
-	/***
+	/**
 	 * Flag if the network is already trained and usable for new data or not.
 	 */
 	private boolean trainingMode;
-    	
-    private ArrayList<Integer> internalList;
+    
+	private boolean selfTest;
+	
+	private ArrayList<Integer> overwatchList;
+	
+	/**
+	 * 
+	 */
+    private ArrayList<PatternHelper> internalList;
 	
     /**
 	 * Set image weight for all images in this network, for a better comparing.

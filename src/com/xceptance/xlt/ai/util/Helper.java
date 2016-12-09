@@ -137,7 +137,7 @@ public class Helper
 	 * 
 	 * @param img Image
 	 * @param imageType chosen int value of the target ImageType
-	 * @return bi BufferedImage
+	 * @return fi FastBitmap
 	 */
 	public static FastBitmap imageToFastBitmap(Image img, String tagName, int imageType) 
 	{
@@ -193,12 +193,11 @@ public class Helper
 	 * @param format String chosen format for the BufferedImage {@link Constants#FORMAT}
 	 * @param imageType int value of the target ImageType
 	 */
-	public static void savePicture(BufferedImage img, String filename, String format, int imageType) 
+	public static void saveImage(BufferedImage img, File filename, String format) 
 	{		
 		try 
-		{	
-			File outputfile = new File(filename);
-			ImageIO.write(img, format, outputfile);
+		{				
+			ImageIO.write(img, format, filename);
 		} 
 		catch (IOException e) 
 		{
@@ -206,13 +205,13 @@ public class Helper
 		}
 	}
 		
-	// 
-	/***
-	 * Read a image file into a BufferedImage.
+	
+	 /**
+	 * Read an image file into a BufferedImage.
 	 * @param filename String full path name
 	 * @return img BufferedImage
 	 */
-	public static BufferedImage loadPicture(String filename) 
+	public static BufferedImage loadImage(String filename) 
 	{
 		BufferedImage img = null;
 		try 
@@ -225,7 +224,64 @@ public class Helper
 		}		
 		return img;
 	}
-		
+	
+	/**
+	 * Read an image file into FastBitmap.
+	 * @param filename
+	 * @return FastBitmap
+	 */
+	public static FastBitmap loadImage_FastBitmap(String filename)
+	{
+		BufferedImage img = null;
+		try 
+		{				
+			img = ImageIO.read(new File(filename));
+		} 
+		catch (IOException e) 
+		{ 
+			System.out.println("File Not Found"); 
+		}		
+		return new FastBitmap(img, filename);
+	}
+	
+	 /**
+	 * Read a image file into a BufferedImage and scale this image.
+	 * @param filename String full path name
+	 * @return img BufferedImage
+	 */
+	public static BufferedImage loadImageScaled(String filename, int width, int height) 
+	{
+		BufferedImage img = null;
+		try 
+		{				
+			img = ImageIO.read(new File(filename));
+		} 
+		catch (IOException e) 
+		{ 
+			System.out.println("File Not Found"); 
+		}		
+		return imageToBufferedImageScaled(img, 1, height, width);
+	}
+	
+	 /**
+	 * Read a image file into a FastBitmap and scale this image..
+	 * @param filename String full path name
+	 * @return BufferedImage
+	 */
+	public static FastBitmap loadImageScaled_FastBitmap(String filename, int width, int height) 
+	{
+		BufferedImage img = null;
+		try 
+		{				
+			img = ImageIO.read(new File(filename));
+		} 
+		catch (IOException e) 
+		{ 
+			System.out.println("File Not Found"); 
+		}		
+		return imageToFastImageScaled(img, filename, 1, height, width);
+	}
+	
 	/***
 	 * Load all Images from the given folder path. Use an image filter for only allowed images and only images.
 	 * @param path String full path name to the folder 
@@ -240,7 +296,7 @@ public class Helper
 		{
 			for (File element : list)
 			{
-				pictureList.add(loadPicture(path + File.separator + element.getName()));
+				pictureList.add(loadImage(path + File.separator + element.getName()));
 			}
 		}	
 		return pictureList;
@@ -259,10 +315,35 @@ public class Helper
 		if (list != null)
 		{
 			for (File element : list)
-			{
-				pictureList.add(new FastBitmap(loadPicture(path + File.separator + element.getName())));
+			{			
+				pictureList.add(new FastBitmap(loadImage(path + File.separator + element.getName())));
 			}
 		}	
+		return pictureList;
+	}
+	
+	/***
+	 * Load all Images from the given folder path. Use an image filter for only allowed images and only images. 
+	 * Images must end with one of the allowed endings ".jpg", ".png", ".bmp" , ".jpeg".
+	 * Takes also a width and height for scaling {@link Helper#imageToBufferedImageScaled(Image, int, int, int)} 
+	 * @param path String full path name to the folder 
+	 * @param heigth int value for scaling
+	 * @param width int value for scaling
+	 * @return ArrayList all found {@link FastBitmap} in the folder
+	 */
+	public static ArrayList<FastBitmap> loadAllImagesScaled_FastBitmap(String path ,int heigth, int width)
+	{
+		ArrayList<FastBitmap> pictureList = new ArrayList<>();
+		File test = new File(path);
+		File[] list = test.listFiles(IMAGE_FILTER);
+		if (list != null)
+		{
+			for (File element : list)
+			{
+				BufferedImage tempimage = loadImage(path + File.separator + element.getName());
+				pictureList.add(new FastBitmap(imageToBufferedImageScaled(tempimage, 1, heigth, width), element.getName()));				
+			}
+		}
 		return pictureList;
 	}
 
@@ -284,7 +365,7 @@ public class Helper
 		{
 			for (File element : list)
 			{
-				BufferedImage tempimage = loadPicture(path + File.separator + element.getName());
+				BufferedImage tempimage = loadImage(path + File.separator + element.getName());
 				pictureList.add(imageToBufferedImageScaled(tempimage, 1, heigth, width));
 			}
 		}
@@ -296,36 +377,11 @@ public class Helper
 		DecimalFormat df = new DecimalFormat("##.##");		
 		return df.format(input * 100);
 	}
-		
-	/***
-	 * Load all Images from the given folder path. Use an image filter for only allowed images and only images. 
-	 * Images must end with one of the allowed endings ".jpg", ".png", ".bmp" , ".jpeg".
-	 * Takes also a width and height for scaling {@link Helper#imageToBufferedImageScaled(Image, int, int, int)} 
-	 * @param path String full path name to the folder 
-	 * @param heigth int value for scaling
-	 * @param width int value for scaling
-	 * @return ArrayList all found {@link FastBitmap} in the folder
-	 */
-	public static ArrayList<FastBitmap> loadAllImagesScaled_FastBitmap(String path ,int heigth, int width)
-	{
-		ArrayList<FastBitmap> pictureList = new ArrayList<>();
-		File test = new File(path);
-		File[] list = test.listFiles(IMAGE_FILTER);
-		if (list != null)
-		{
-			for (File element : list)
-			{
-				BufferedImage tempimage = loadPicture(path + File.separator + element.getName());
-				pictureList.add(new FastBitmap(imageToBufferedImageScaled(tempimage, 1, heigth, width), element.getName()));				
-			}
-		}
-		return pictureList;
-	}
 	
 	/***
 	 * Create a new FilenameFilter, to check for image extensions. 
 	 */
-	private static final FilenameFilter IMAGE_FILTER = new FilenameFilter() 
+	public static final FilenameFilter IMAGE_FILTER = new FilenameFilter() 
 	{
         @Override
         public boolean accept(final File dir, final String name) 

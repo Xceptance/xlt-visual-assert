@@ -32,7 +32,7 @@ public class Metric implements Serializable, Comparable<Metric>
 		centerOfGravity = new FloatPoint();
 		coordOrigin		= new IntPoint(0,0);
 		histo			= null;	
-		imageStat		= null;
+		imageStat		= null;		
 		startMetricCalculation(group, image);
 	}
 	

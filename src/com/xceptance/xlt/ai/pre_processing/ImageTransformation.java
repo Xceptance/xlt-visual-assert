@@ -11,12 +11,14 @@ import java.util.Map;
 import com.xceptance.xlt.ai.core.FloatPoint;
 import com.xceptance.xlt.ai.corner.Fast9;
 import com.xceptance.xlt.ai.corner.FastCornersDetector;
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 import com.xceptance.xlt.ai.core.FeaturePoint;
 import com.xceptance.xlt.ai.corner.FastCornersDetector.Algorithm;
 import com.xceptance.xlt.ai.image.AverageMetric;
 import com.xceptance.xlt.ai.image.Convolution;
 import com.xceptance.xlt.ai.image.ConvolutionKernel;
 import com.xceptance.xlt.ai.image.FastBitmap;
+import com.xceptance.xlt.ai.image.MetricCurator;
 import com.xceptance.xlt.ai.image.PatternHelper;
 import com.xceptance.xlt.ai.util.Constants;
 import com.xceptance.xlt.ai.util.Helper;
@@ -35,15 +37,13 @@ public class ImageTransformation
 	 * Load the images out of a folder and start the analyze with {@link #applyTransformation()}
 	 * @param path String to the folder.
 	 */
-	public ImageTransformation(BufferedImage img, String tagName, Map<Integer, AverageMetric> averageMet, boolean trainingFlag, boolean useOriginalSize, int width, int height)
+	public ImageTransformation(ArrayList<FastBitmap> imgList, Map<Integer, AverageMetric> averageMet, boolean trainingFlag, boolean useOriginalSize, int width, int height)
 	{		
 		maxSize 		= 0;
-		trainingFlag 	= true;
 		averMet 		= averageMet;
 		this.trainingFlag 	= trainingFlag;
-		process(img, tagName, useOriginalSize, width, height);
-		//load(path, useOriginalSize, width, height);
-		applyTransformation();
+		process(imgList, useOriginalSize, width, height);
+		applyTransformation(); 
 	}
 	
 	/***
@@ -54,12 +54,11 @@ public class ImageTransformation
 	 * @param averMetr AverageMetric which is saved in the network. 
 	 * @param flag Boolean for further training or comparison.
 	 */
-	public ImageTransformation(String path, String tagName, boolean useOriginalSize, int width, int height)
+	public ImageTransformation(FastBitmap img, String path, boolean useOriginalSize, int width, int height)
 	{
 		averMet 			= new HashMap<Integer, AverageMetric>();
-		maxSize 			= 0;
-		//process(img, tagName, useOriginalSize, width, height);
-		load(path, useOriginalSize, width, height);
+		maxSize 			= 0;		
+		load(img, path, useOriginalSize, width, height);
 		applyTransformation();
 	}
 	
@@ -109,10 +108,11 @@ public class ImageTransformation
 		}
 		
 		// main loop for all images which are stored in PreProcessing
-		for (int index = 0; index < pp.size(); ++index)
+		for (int index = 0; index < pp.size(); ++index)			
 		{
-			maxSize = pp.get(index).getMetricCurator().metricList.size();
-			pattern = new PatternHelper(pp.get(index).getMetricCurator().getTagName());
+			MetricCurator mc = pp.get(index).getMetricCurator();
+			maxSize = mc.metricList.size();
+			pattern = new PatternHelper(mc.getTagName());
 			for (int inde = 0; inde < averMet.keySet().size(); ++inde)
 			{
 				pattern.addElementToPattern(0);
@@ -233,10 +233,11 @@ public class ImageTransformation
 		for (FastBitmap element : pictureList)
 		{
 			long startTime = System.nanoTime();
-			conv.applyInPlace(element);			
+			// convolution take too much time and is therefore disabled, improve the performance up to 3 times
+			//conv.applyInPlace(element);			
 			// apply the fast corner detection to the image
 			tempList = fcd.ProcessImage(element);
-			// sorting with the comparator set in FeaturePoints, sorting order is ascending x values
+			// sorting with the comparator set in FeaturePoints, sorting order is ascending x and y values
 			Collections.sort(tempList, new FeaturePoint());			
 			pp.add(new PreProcessing(tempList, element));			
 			long estimatedTime = System.nanoTime() - startTime;
@@ -249,7 +250,7 @@ public class ImageTransformation
 	 * Load all images out of a given folder path..
 	 * @param path String full path name to folder
 	 */
-	private void load(String path, boolean useOriginalSize, int width, int height)
+	private void load(FastBitmap img,String path, boolean useOriginalSize, int width, int height)
 	{
 		if (useOriginalSize)
 		{
@@ -260,30 +261,35 @@ public class ImageTransformation
 			pictureList = Helper.loadAllImagesScaled_FastBitmap(path, height, width);
 		}
 
-		if (pictureList != null)
+		if (!pictureList.isEmpty())
 		{			
-			Helper.setImageParameter(pictureList.get(0).getWidth(), pictureList.get(0).getHeight());			
-			pp = new ArrayList<>();
-			recognizeFlag = false;		
+			Helper.setImageParameter(pictureList.get(0).getWidth(), pictureList.get(0).getHeight());	
 		}
 		else
 		{
-			throw new NullPointerException("folder not found or it was empty");
+			ArrayList<FastBitmap> temp = new ArrayList<>();
+			temp.add(img);
+			process(temp, useOriginalSize, width, height);
 		}
 	}
 	
-	private void process(BufferedImage img, String tagName, boolean useOriginalSize, int width, int height)
+	private void process(ArrayList<FastBitmap> imgList, boolean useOriginalSize, int width, int height)
 	{
 		pictureList = new ArrayList<>();
 		if (useOriginalSize)
 		{
-			pictureList.add(Helper.imageToFastBitmap(img, tagName, 1));
+			for (FastBitmap img : imgList)
+			{
+				pictureList.add(img);
+			}
 		}
 		else
 		{
-			pictureList.add(Helper.imageToFastImageScaled(img, tagName, 1, height, width));
-		}
-		
+			for (FastBitmap img : imgList)
+			{
+				pictureList.add(Helper.imageToFastImageScaled(img.toBufferedImage(), img.getTagName(), 1, height, width));
+			}
+		}		
 		Helper.setImageParameter(width, height);
 		pp = new ArrayList<>();
 		recognizeFlag = false;	

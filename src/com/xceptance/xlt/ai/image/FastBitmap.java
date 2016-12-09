@@ -126,7 +126,7 @@ public class FastBitmap
      */
     public FastBitmap(BufferedImage bufferedImage) 
     {
-        this.bufferedImage = bufferedImage;
+        this.bufferedImage 		= bufferedImage;
         prepare();
         refresh();
     }
@@ -142,7 +142,7 @@ public class FastBitmap
         this.bufferedImage 	= bufferedImage;
         prepare();
         refresh();
-    }
+    }    
 
     /**
      * Initialize a new instance of the FastBitmap class.
@@ -305,7 +305,7 @@ public class FastBitmap
         return ColorSpace.RGB;
     }
     
-    /***
+    /**
      * Get the name of the Image.
      * @return String Picture tag
      */
@@ -1325,7 +1325,6 @@ public class FastBitmap
     /**
      * Get Green.
      * @param x X axis coordinate.
-     * @param y Y axis coordinate.
      * @return Green channel's value.
      */
     public int getGreen(int x, int y)

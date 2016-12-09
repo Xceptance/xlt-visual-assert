@@ -23,17 +23,17 @@ public class MetricCurator implements Serializable
 	 */
 	private static final long serialVersionUID = 1L;
 
-	/***
+	/**
 	 * Constructor.
 	 * @param tag String name of the image
 	 */
 	public MetricCurator(String tag) 
 	{
-		tagName 	= tag;
-		metricList 	= new ArrayList<>();
+		tagName 		= tag;
+		metricList 		= new ArrayList<>();
 	}
 
-	/***
+	/**
 	 * Get the name of the image represented by the MetricCurator.
 	 * @return tagName String name of the image
 	 */
@@ -92,7 +92,7 @@ public class MetricCurator implements Serializable
         }
         return mc;
     }
-    
+        
     /***
      * Name tag of the image.
      */

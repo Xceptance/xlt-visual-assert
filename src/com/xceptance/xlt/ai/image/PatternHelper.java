@@ -1,6 +1,9 @@
 package com.xceptance.xlt.ai.image;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+
+import org.jaxen.function.ContainsFunction;
 
 /***
  * Helper class for storing the found pattern.
@@ -8,8 +11,13 @@ import java.util.ArrayList;
  * @author Thomas Volkmann
  *
  */
-public class PatternHelper
+public class PatternHelper implements Serializable
 {
+	/**
+	 * Auto generated serial number.
+	 */
+	private static final long serialVersionUID = 1L;
+
 	/***
 	 * Constructor.
 	 * @param tagName String name of the image.
@@ -18,6 +26,7 @@ public class PatternHelper
 	{
 		this.tagName = tagName;
 		patternList = new ArrayList<>();
+		
 	}
 	
 	/***
@@ -83,12 +92,23 @@ public class PatternHelper
 	public String getTagName()
 	{
 		return tagName;
-	}
-	
-	public int gethashCode(int index)
-	{
-		return patternList.hashCode() + index;
 	}	
+	
+//	@Override
+//	public boolean equals(Object obj) 
+//	{
+//		if (obj instanceof PatternHelper)
+//		{
+//			return this.hashCode() == obj.hashCode();
+//		}
+//		return false;
+//	};
+//	
+//	@Override
+//	public int hashCode()
+//	{
+//		return patternList.hashCode() + (int)modTime;
+//	}	
 	
 	/***
 	 * Holds the value for the found pattern (0,1).
