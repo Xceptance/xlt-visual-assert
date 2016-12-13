@@ -14,10 +14,10 @@ public class Constants
 	public static final String INTENDED_PERCENTAGE_MATCH = "0.80";
 	// Color will also be used for image comparison, not recommended for websides with many images
 	// or consequently changing content 
-	public static final boolean USE_COLOR_FOR_COMPARISON = false;
+	public static boolean USE_COLOR_FOR_COMPARISON = false;
 	// Parameter for enabling down scaling from screenshots or not, this can drastically change 
 	// the performance of the algorithm
-	public static final boolean USE_ORIGINAL_SIZE = false;
+	public static boolean USE_ORIGINAL_SIZE = false;
 	// Fixed Size for the histogram creation in Metric
 	public static final int BINSIZE = 10;
 	// Distance from current point for grouping
@@ -25,7 +25,7 @@ public class Constants
 	// Points cloud minimum value
 	public static int MINGROUPSIZE = 200;	
 	// procedural value for the difference level, to compare images
-	public static final int PERCENTAGE_DIFFERENCE = 10;		
+	public static int PERCENTAGE_DIFFERENCE = 10;		
 	// value for the learning algorithm allowed values are between 0.0 - 1.0
 	// default is 0.2
 	public static final String LEARNING_RATE = "0.2";
@@ -34,10 +34,14 @@ public class Constants
 	// absolute Path for string concatenation 
 	public static final String ABSOLUTE_PATH = CURRENT_RELATIVE_PATH.toAbsolutePath().toString();
 	// image format for saving
-	public static final String FORMAT = "png";
+	public static String FORMAT = "png";
 	// value for the height of the image
 	public static final int IMAGE_HEIGHT = 800;
 	// value for the width of the image
-	public static final int IMAGE_WIDTH = 800; 
+	public static final int IMAGE_WIDTH = 800;
+	// allowed file extensions for loading from folder
 	static final String[] EXTENSIONS = new String[]	{"jpg",	"png", "bmp" , "jpeg"};
+	// time to wait until the website is loaded and the screenshot is taken
+    public static final int WAITINGTIME = 1000;
+    
 }

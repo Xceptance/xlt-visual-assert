@@ -47,8 +47,6 @@ public class AI implements WebDriverCustomModule
      */
     private static ThreadLocal<Integer> indexCounter = new ThreadLocal<>();
 
-    private final int WAITINGTIME = 300;
-    
     private final String ALL = "all";
 
 	private final String PREFIX = "com.xceptance.xlt.ai.";
@@ -73,6 +71,7 @@ public class AI implements WebDriverCustomModule
     public final String PROPERTY_PERCENTAGE_DIFFERENCE = PREFIX + "PERCENTAGE_DIFFERENCE";
     public final String PROPERTY_IMAGE_HEIGHT = PREFIX + "IMAGE_HEIGHT";
     public final String PROPERTY_IMAGE_WIDTH = PREFIX + "IMAGE_WIDTH";
+    public final String PROPERTY_FORMAT = PREFIX + "FORMAT";
 
     @Override
     public void execute(final WebDriver webdriver, final String... arguments)
@@ -86,7 +85,7 @@ public class AI implements WebDriverCustomModule
             // skipped silently
             return;
         }
-
+        
         //--------------------------------------------------------------------------------
         // Get Properties and convert them from String if necessary
         //--------------------------------------------------------------------------------
@@ -95,10 +94,12 @@ public class AI implements WebDriverCustomModule
         final String resultDirectory = props.getProperty(PROPERTY_RESULT_DIRECTORY, RESULT_DIRECTORY);
 
         // Wait time for the page to load completely
-        final int waitTime = props.getProperty(PROPERTY_WAITING_TIME, WAITINGTIME);
+        final int waitTime = props.getProperty(PROPERTY_WAITING_TIME, Constants.WAITINGTIME);
         
-        final boolean useOriginalSize = props.getProperty(PROPERTY_USE_ORIGINAL_SIZE, Constants.USE_COLOR_FOR_COMPARISON);
-        final boolean useColorForComparison = props.getProperty(PROPERTY_USE_COLOR_FOR_COMPARISON, Constants.USE_COLOR_FOR_COMPARISON);
+        Constants.FORMAT = props.getProperty(PROPERTY_FORMAT, Constants.FORMAT);
+        
+        Constants.USE_ORIGINAL_SIZE = props.getProperty(PROPERTY_USE_ORIGINAL_SIZE, Constants.USE_COLOR_FOR_COMPARISON);
+        Constants.USE_COLOR_FOR_COMPARISON = props.getProperty(PROPERTY_USE_COLOR_FOR_COMPARISON, Constants.USE_COLOR_FOR_COMPARISON);
 
         // Identification of the current environment for this test
         final String id = props.getProperty(PROPERTY_ID, ALL);
@@ -161,11 +162,11 @@ public class AI implements WebDriverCustomModule
         final File testInstanceDirectory = new File(new File(targetDirectory, RESULT_DIRECTORY_UNRECOGNIZED), screenshotName);
         
 //        // Path of the screenshot image file
-        final String exactScreenshotName = screenshotName + Session.getCurrent().getID() + ".png";
+        final String exactScreenshotName = screenshotName + Session.getCurrent().getID() + "." + Constants.FORMAT;
         final File currentScreenShotFile = new File(trainingDirectory, exactScreenshotName);
 //        
         // Path of the unrecognized image file
-        final File differenceImageFile = new File(testInstanceDirectory, screenshotName + "-unrecognized" + ".png");
+        final File differenceImageFile = new File(testInstanceDirectory, screenshotName + "-unrecognized" + "." + Constants.FORMAT);
         // Directory of the network file
         final File networkDirectoryPath = new File(targetDirectory, RESULT_DIRECTORY_NETWORKS);
         networkDirectoryPath.mkdirs();
@@ -207,14 +208,14 @@ public class AI implements WebDriverCustomModule
             	an = (ActivationNetwork) an.Load(networkFile.getPath());
             	ArrayList<FastBitmap> imgList = new ArrayList<>();
             	imgList.add(screenshot);
-            	imgList.addAll(an.scanFolderForChanges(currentScreenShotFile.getParent(), exactScreenshotName, useOriginalSize, an.getReferenceImageWidth(), an.getReferenceimageHeight()));
+            	imgList.addAll(an.scanFolderForChanges(currentScreenShotFile.getParent(), exactScreenshotName, Constants.USE_ORIGINAL_SIZE, an.getReferenceImageWidth(), an.getReferenceimageHeight()));
             	
             	// transform the new screenshot
                 im = new ImageTransformation(
                 		imgList,                		
                 		an.getAverageMetric(), 
                 		an.getModusFlag(), 
-                		useOriginalSize, 
+                		Constants.USE_ORIGINAL_SIZE, 
                 		an.getReferenceImageWidth(),  
                 		an.getReferenceimageHeight());
                 
@@ -222,17 +223,17 @@ public class AI implements WebDriverCustomModule
             }
             else
             {   
-            	an.scanFolderForChanges(currentScreenShotFile.getParent(), exactScreenshotName, useOriginalSize, Constants.IMAGE_WIDTH, Constants.IMAGE_HEIGHT);
+            	an.scanFolderForChanges(currentScreenShotFile.getParent(), exactScreenshotName, Constants.USE_ORIGINAL_SIZE, Constants.IMAGE_WIDTH, Constants.IMAGE_HEIGHT);
             	// load all images from the directory
                 im = new ImageTransformation(
                 		screenshot,
                 		currentScreenShotFile.getParent(),                		
-                		useOriginalSize,
+                		Constants.USE_ORIGINAL_SIZE,
                 		imageWidth,
                 		imageHeight);
             }
             
-            patternList = im.computeAverageMetric(percentageDifferenceValue, useColorForComparison, useOriginalSize);
+            patternList = im.computeAverageMetric(percentageDifferenceValue, Constants.USE_COLOR_FOR_COMPARISON, Constants.USE_ORIGINAL_SIZE);
             // internal list in network for self testing and image confirmation        
             an.setInternalList(patternList);            
     		PerceptronLearning pl = new PerceptronLearning(an, learningRate);
@@ -247,12 +248,12 @@ public class AI implements WebDriverCustomModule
 			
 			double result = 2.0;
 			
-			if (!selfTest)
+			if (selfTest)
 			{	
 				result = an.checkForRecognitionAsDouble(patternList.get(0).getPatternList());
 			}
 			
-			if (!selfTest)
+			if (selfTest)
 			{
 				System.out.println("Network result: " + result);
                 //Assert.assertTrue(indentedPercentageMatch < result);

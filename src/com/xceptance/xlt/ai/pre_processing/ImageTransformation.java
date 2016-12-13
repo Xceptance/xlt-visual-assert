@@ -39,8 +39,8 @@ public class ImageTransformation
 	 */
 	public ImageTransformation(ArrayList<FastBitmap> imgList, Map<Integer, AverageMetric> averageMet, boolean trainingFlag, boolean useOriginalSize, int width, int height)
 	{		
-		maxSize 		= 0;
-		averMet 		= averageMet;
+		maxSize 			= 0;
+		averMet 			= averageMet;
 		this.trainingFlag 	= trainingFlag;
 		process(imgList, useOriginalSize, width, height);
 		applyTransformation(); 
@@ -261,6 +261,8 @@ public class ImageTransformation
 			pictureList = Helper.loadAllImagesScaled_FastBitmap(path, height, width);
 		}
 
+		pp = new ArrayList<>();
+		
 		if (!pictureList.isEmpty())
 		{			
 			Helper.setImageParameter(pictureList.get(0).getWidth(), pictureList.get(0).getHeight());	
@@ -271,6 +273,7 @@ public class ImageTransformation
 			temp.add(img);
 			process(temp, useOriginalSize, width, height);
 		}
+//		recognizeFlag = false;	
 	}
 	
 	private void process(ArrayList<FastBitmap> imgList, boolean useOriginalSize, int width, int height)
@@ -291,8 +294,7 @@ public class ImageTransformation
 			}
 		}		
 		Helper.setImageParameter(width, height);
-		pp = new ArrayList<>();
-		recognizeFlag = false;	
+//		recognizeFlag = false;	
 	}
 	
 	/***
