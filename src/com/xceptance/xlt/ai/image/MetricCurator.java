@@ -41,57 +41,6 @@ public class MetricCurator implements Serializable
 	{
 		return tagName;
 	}
-	
-	/**
-     * Save metricCurator to specified file.
-     * @param fileName File name to save MetricCurator into.
-     */
-    public void Save(String fileName)
-    {
-        try 
-        {
-            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName));
-            out.writeObject(this);
-            out.close();
-        } 
-        catch (FileNotFoundException ex) 
-        {
-            ex.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
-    
-    /**
-     * Load metricCurator from specified file.
-     * @param fileName File name to load network from.
-     * @return Returns instance of MetricCurator class with all properties initialized from file.
-     */
-    public MetricCurator Load(String fileName)
-    {
-        MetricCurator mc = null;
-        try 
-        {
-            ObjectInputStream in = new ObjectInputStream(new FileInputStream(fileName));
-            mc = (MetricCurator)in.readObject();
-            in.close();
-        } 
-        catch (FileNotFoundException ex) 
-        {
-            ex.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        catch (ClassNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-        return mc;
-    }
         
     /***
      * Name tag of the image.

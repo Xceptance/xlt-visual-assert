@@ -21,7 +21,6 @@
 
 package com.xceptance.xlt.ai.machine_learning;
 
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -30,21 +29,14 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.nio.Buffer;
-import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 import com.xceptance.xlt.ai.image.AverageMetric;
 import com.xceptance.xlt.ai.image.FastBitmap;
 import com.xceptance.xlt.ai.image.PatternHelper;
-import com.xceptance.xlt.ai.util.Constants;
 import com.xceptance.xlt.ai.util.Helper;
-import com.xceptance.xlt.report.providers.SlowestRequestsTracker;
 
 /**
  * Base neural network class.
@@ -113,9 +105,10 @@ public abstract class Network implements Serializable
         this.inputsCount = Math.max( 1, inputsCount );        
         // create collection of layers
         this.layer = Layer.getInstance(inputsCount);
-        internalList = new ArrayList<>();
-        overwatchList = new ArrayList<>();
-        selfTest = true;
+        internalList 	= new ArrayList<>();
+        overwatchList 	= new ArrayList<>();
+        selfTest 		= true;
+        trainingMode	= true;
     }
     
     /**
@@ -187,25 +180,24 @@ public abstract class Network implements Serializable
      */
     public boolean onSelfTest(double intendedPercentageMatch)
     { 
-	    	if (internalList.size() >= 5 && selfTest)
-	    	{
-				Random rand = new Random();
+	    if (internalList.size() >= 5 && selfTest)
+	    {
+			Random rand = new Random();
 	
-	    		double result = 0.0;
-	    		int size = internalList.size() / 3;
-		    	for (int index = 0; index < size; ++index)
-		    	{
-		    		result += layer.computeSum(internalList.get(rand.nextInt(internalList.size())).getPatternList());
-		    	}	    	
-		    	if ((result / size) > intendedPercentageMatch)
-	    		{
-	    			trainingMode = false;
-	    			selfTest = false;
-	    			return true;
-	    		}  
-	    	}
-	    	trainingMode = true;
-	    	return false;
+	    	double result = 0.0;
+	    	int size = internalList.size() / 3;
+		   	for (int index = 0; index < size; ++index)
+		   	{
+		   		result += layer.computeSum(internalList.get(rand.nextInt(internalList.size())).getPatternList());
+		   	}	    	
+		   	if ((result / size) > intendedPercentageMatch)
+	    	{
+	    		trainingMode = false;
+	    		selfTest = false;
+	    		return false;
+	    	}  
+	    }
+	    return selfTest;
     }
     
     public ArrayList<FastBitmap> scanFolderForChanges(String path, String screenshotName, boolean useOriginalSize, int width, int height)

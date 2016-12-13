@@ -11,7 +11,7 @@ public class Constants
 {
 	// Desired percentage value for the self test, until this barrier is confirmed the network will 
 	// still learn (use several images which where already seen)
-	public static final String INTENDED_PERCENTAGE_MATCH = "0.80";
+	public static String INTENDED_PERCENTAGE_MATCH = "0.80";
 	// Color will also be used for image comparison, not recommended for websides with many images
 	// or consequently changing content 
 	public static boolean USE_COLOR_FOR_COMPARISON = false;
@@ -38,7 +38,7 @@ public class Constants
 	// value for the height of the image
 	public static final int IMAGE_HEIGHT = 800;
 	// value for the width of the image
-	public static final int IMAGE_WIDTH = 800;
+	public static final int IMAGE_WIDTH = 600;
 	// allowed file extensions for loading from folder
 	static final String[] EXTENSIONS = new String[]	{"jpg",	"png", "bmp" , "jpeg"};
 	// time to wait until the website is loaded and the screenshot is taken

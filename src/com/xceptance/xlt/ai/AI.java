@@ -96,8 +96,7 @@ public class AI implements WebDriverCustomModule
         // Wait time for the page to load completely
         final int waitTime = props.getProperty(PROPERTY_WAITING_TIME, Constants.WAITINGTIME);
         
-        Constants.FORMAT = props.getProperty(PROPERTY_FORMAT, Constants.FORMAT);
-        
+        Constants.FORMAT = props.getProperty(PROPERTY_FORMAT, Constants.FORMAT);        
         Constants.USE_ORIGINAL_SIZE = props.getProperty(PROPERTY_USE_ORIGINAL_SIZE, Constants.USE_COLOR_FOR_COMPARISON);
         Constants.USE_COLOR_FOR_COMPARISON = props.getProperty(PROPERTY_USE_COLOR_FOR_COMPARISON, Constants.USE_COLOR_FOR_COMPARISON);
 
@@ -208,7 +207,12 @@ public class AI implements WebDriverCustomModule
             	an = (ActivationNetwork) an.Load(networkFile.getPath());
             	ArrayList<FastBitmap> imgList = new ArrayList<>();
             	imgList.add(screenshot);
-            	imgList.addAll(an.scanFolderForChanges(currentScreenShotFile.getParent(), exactScreenshotName, Constants.USE_ORIGINAL_SIZE, an.getReferenceImageWidth(), an.getReferenceimageHeight()));
+            	imgList.addAll(an.scanFolderForChanges(
+            			currentScreenShotFile.getParent(), 
+            			exactScreenshotName, 
+            			Constants.USE_ORIGINAL_SIZE, 
+            			an.getReferenceImageWidth(), 
+            			an.getReferenceimageHeight()));
             	
             	// transform the new screenshot
                 im = new ImageTransformation(
@@ -223,7 +227,13 @@ public class AI implements WebDriverCustomModule
             }
             else
             {   
-            	an.scanFolderForChanges(currentScreenShotFile.getParent(), exactScreenshotName, Constants.USE_ORIGINAL_SIZE, Constants.IMAGE_WIDTH, Constants.IMAGE_HEIGHT);
+            	an.scanFolderForChanges(
+            			currentScreenShotFile.getParent(), 
+            			exactScreenshotName, 
+            			Constants.USE_ORIGINAL_SIZE, 
+            			imageWidth, 
+            			imageHeight);
+            	
             	// load all images from the directory
                 im = new ImageTransformation(
                 		screenshot,
@@ -232,28 +242,29 @@ public class AI implements WebDriverCustomModule
                 		imageWidth,
                 		imageHeight);
             }
-            
             patternList = im.computeAverageMetric(percentageDifferenceValue, Constants.USE_COLOR_FOR_COMPARISON, Constants.USE_ORIGINAL_SIZE);
             // internal list in network for self testing and image confirmation        
             an.setInternalList(patternList);            
     		PerceptronLearning pl = new PerceptronLearning(an, learningRate);
     		pl.setLearningRate(learningRate);	
     		
-			for (PatternHelper pattern : patternList)
-			{
-				pl.Run(pattern.getPatternList());
-			}
-					
+    		if (an.getModusFlag())
+    		{
+				for (PatternHelper pattern : patternList)
+				{
+					pl.Run(pattern.getPatternList());
+				}
+    		}		
 			boolean selfTest = an.onSelfTest(indentedPercentageMatch);
 			
 			double result = 2.0;
 			
-			if (selfTest)
+			if (!selfTest)
 			{	
-				result = an.checkForRecognitionAsDouble(patternList.get(0).getPatternList());
+				result = an.checkForRecognitionAsDouble(patternList.get(patternList.size() - 1).getPatternList());
 			}
 			
-			if (selfTest)
+			if (!selfTest)
 			{
 				System.out.println("Network result: " + result);
                 //Assert.assertTrue(indentedPercentageMatch < result);
