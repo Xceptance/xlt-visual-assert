@@ -90,7 +90,7 @@ public class ImageTransformation
 	 * This step is important so the perceptron network can learn the patterns and distinguish the different images.
 	 * @return foundPattern ArrayList of {@link PatternHelper} of all found pattern if there was more than one image in the folder.
 	 */
-	public ArrayList<PatternHelper> computeAverageMetric(int percentageDifference, boolean useColor, boolean useOriginalSize)
+	public ArrayList<PatternHelper> computeAverageMetric(int percentageDifference)
 	{
 		int groupSize 								= 0;
 		double boundingBoxSize						= 0.0;
@@ -131,7 +131,7 @@ public class ImageTransformation
 				distanceMax 		= pp.get(index).getMetricCurator().metricList.get(ind).getMaxDistanceToZero();		
 				centerOfGravity.Add(pp.get(index).getMetricCurator().metricList.get(ind).getCenterOfGravity());
 				
-				if (useColor)
+				if (Constants.USE_COLOR_FOR_COMPARISON)
 				{
 					histoRedMean		= pp.get(index).getMetricCurator().metricList.get(ind).getImageStatistic().getHistogramRed().getMean();
 					histoGreenMean		= pp.get(index).getMetricCurator().metricList.get(ind).getImageStatistic().getHistogramGreen().getMean();

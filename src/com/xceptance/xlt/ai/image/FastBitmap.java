@@ -139,18 +139,25 @@ public class FastBitmap
      * @param bufferedImage Buffered image.
      * @param tagName String image name.
      */
-    public FastBitmap(BufferedImage bufferedImage, String tagName) 
+    public FastBitmap(BufferedImage bufferedImage, String tagName, boolean useOriginalSize) 
     {
-    	int width 			= Constants.IMAGE_WIDTH;
-    	int height 			= Constants.IMAGE_HEIGHT;    	
     	this.tagName 		= tagName;
-    	Image tmp 			= bufferedImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-        BufferedImage dimg 	= new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-
-        Graphics2D g2d = dimg.createGraphics();
-        g2d.drawImage(tmp, 0, 0, null);
-        g2d.dispose();
-        this.bufferedImage 	= dimg;
+    	
+    	if (!useOriginalSize)
+    	{
+    		int width 			= Constants.IMAGE_WIDTH;
+    		int height 			= Constants.IMAGE_HEIGHT;    	
+    		Image tmp 			= bufferedImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        	BufferedImage dimg 	= new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        	Graphics2D g2d = dimg.createGraphics();
+        	g2d.drawImage(tmp, 0, 0, null);
+        	g2d.dispose();
+        	this.bufferedImage 	= dimg;
+    	}
+    	else
+    	{
+    		this.bufferedImage = bufferedImage;
+    	}
         prepare();
         refresh();
     } 

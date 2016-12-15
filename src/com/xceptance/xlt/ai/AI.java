@@ -87,29 +87,26 @@ public class AI implements WebDriverCustomModule
         // Get Properties and convert them from String if necessary
         //--------------------------------------------------------------------------------
 
+        // Identification of the current environment for this test
+        final String id = props.getProperty(PROPERTY_ID, ALL);
         // Parent directory of the visual assertion results
         final String resultDirectory = props.getProperty(PROPERTY_RESULT_DIRECTORY, RESULT_DIRECTORY);
 
         // Wait time for the page to load completely
         final int waitTime = props.getProperty(PROPERTY_WAITING_TIME, Constants.WAITINGTIME);
+        final int percentageDifferenceValue = props.getProperty(PROPERTY_PERCENTAGE_DIFFERENCE, Constants.PERCENTAGE_DIFFERENCE);
         
-        Constants.IMAGE_HEIGHT = props.getProperty(PROPERTY_IMAGE_HEIGHT, Constants.IMAGE_HEIGHT);
-        Constants.IMAGE_WIDTH = props.getProperty(PROPERTY_IMAGE_WIDTH, Constants.IMAGE_WIDTH);
-        Constants.FORMAT = props.getProperty(PROPERTY_FORMAT, Constants.FORMAT);        
-        Constants.USE_ORIGINAL_SIZE = props.getProperty(PROPERTY_USE_ORIGINAL_SIZE, Constants.USE_COLOR_FOR_COMPARISON);
-        Constants.USE_COLOR_FOR_COMPARISON = props.getProperty(PROPERTY_USE_COLOR_FOR_COMPARISON, Constants.USE_COLOR_FOR_COMPARISON);
-
-        // Identification of the current environment for this test
-        final String id = props.getProperty(PROPERTY_ID, ALL);
+        Constants.IMAGE_HEIGHT 				= props.getProperty(PROPERTY_IMAGE_HEIGHT, Constants.IMAGE_HEIGHT);
+        Constants.IMAGE_WIDTH 				= props.getProperty(PROPERTY_IMAGE_WIDTH, Constants.IMAGE_WIDTH);
+        Constants.FORMAT 					= props.getProperty(PROPERTY_FORMAT, Constants.FORMAT);        
+        Constants.USE_ORIGINAL_SIZE 		= props.getProperty(PROPERTY_USE_ORIGINAL_SIZE, Constants.USE_COLOR_FOR_COMPARISON);
+        Constants.USE_COLOR_FOR_COMPARISON 	= props.getProperty(PROPERTY_USE_COLOR_FOR_COMPARISON, Constants.USE_COLOR_FOR_COMPARISON);
         
         final String learningRateValue = props.getProperty(PROPERTY_LEARNING_RATE, Constants.LEARNING_RATE);
         final double learningRate = Double.parseDouble(learningRateValue);
         
         final String indentedPercentageMatchValue = props.getProperty(PROPERTY_INTENDED_PERCENTAGE_MATCH, Constants.INTENDED_PERCENTAGE_MATCH);
         final double indentedPercentageMatch = Double.parseDouble(indentedPercentageMatchValue);
-                
-        final int percentageDifferenceValue = props.getProperty(PROPERTY_PERCENTAGE_DIFFERENCE, Constants.PERCENTAGE_DIFFERENCE);
-
 
         //--------------------------------------------------------------------------------
         // Get the current environment
@@ -183,7 +180,7 @@ public class AI implements WebDriverCustomModule
         //--------------------------------------------------------------------------------
 
         // need to be done on another location
-        final FastBitmap screenshot = new FastBitmap(takeScreenshot(webdriver), exactScreenshotName);
+        final FastBitmap screenshot = new FastBitmap(takeScreenshot(webdriver), exactScreenshotName, Constants.USE_ORIGINAL_SIZE);
         
         if (screenshot == null)
         {
@@ -199,6 +196,7 @@ public class AI implements WebDriverCustomModule
 
         if (networkFile.exists())
         {
+        	// load the corresponding network and all settings which are saved 
           	an = (ActivationNetwork) an.Load(networkFile.getPath());
         	Constants.IMAGE_HEIGHT = an.getReferenceimageHeight();
         	Constants.IMAGE_WIDTH = an.getReferenceImageWidth();
@@ -212,12 +210,11 @@ public class AI implements WebDriverCustomModule
             im = new ImageTransformation(
                		imgList,                		
                		an.getAverageMetric(), 
-               		an.getModusFlag());
-                
+               		an.getModusFlag());                
             imgList = null;
-            }
+        }
         else
-        {   
+        {           	
           	an.scanFolderForChanges(
           			trainingScreenShotFile.getParent(), 
            			exactScreenshotName);
@@ -227,7 +224,7 @@ public class AI implements WebDriverCustomModule
                		screenshot,
                		trainingScreenShotFile.getParent());
         }
-        patternList = im.computeAverageMetric(percentageDifferenceValue, Constants.USE_COLOR_FOR_COMPARISON, Constants.USE_ORIGINAL_SIZE);
+        patternList = im.computeAverageMetric(percentageDifferenceValue);
         // internal list in network for self testing and image confirmation        
         an.setInternalList(patternList);            
     	PerceptronLearning pl = new PerceptronLearning(an, learningRate);
