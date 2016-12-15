@@ -18,11 +18,14 @@
 
 package com.xceptance.xlt.ai.image;
 
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 import com.xceptance.xlt.ai.core.IntPoint;
 import com.xceptance.xlt.ai.image.Grayscale;
+import com.xceptance.xlt.ai.util.Constants;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
@@ -138,12 +141,20 @@ public class FastBitmap
      */
     public FastBitmap(BufferedImage bufferedImage, String tagName) 
     {
+    	int width 			= Constants.IMAGE_WIDTH;
+    	int height 			= Constants.IMAGE_HEIGHT;    	
     	this.tagName 		= tagName;
-        this.bufferedImage 	= bufferedImage;
+    	Image tmp 			= bufferedImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        BufferedImage dimg 	= new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D g2d = dimg.createGraphics();
+        g2d.drawImage(tmp, 0, 0, null);
+        g2d.dispose();
+        this.bufferedImage 	= dimg;
         prepare();
         refresh();
-    }    
-
+    } 
+    
     /**
      * Initialize a new instance of the FastBitmap class.
      * @param image Image.

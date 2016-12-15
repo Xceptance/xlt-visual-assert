@@ -29,16 +29,12 @@ public class Constants
 	// value for the learning algorithm allowed values are between 0.0 - 1.0
 	// default is 0.2
 	public static final String LEARNING_RATE = "0.2";
-	// working directory	
-	public static final Path CURRENT_RELATIVE_PATH = Paths.get("");
-	// absolute Path for string concatenation 
-	public static final String ABSOLUTE_PATH = CURRENT_RELATIVE_PATH.toAbsolutePath().toString();
 	// image format for saving
 	public static String FORMAT = "png";
 	// value for the height of the image
-	public static final int IMAGE_HEIGHT = 800;
+	public static int IMAGE_HEIGHT = 800;
 	// value for the width of the image
-	public static final int IMAGE_WIDTH = 600;
+	public static int IMAGE_WIDTH = 600;
 	// allowed file extensions for loading from folder
 	static final String[] EXTENSIONS = new String[]	{"jpg",	"png", "bmp" , "jpeg"};
 	// time to wait until the website is loaded and the screenshot is taken

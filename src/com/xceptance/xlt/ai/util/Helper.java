@@ -7,6 +7,7 @@ import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.Buffer;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -86,12 +87,12 @@ public class Helper
 	 * @param width reference image width
 	 * @param height reference image height
 	 */
-	public static void setImageParameter(int width, int height)
+	public static void setImageParameter()
 	{
 		// values for the parameter THRESHOLD correspondent out of experience
 		int tmpMinGrpSize = 200;
 		int tmpThreshold = 20;
-		tmpMinGrpSize = (width + height) / 6;
+		tmpMinGrpSize = (Constants.IMAGE_WIDTH + Constants.IMAGE_HEIGHT) / 6;
 		
 		if (tmpMinGrpSize > 500)
 		{
@@ -153,13 +154,23 @@ public class Helper
 	 * @param width width of the new bufferedImage
 	 * @return resizeBi Resized BufferedImage
 	 */
-	public static FastBitmap imageToFastImageScaled(Image img, String tagName, int imageType, int height, int width) 
+	public static FastBitmap imageToFastImageScaled(Image img, String tagName) 
 	{
-		BufferedImage resizedBi = new BufferedImage(width, height, imageType);
-		Graphics2D g2 = resizedBi.createGraphics();
-		g2.drawImage(img,0,0,width,height, null);		
-		g2.dispose();
-		FastBitmap fi = new FastBitmap(resizedBi, tagName); 
+		int width = Constants.IMAGE_WIDTH;
+		int height = Constants.IMAGE_HEIGHT;
+		
+		Image tmp = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+	    BufferedImage resizedBI = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+	    Graphics2D g2d = resizedBI.createGraphics();
+	    g2d.drawImage(tmp, 0, 0, null);
+	    g2d.dispose();
+	    
+//		BufferedImage resizedBi = new BufferedImage(width, height, imageType);
+//		Graphics2D g2 = resizedBi.createGraphics();
+//		g2.drawImage(img,0,0,Constants.IMAGE_WIDTH,Constants.IMAGE_WIDTH, null);		
+//		g2.dispose();
+	    
+		FastBitmap fi = new FastBitmap(resizedBI, tagName); 
 		return fi;
 	}
 	
@@ -193,11 +204,11 @@ public class Helper
 	 * @param format String chosen format for the BufferedImage {@link Constants#FORMAT}
 	 * @param imageType int value of the target ImageType
 	 */
-	public static void saveImage(BufferedImage img, File filename, String format) 
+	public static void saveImage(BufferedImage img, File filename) 
 	{		
 		try 
 		{				
-			ImageIO.write(img, format, filename);
+			ImageIO.write(img, Constants.FORMAT, filename);
 		} 
 		catch (IOException e) 
 		{
@@ -279,7 +290,7 @@ public class Helper
 		{ 
 			System.out.println("File Not Found"); 
 		}		
-		return imageToFastImageScaled(img, filename, 1, height, width);
+		return imageToFastImageScaled(img, filename);
 	}
 	
 	/***

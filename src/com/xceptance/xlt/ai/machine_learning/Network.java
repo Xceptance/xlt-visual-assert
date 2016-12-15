@@ -36,6 +36,7 @@ import java.util.Random;
 import com.xceptance.xlt.ai.image.AverageMetric;
 import com.xceptance.xlt.ai.image.FastBitmap;
 import com.xceptance.xlt.ai.image.PatternHelper;
+import com.xceptance.xlt.ai.util.Constants;
 import com.xceptance.xlt.ai.util.Helper;
 
 /**
@@ -180,7 +181,7 @@ public abstract class Network implements Serializable
      */
     public boolean onSelfTest(double intendedPercentageMatch)
     { 
-	    if (internalList.size() >= 5 && selfTest)
+	    if (internalList.size() > 5 && selfTest)
 	    {
 			Random rand = new Random();
 	
@@ -200,7 +201,7 @@ public abstract class Network implements Serializable
 	    return selfTest;
     }
     
-    public ArrayList<FastBitmap> scanFolderForChanges(String path, String screenshotName, boolean useOriginalSize, int width, int height)
+    public ArrayList<FastBitmap> scanFolderForChanges(String path, String screenshotName)
     {
     	ArrayList<FastBitmap> result = new ArrayList<>();
     	
@@ -212,13 +213,13 @@ public abstract class Network implements Serializable
 		{
 			if (!overwatchList.contains(element.getName().hashCode()))
 			{
-				if(useOriginalSize)
+				if(Constants.USE_ORIGINAL_SIZE)
 				{
 					result.add(Helper.loadImage_FastBitmap(element.getAbsolutePath()));
 				}
 				else
 				{
-					result.add(Helper.loadImageScaled_FastBitmap(element.getAbsolutePath(), height, width));
+					result.add(Helper.loadImageScaled_FastBitmap(element.getAbsolutePath(), Constants.IMAGE_HEIGHT, Constants.IMAGE_WIDTH));
 				}
 			}
 			tempList.add(element.getName().hashCode());

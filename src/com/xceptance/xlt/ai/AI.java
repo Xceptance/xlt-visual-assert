@@ -48,15 +48,14 @@ public class AI implements WebDriverCustomModule
     private static ThreadLocal<Integer> indexCounter = new ThreadLocal<>();
 
     private final String ALL = "all";
-
 	private final String PREFIX = "com.xceptance.xlt.ai.";
-
     private final String RESULT_DIRECTORY = "results" + File.separator + "ai";
 
     // subdirectories
-    private final String RESULT_DIRECTORY_TRAINING = "training";
-    private final String RESULT_DIRECTORY_NETWORKS = "networks";
-    private final String RESULT_DIRECTORY_UNRECOGNIZED = "unrecognized"; 
+    private final String RESULT_DIRECTORY_TRAINING 		= "training";
+    private final String RESULT_DIRECTORY_NETWORKS 		= "networks";
+    private final String RESULT_DIRECTORY_UNRECOGNIZED 	= "unrecognized";
+    private final String RESULT_DIRECTORY_RECOGNIZED 	= "recognized";
 
     // the property names
     public final String PROPERTY_ENABLED = PREFIX + "enabled";
@@ -65,7 +64,6 @@ public class AI implements WebDriverCustomModule
     public final String PROPERTY_WAITING_TIME = PREFIX + "waitingTime";
     public final String PROPERTY_USE_ORIGINAL_SIZE = PREFIX + "USE_ORIGINAL_SIZE";
     public final String PROPERTY_USE_COLOR_FOR_COMPARISON = PREFIX + "USE_COLOR_FOR_COMPARISON";
-    
     public final String PROPERTY_LEARNING_RATE = PREFIX + "LEARNING_RATE"; 
     public final String PROPERTY_INTENDED_PERCENTAGE_MATCH = PREFIX + "INTENDED_PERCENTAGE_MATCH";
     public final String PROPERTY_PERCENTAGE_DIFFERENCE = PREFIX + "PERCENTAGE_DIFFERENCE";
@@ -85,7 +83,6 @@ public class AI implements WebDriverCustomModule
             // skipped silently
             return;
         }
-        
         //--------------------------------------------------------------------------------
         // Get Properties and convert them from String if necessary
         //--------------------------------------------------------------------------------
@@ -96,6 +93,8 @@ public class AI implements WebDriverCustomModule
         // Wait time for the page to load completely
         final int waitTime = props.getProperty(PROPERTY_WAITING_TIME, Constants.WAITINGTIME);
         
+        Constants.IMAGE_HEIGHT = props.getProperty(PROPERTY_IMAGE_HEIGHT, Constants.IMAGE_HEIGHT);
+        Constants.IMAGE_WIDTH = props.getProperty(PROPERTY_IMAGE_WIDTH, Constants.IMAGE_WIDTH);
         Constants.FORMAT = props.getProperty(PROPERTY_FORMAT, Constants.FORMAT);        
         Constants.USE_ORIGINAL_SIZE = props.getProperty(PROPERTY_USE_ORIGINAL_SIZE, Constants.USE_COLOR_FOR_COMPARISON);
         Constants.USE_COLOR_FOR_COMPARISON = props.getProperty(PROPERTY_USE_COLOR_FOR_COMPARISON, Constants.USE_COLOR_FOR_COMPARISON);
@@ -108,10 +107,9 @@ public class AI implements WebDriverCustomModule
         
         final String indentedPercentageMatchValue = props.getProperty(PROPERTY_INTENDED_PERCENTAGE_MATCH, Constants.INTENDED_PERCENTAGE_MATCH);
         final double indentedPercentageMatch = Double.parseDouble(indentedPercentageMatchValue);
-        
+                
         final int percentageDifferenceValue = props.getProperty(PROPERTY_PERCENTAGE_DIFFERENCE, Constants.PERCENTAGE_DIFFERENCE);
-        final int imageHeight = props.getProperty(PROPERTY_IMAGE_HEIGHT, Constants.IMAGE_HEIGHT);
-        final int imageWidth = props.getProperty(PROPERTY_IMAGE_WIDTH, Constants.IMAGE_WIDTH);
+
 
         //--------------------------------------------------------------------------------
         // Get the current environment
@@ -120,7 +118,7 @@ public class AI implements WebDriverCustomModule
         // Get the name of the test case for the correct folder identifier
         final String currentTestCaseName = Session.getCurrent().getUserName();
 
-        // Get browsername and browserversion for the subfolders
+        // Get browser name and browser version for the subfolders
         final String browserName = getBrowserName(webdriver);
 
         // Get the name of the action that called the visual assertion
@@ -157,19 +155,14 @@ public class AI implements WebDriverCustomModule
         final File trainingDirectory = new File(new File(targetDirectory, RESULT_DIRECTORY_TRAINING), screenshotName);
         trainingDirectory.mkdirs();
 
-        // Directory for the unrecognized images of the current test run
-        final File testInstanceDirectory = new File(new File(targetDirectory, RESULT_DIRECTORY_UNRECOGNIZED), screenshotName);
-        
-//        // Path of the screenshot image file
+        // Path of the screenshot image file
         final String exactScreenshotName = screenshotName + Session.getCurrent().getID() + "." + Constants.FORMAT;
-        final File currentScreenShotFile = new File(trainingDirectory, exactScreenshotName);
-//        
-        // Path of the unrecognized image file
-        final File differenceImageFile = new File(testInstanceDirectory, screenshotName + "-unrecognized" + "." + Constants.FORMAT);
+        final File trainingScreenShotFile = new File(trainingDirectory, exactScreenshotName);
+        
         // Directory of the network file
         final File networkDirectoryPath = new File(targetDirectory, RESULT_DIRECTORY_NETWORKS);
         networkDirectoryPath.mkdirs();
-        // Path of the mask image file
+        // Path of the network file
         final File networkFile = new File(networkDirectoryPath, screenshotName);
 
         //--------------------------------------------------------------------------------
@@ -189,105 +182,111 @@ public class AI implements WebDriverCustomModule
         // Make the screenshot and load the network
         //--------------------------------------------------------------------------------
 
-            final FastBitmap screenshot = new FastBitmap(takeScreenshot(webdriver), exactScreenshotName);
-            if (screenshot == null)
-            {
-                // TODO Has this to be handled in a different way?
-                // webdriver cannot take the screenshot -> RETURN
-                return;
-            }
-           
-            // initialization 
-            ActivationNetwork an = new ActivationNetwork(new BipolarSigmoidFunction(), 1); 
-            ImageTransformation im;
-            ArrayList<PatternHelper> patternList = new ArrayList<>();
+        // need to be done on another location
+        final FastBitmap screenshot = new FastBitmap(takeScreenshot(webdriver), exactScreenshotName);
+        
+        if (screenshot == null)
+        {
+        	// TODO Has this to be handled in a different way?
+            // webdriver cannot take the screenshot -> RETURN
+            return;
+        }
+        
+        // initialization 
+        ActivationNetwork an = new ActivationNetwork(new BipolarSigmoidFunction(), 1); 
+        ImageTransformation im;
+        ArrayList<PatternHelper> patternList = new ArrayList<>();
 
-            if (networkFile.exists())
-            {
-            	an = (ActivationNetwork) an.Load(networkFile.getPath());
-            	ArrayList<FastBitmap> imgList = new ArrayList<>();
-            	imgList.add(screenshot);
-            	imgList.addAll(an.scanFolderForChanges(
-            			currentScreenShotFile.getParent(), 
-            			exactScreenshotName, 
-            			Constants.USE_ORIGINAL_SIZE, 
-            			an.getReferenceImageWidth(), 
-            			an.getReferenceimageHeight()));
+        if (networkFile.exists())
+        {
+          	an = (ActivationNetwork) an.Load(networkFile.getPath());
+        	Constants.IMAGE_HEIGHT = an.getReferenceimageHeight();
+        	Constants.IMAGE_WIDTH = an.getReferenceImageWidth();
+           	ArrayList<FastBitmap> imgList = new ArrayList<>();
+           	imgList.add(screenshot);
+           	imgList.addAll(an.scanFolderForChanges(
+           			trainingScreenShotFile.getParent(), 
+           			exactScreenshotName));
             	
-            	// transform the new screenshot
-                im = new ImageTransformation(
-                		imgList,                		
-                		an.getAverageMetric(), 
-                		an.getModusFlag(), 
-                		Constants.USE_ORIGINAL_SIZE, 
-                		an.getReferenceImageWidth(),  
-                		an.getReferenceimageHeight());
+            // transform the new screenshot
+            im = new ImageTransformation(
+               		imgList,                		
+               		an.getAverageMetric(), 
+               		an.getModusFlag());
                 
-                imgList = null;
+            imgList = null;
             }
-            else
-            {   
-            	an.scanFolderForChanges(
-            			currentScreenShotFile.getParent(), 
-            			exactScreenshotName, 
-            			Constants.USE_ORIGINAL_SIZE, 
-            			imageWidth, 
-            			imageHeight);
+        else
+        {   
+          	an.scanFolderForChanges(
+          			trainingScreenShotFile.getParent(), 
+           			exactScreenshotName);
             	
-            	// load all images from the directory
-                im = new ImageTransformation(
-                		screenshot,
-                		currentScreenShotFile.getParent(),                		
-                		Constants.USE_ORIGINAL_SIZE,
-                		imageWidth,
-                		imageHeight);
-            }
-            patternList = im.computeAverageMetric(percentageDifferenceValue, Constants.USE_COLOR_FOR_COMPARISON, Constants.USE_ORIGINAL_SIZE);
-            // internal list in network for self testing and image confirmation        
-            an.setInternalList(patternList);            
-    		PerceptronLearning pl = new PerceptronLearning(an, learningRate);
-    		pl.setLearningRate(learningRate);	
-    		
-    		if (an.getModusFlag())
-    		{
-				for (PatternHelper pattern : patternList)
-				{
-					pl.Run(pattern.getPatternList());
-				}
-    		}		
-			boolean selfTest = an.onSelfTest(indentedPercentageMatch);
-			
-			double result = 2.0;
-			
-			if (!selfTest)
-			{	
-				result = an.checkForRecognitionAsDouble(patternList.get(patternList.size() - 1).getPatternList());
-			}
-			
-			if (!selfTest)
+          	// load all images from the directory
+            im = new ImageTransformation(
+               		screenshot,
+               		trainingScreenShotFile.getParent());
+        }
+        patternList = im.computeAverageMetric(percentageDifferenceValue, Constants.USE_COLOR_FOR_COMPARISON, Constants.USE_ORIGINAL_SIZE);
+        // internal list in network for self testing and image confirmation        
+        an.setInternalList(patternList);            
+    	PerceptronLearning pl = new PerceptronLearning(an, learningRate);
+    	pl.setLearningRate(learningRate);	
+    	
+    	if (an.getModusFlag())
+    	{
+			for (PatternHelper pattern : patternList)
 			{
-				System.out.println("Network result: " + result);
-                //Assert.assertTrue(indentedPercentageMatch < result);
+				pl.Run(pattern.getPatternList());
 			}
-			else
-			{
-				System.out.println("Network not ready");
-				System.out.println("result: " + result);
-			}
+    	}
+    	// test the corresponding network the new and all therefore seen pattern
+    	// if the self test is correct there is no further training necessary
+		boolean selfTest = an.onSelfTest(indentedPercentageMatch);
 			
-			// Save the network
-			an.Save(networkFile.toString(), im.getAverageMetric(), imageWidth, imageHeight);
-			// Save the screenshot
-			if (indentedPercentageMatch > result && !selfTest)
-			{
-				testInstanceDirectory.mkdirs();
-				Helper.saveImage(screenshot.toBufferedImage(), differenceImageFile, Constants.FORMAT);
-			}
-			else if (indentedPercentageMatch < result)
-			{				
-				Helper.saveImage(screenshot.toBufferedImage(), currentScreenShotFile, Constants.FORMAT);				
-			}
-    }
+		double result = 2.0;
+		
+		if (!selfTest)
+		{	
+			// ensure to get the last element in the list, which is always the current screenshot
+			result = an.checkForRecognitionAsDouble(patternList.get(patternList.size() - 1).getPatternList());
+		}
+			
+		if (!selfTest)
+		{
+			System.out.println("Network result: " + result);
+			
+		}
+		else
+		{
+			System.out.println("Network not ready");
+			System.out.println("result: " + result);
+		}
+		// Save the network
+		an.Save(networkFile.toString(), im.getAverageMetric(), Constants.IMAGE_WIDTH, Constants.IMAGE_HEIGHT);
+			
+		// Save the screenshot
+		if (indentedPercentageMatch > result && !selfTest)
+		{
+			// Directory for the unrecognized images of the current test run
+			final File unrecognizedInstanceDirectory = new File(new File(targetDirectory, RESULT_DIRECTORY_UNRECOGNIZED), screenshotName);
+			// Path of the unrecognized image file
+		    final File unrecognizedImageFile = new File(unrecognizedInstanceDirectory, exactScreenshotName);
+		    unrecognizedImageFile.mkdirs();
+			Helper.saveImage(screenshot.toBufferedImage(), unrecognizedImageFile);
+		}
+		else if (indentedPercentageMatch < result && selfTest)
+		{				
+			Helper.saveImage(screenshot.toBufferedImage(), trainingScreenShotFile);				
+		}
+		else
+		{
+			final File recognizedInstanceDirectory = new File(new File(targetDirectory, RESULT_DIRECTORY_RECOGNIZED), screenshotName);
+			final File recognizedImageFile = new File(recognizedInstanceDirectory, exactScreenshotName);
+			recognizedInstanceDirectory.mkdirs();
+			Helper.saveImage(screenshot.toBufferedImage(), recognizedImageFile);
+		}
+}
 
     /**
      * Takes a screenshot if the underlying web driver instance is capable of doing it. Fails with a message only in
@@ -332,22 +331,5 @@ public class AI implements WebDriverCustomModule
         final String browserName = capabilities.getBrowserName();
 
         return browserName == null ? "unknown" : browserName;
-    }
-
-    /**
-     * Write the image into the filepath given by file
-     * @param image that should be saved
-     * @param file path where the image shall be saved
-     */
-    private void writeImage(final BufferedImage image, final File file)
-    {
-        try
-        {
-            ImageIO.write(image, Constants.FORMAT, file);
-        }
-        catch (final IOException e)
-        {
-            throw new RuntimeException(e);
-        }
     }
 }

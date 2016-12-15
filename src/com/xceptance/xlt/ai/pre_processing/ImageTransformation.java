@@ -37,13 +37,13 @@ public class ImageTransformation
 	 * Load the images out of a folder and start the analyze with {@link #applyTransformation()}
 	 * @param path String to the folder.
 	 */
-	public ImageTransformation(ArrayList<FastBitmap> imgList, Map<Integer, AverageMetric> averageMet, boolean trainingFlag, boolean useOriginalSize, int width, int height)
+	public ImageTransformation(ArrayList<FastBitmap> imgList, Map<Integer, AverageMetric> averageMet, boolean trainingFlag)
 	{		
 		maxSize 			= 0;
 		averMet 			= averageMet;
 		this.trainingFlag 	= trainingFlag;
 		pp = new ArrayList<>();
-		process(imgList, useOriginalSize, width, height);
+		process(imgList);
 		applyTransformation(); 
 	}
 	
@@ -55,13 +55,13 @@ public class ImageTransformation
 	 * @param averMetr AverageMetric which is saved in the network. 
 	 * @param flag Boolean for further training or comparison.
 	 */
-	public ImageTransformation(FastBitmap img, String path, boolean useOriginalSize, int width, int height)
+	public ImageTransformation(FastBitmap img, String path)
 	{
 		averMet 			= new HashMap<Integer, AverageMetric>();
 		maxSize 			= 0;
 		trainingFlag		= true;
 		pp = new ArrayList<>();
-		load(img, path, useOriginalSize, width, height);
+		load(img, path);
 		applyTransformation();
 	}
 	
@@ -229,7 +229,7 @@ public class ImageTransformation
 	 */
 	private void applyTransformation()
 	{
-		Convolution conv = new Convolution(ConvolutionKernel.LaplacianOfGaussian);
+		//Convolution conv = new Convolution(ConvolutionKernel.LaplacianOfGaussian);
 		FastCornersDetector fcd = new FastCornersDetector(Algorithm.FAST_9);		
 		fcd.setSuppression(false);
 		List<FeaturePoint> tempList = null;
@@ -253,35 +253,35 @@ public class ImageTransformation
 	 * Load all images out of a given folder path..
 	 * @param path String full path name to folder
 	 */
-	private void load(FastBitmap img,String path, boolean useOriginalSize, int width, int height)
+	private void load(FastBitmap img,String path)
 	{
-		if (useOriginalSize)
+		if (Constants.USE_ORIGINAL_SIZE)
 		{
 			pictureList = Helper.loadAllImages_FastBitmap(path);
 		}
 		else
 		{
-			pictureList = Helper.loadAllImagesScaled_FastBitmap(path, height, width);
+			pictureList = Helper.loadAllImagesScaled_FastBitmap(path, Constants.IMAGE_HEIGHT, Constants.IMAGE_WIDTH);
 		}
 		
 		if (!pictureList.isEmpty())
 		{			
-			Helper.setImageParameter(pictureList.get(0).getWidth(), pictureList.get(0).getHeight());
+			Helper.setImageParameter();
 			pictureList.add(img);
 		}
 		else
 		{
 			ArrayList<FastBitmap> temp = new ArrayList<>();
 			temp.add(img);
-			process(temp, useOriginalSize, width, height);
+			process(temp);
 		}
 		recognizeFlag = false;	
 	}
 	
-	private void process(ArrayList<FastBitmap> imgList, boolean useOriginalSize, int width, int height)
+	private void process(ArrayList<FastBitmap> imgList)
 	{
 		pictureList = new ArrayList<>();
-		if (useOriginalSize)
+		if (Constants.USE_ORIGINAL_SIZE)
 		{
 			for (FastBitmap img : imgList)
 			{
@@ -292,10 +292,10 @@ public class ImageTransformation
 		{
 			for (FastBitmap img : imgList)
 			{
-				pictureList.add(Helper.imageToFastImageScaled(img.toBufferedImage(), img.getTagName(), 1, height, width));
+				pictureList.add(Helper.imageToFastImageScaled(img.toBufferedImage(), img.getTagName()));
 			}
 		}		
-		Helper.setImageParameter(width, height);
+		Helper.setImageParameter();
 		recognizeFlag = false;	
 	}
 	
