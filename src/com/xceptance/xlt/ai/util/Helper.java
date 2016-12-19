@@ -142,7 +142,7 @@ public class Helper
 	 */
 	public static FastBitmap imageToFastBitmap(Image img, String tagName, int imageType) 
 	{
-		FastBitmap fi = new FastBitmap(new BufferedImage(img.getWidth(null), img.getHeight(null), imageType), tagName);
+		FastBitmap fi = new FastBitmap(new BufferedImage(img.getWidth(null), img.getHeight(null), imageType), tagName, Constants.USE_ORIGINAL_SIZE);
 		return fi;
 	}
 
@@ -165,12 +165,7 @@ public class Helper
 	    g2d.drawImage(tmp, 0, 0, null);
 	    g2d.dispose();
 	    
-//		BufferedImage resizedBi = new BufferedImage(width, height, imageType);
-//		Graphics2D g2 = resizedBi.createGraphics();
-//		g2.drawImage(img,0,0,Constants.IMAGE_WIDTH,Constants.IMAGE_WIDTH, null);		
-//		g2.dispose();
-	    
-		FastBitmap fi = new FastBitmap(resizedBI, tagName); 
+		FastBitmap fi = new FastBitmap(resizedBI, tagName, Constants.USE_ORIGINAL_SIZE); 
 		return fi;
 	}
 	
@@ -252,7 +247,7 @@ public class Helper
 		{ 
 			System.out.println("File Not Found"); 
 		}		
-		return new FastBitmap(img, filename);
+		return new FastBitmap(img, filename, Constants.USE_ORIGINAL_SIZE);
 	}
 	
 	 /**
@@ -352,7 +347,7 @@ public class Helper
 			for (File element : list)
 			{
 				BufferedImage tempimage = loadImage(path + File.separator + element.getName());
-				pictureList.add(new FastBitmap(imageToBufferedImageScaled(tempimage, 1, heigth, width), element.getName()));				
+				pictureList.add(new FastBitmap(imageToBufferedImageScaled(tempimage, 1, heigth, width), element.getName(), Constants.USE_ORIGINAL_SIZE));				
 			}
 		}
 		return pictureList;

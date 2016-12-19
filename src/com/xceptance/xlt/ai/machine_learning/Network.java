@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
 
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 import com.xceptance.xlt.ai.image.AverageMetric;
 import com.xceptance.xlt.ai.image.FastBitmap;
 import com.xceptance.xlt.ai.image.PatternHelper;
@@ -105,11 +106,15 @@ public abstract class Network implements Serializable
     {    	
         this.inputsCount = Math.max( 1, inputsCount );        
         // create collection of layers
-        this.layer = Layer.getInstance(inputsCount);
-        internalList 	= new ArrayList<>();
-        overwatchList 	= new ArrayList<>();
-        selfTest 		= true;
-        trainingMode	= true;
+        this.layer 				= Layer.getInstance(inputsCount);
+        internalList 			= new ArrayList<>();
+        overwatchList 			= new ArrayList<>();
+        selfTest 				= true;
+        trainingMode			= true;
+        useColor				= Constants.USE_COLOR_FOR_COMPARISON;
+        useOriginSize			= Constants.USE_ORIGINAL_SIZE;
+        referenceImageHeight 	= Constants.IMAGE_HEIGHT;
+        referenceImageWidth 	= Constants.IMAGE_WIDTH;
     }
     
     /**
@@ -157,21 +162,14 @@ public abstract class Network implements Serializable
     }
     
     /**
-     * Get the image width which was detected with the first (reference image) and is used for all other images.
-     * @return referenceImageWidth int value for image width
+     * Set the internal used constants. 
      */
-    public int getReferenceImageWidth()
+    public void setConstants()
     {
-    	return referenceImageWidth;   	
-    }
-
-    /**
-     * Get the image height which was detected with the first (reference image) and is used for all other images.
-     * @return referenceImageWidth int value for image height
-     */
-    public int getReferenceimageHeight()
-    {
-    	return referenceImageHeight;
+    	Constants.IMAGE_HEIGHT 				= referenceImageHeight;
+    	Constants.IMAGE_WIDTH 				= referenceImageWidth;
+    	Constants.USE_COLOR_FOR_COMPARISON 	= useColor;
+    	Constants.USE_ORIGINAL_SIZE 		= useOriginSize;
     }
     
     /**
@@ -181,7 +179,7 @@ public abstract class Network implements Serializable
      */
     public boolean onSelfTest(double intendedPercentageMatch)
     { 
-	    if (internalList.size() > 5 && selfTest)
+	    if (internalList.size() > 6 && selfTest)
 	    {
 			Random rand = new Random();
 	
@@ -193,6 +191,7 @@ public abstract class Network implements Serializable
 		   	}	    	
 		   	if ((result / size) > intendedPercentageMatch)
 	    	{
+		   		internalList.clear();
 	    		trainingMode = false;
 	    		selfTest = false;
 	    		return false;
@@ -253,11 +252,14 @@ public abstract class Network implements Serializable
      * @param fileName File name to save network into.
      * @param averMetric average metric to save
      */
-    public void Save(String fileName, Map<Integer, AverageMetric> averMetric, int width, int height)
+    public void Save(String fileName, Map<Integer, AverageMetric> averMetric)
     {
-    	this.averMet 				= averMetric;
-    	this.referenceImageWidth 	= width;
-    	this.referenceImageHeight 	= height;
+    	this.averMet 			= averMetric;
+    	useColor 				= Constants.USE_COLOR_FOR_COMPARISON;
+    	useOriginSize 			= Constants.USE_ORIGINAL_SIZE;
+    	referenceImageHeight 	= Constants.IMAGE_HEIGHT;
+    	referenceImageWidth 	= Constants.IMAGE_WIDTH;
+    	
         try 
         {        	
         	ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(fileName));
@@ -300,9 +302,19 @@ public abstract class Network implements Serializable
         {
             e.printStackTrace();
         }
+        
         return network;
     }
     	
+    /**
+     * Flag for image comparison.
+     */
+    private boolean useColor;
+    
+    /**
+     * Flag for image scaling.
+     */
+    private boolean useOriginSize;
     /**
      * Saved average metric of all seen Images.
      */
@@ -313,12 +325,18 @@ public abstract class Network implements Serializable
 	 */
 	private boolean trainingMode;
     
+	/**
+	 * Flag if the network is already proper trained.
+	 */
 	private boolean selfTest;
 	
+	/**
+	 * Folder list which contains Hashvalues from already seen images, in the folder corresponding to the network.
+	 */
 	private ArrayList<Integer> overwatchList;
 	
 	/**
-	 * 
+	 * Internal Pattern list for self test.
 	 */
     private ArrayList<PatternHelper> internalList;
 	

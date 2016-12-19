@@ -150,8 +150,7 @@ public class AI implements WebDriverCustomModule
 
         // Directory for the training images
         final File trainingDirectory = new File(new File(targetDirectory, RESULT_DIRECTORY_TRAINING), screenshotName);
-        trainingDirectory.mkdirs();
-
+        
         // Path of the screenshot image file
         final String exactScreenshotName = screenshotName + Session.getCurrent().getID() + "." + Constants.FORMAT;
         final File trainingScreenShotFile = new File(trainingDirectory, exactScreenshotName);
@@ -178,18 +177,9 @@ public class AI implements WebDriverCustomModule
         //--------------------------------------------------------------------------------
         // Make the screenshot and load the network
         //--------------------------------------------------------------------------------
-
-        // need to be done on another location
-        final FastBitmap screenshot = new FastBitmap(takeScreenshot(webdriver), exactScreenshotName, Constants.USE_ORIGINAL_SIZE);
-        
-        if (screenshot == null)
-        {
-        	// TODO Has this to be handled in a different way?
-            // webdriver cannot take the screenshot -> RETURN
-            return;
-        }
         
         // initialization 
+        final FastBitmap screenshot;
         ActivationNetwork an = new ActivationNetwork(new BipolarSigmoidFunction(), 1); 
         ImageTransformation im;
         ArrayList<PatternHelper> patternList = new ArrayList<>();
@@ -197,15 +187,26 @@ public class AI implements WebDriverCustomModule
         if (networkFile.exists())
         {
         	// load the corresponding network and all settings which are saved 
-          	an = (ActivationNetwork) an.Load(networkFile.getPath());
-        	Constants.IMAGE_HEIGHT = an.getReferenceimageHeight();
-        	Constants.IMAGE_WIDTH = an.getReferenceImageWidth();
-           	ArrayList<FastBitmap> imgList = new ArrayList<>();
+          	an = (ActivationNetwork) an.Load(networkFile.getPath()); 
+          	an.setConstants();
+           	ArrayList<FastBitmap> imgList = new ArrayList<>();   
+            screenshot = new FastBitmap(takeScreenshot(webdriver), exactScreenshotName, Constants.USE_ORIGINAL_SIZE);
+            
+            if (screenshot == null)
+            {
+            	// TODO Has this to be handled in a different way?
+                // webdriver cannot take the screenshot -> RETURN
+                return;
+            }
+           	
            	imgList.add(screenshot);
-           	imgList.addAll(an.scanFolderForChanges(
-           			trainingScreenShotFile.getParent(), 
-           			exactScreenshotName));
-            	
+           	if (an.getModusFlag())
+           	{
+           		trainingDirectory.mkdirs();
+           		imgList.addAll(an.scanFolderForChanges(
+           				trainingScreenShotFile.getParent(), 
+           				exactScreenshotName));
+           	}
             // transform the new screenshot
             im = new ImageTransformation(
                		imgList,                		
@@ -214,11 +215,22 @@ public class AI implements WebDriverCustomModule
             imgList = null;
         }
         else
-        {           	
+        {  
+        	trainingDirectory.mkdirs();
+       	
           	an.scanFolderForChanges(
           			trainingScreenShotFile.getParent(), 
            			exactScreenshotName);
             	
+            screenshot = new FastBitmap(takeScreenshot(webdriver), exactScreenshotName, Constants.USE_ORIGINAL_SIZE);
+            
+            if (screenshot == null)
+            {
+            	// TODO Has this to be handled in a different way?
+                // webdriver cannot take the screenshot -> RETURN
+                return;
+            } 
+          	
           	// load all images from the directory
             im = new ImageTransformation(
                		screenshot,
@@ -260,7 +272,7 @@ public class AI implements WebDriverCustomModule
 			System.out.println("result: " + result);
 		}
 		// Save the network
-		an.Save(networkFile.toString(), im.getAverageMetric(), Constants.IMAGE_WIDTH, Constants.IMAGE_HEIGHT);
+		an.Save(networkFile.toString(), im.getAverageMetric());
 			
 		// Save the screenshot
 		if (indentedPercentageMatch > result && !selfTest)
@@ -273,7 +285,7 @@ public class AI implements WebDriverCustomModule
 			Helper.saveImage(screenshot.toBufferedImage(), unrecognizedImageFile);
 		}
 		else if (indentedPercentageMatch < result && selfTest)
-		{				
+		{
 			Helper.saveImage(screenshot.toBufferedImage(), trainingScreenShotFile);				
 		}
 		else
