@@ -221,9 +221,9 @@ public class AI implements WebDriverCustomModule
           	an.scanFolderForChanges(
           			trainingScreenShotFile.getParent(), 
            			exactScreenshotName);
-            	
-            screenshot = new FastBitmap(takeScreenshot(webdriver), exactScreenshotName, Constants.USE_ORIGINAL_SIZE);
-            
+          	
+          	 screenshot = new FastBitmap(takeScreenshot(webdriver), exactScreenshotName, Constants.USE_ORIGINAL_SIZE);
+
             if (screenshot == null)
             {
             	// TODO Has this to be handled in a different way?

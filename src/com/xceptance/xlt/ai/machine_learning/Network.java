@@ -194,7 +194,7 @@ public abstract class Network implements Serializable
 		   		internalList.clear();
 	    		trainingMode = false;
 	    		selfTest = false;
-	    		return false;
+	    		return selfTest;
 	    	}  
 	    }
 	    return selfTest;
