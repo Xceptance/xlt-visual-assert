@@ -18,7 +18,6 @@
 
 package com.xceptance.xlt.ai.image;
 
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 import com.xceptance.xlt.ai.core.IntPoint;
 import com.xceptance.xlt.ai.image.Grayscale;
 import com.xceptance.xlt.ai.util.Constants;
@@ -148,7 +147,7 @@ public class FastBitmap
     		int width 			= Constants.IMAGE_WIDTH;
     		int height 			= Constants.IMAGE_HEIGHT;    	
     		Image tmp 			= bufferedImage.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-        	BufferedImage dimg 	= new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        	BufferedImage dimg 	= new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         	Graphics2D g2d = dimg.createGraphics();
         	g2d.drawImage(tmp, 0, 0, null);
         	g2d.dispose();

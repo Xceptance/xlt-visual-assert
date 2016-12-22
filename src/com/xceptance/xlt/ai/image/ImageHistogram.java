@@ -219,12 +219,12 @@ public class ImageHistogram {
         }
 
         mean   = HistogramStatistics.Mean( values );
-        stdDev = HistogramStatistics.StdDev( values, mean );
-        kurtosis = HistogramStatistics.Kurtosis(values, mean, stdDev);
-        skewness = HistogramStatistics.Skewness(values, mean, stdDev);
-        median = HistogramStatistics.Median( values );
-        mode = HistogramStatistics.Mode(values);
-        entropy = HistogramStatistics.Entropy(values);
+//        stdDev = HistogramStatistics.StdDev( values, mean );
+//        kurtosis = HistogramStatistics.Kurtosis(values, mean, stdDev);
+//        skewness = HistogramStatistics.Skewness(values, mean, stdDev);
+//        median = HistogramStatistics.Median( values );
+//        mode = HistogramStatistics.Mode(values);
+//        entropy = HistogramStatistics.Entropy(values);
     }
     
     /**

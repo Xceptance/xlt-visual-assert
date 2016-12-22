@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
 
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
 import com.xceptance.xlt.ai.image.AverageMetric;
 import com.xceptance.xlt.ai.image.FastBitmap;
 import com.xceptance.xlt.ai.image.PatternHelper;
@@ -212,14 +211,14 @@ public abstract class Network implements Serializable
 		{
 			if (!overwatchList.contains(element.getName().hashCode()))
 			{
-				if(Constants.USE_ORIGINAL_SIZE)
-				{
-					result.add(Helper.loadImage_FastBitmap(element.getAbsolutePath()));
-				}
-				else
-				{
+//				if(Constants.USE_ORIGINAL_SIZE)
+//				{
+//					result.add(Helper.loadImage_FastBitmap(element.getAbsolutePath()));
+//				}
+//				else
+//				{
 					result.add(Helper.loadImageScaled_FastBitmap(element.getAbsolutePath(), Constants.IMAGE_HEIGHT, Constants.IMAGE_WIDTH));
-				}
+//				}
 			}
 			tempList.add(element.getName().hashCode());
 		}		

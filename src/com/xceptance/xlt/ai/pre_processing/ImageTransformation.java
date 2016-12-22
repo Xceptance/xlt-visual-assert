@@ -1,6 +1,5 @@
 package com.xceptance.xlt.ai.pre_processing;
 
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -11,12 +10,9 @@ import java.util.Map;
 import com.xceptance.xlt.ai.core.FloatPoint;
 import com.xceptance.xlt.ai.corner.Fast9;
 import com.xceptance.xlt.ai.corner.FastCornersDetector;
-import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 import com.xceptance.xlt.ai.core.FeaturePoint;
 import com.xceptance.xlt.ai.corner.FastCornersDetector.Algorithm;
 import com.xceptance.xlt.ai.image.AverageMetric;
-import com.xceptance.xlt.ai.image.Convolution;
-import com.xceptance.xlt.ai.image.ConvolutionKernel;
 import com.xceptance.xlt.ai.image.FastBitmap;
 import com.xceptance.xlt.ai.image.MetricCurator;
 import com.xceptance.xlt.ai.image.PatternHelper;
@@ -237,6 +233,7 @@ public class ImageTransformation
 		{
 			long startTime = System.nanoTime();
 			// convolution take too much time and is therefore disabled, improve the performance up to 3 times
+			// but also decrease accuracy 
 			//conv.applyInPlace(element);			
 			// apply the fast corner detection to the image
 			tempList = fcd.ProcessImage(element);
@@ -255,14 +252,14 @@ public class ImageTransformation
 	 */
 	private void load(FastBitmap img,String path)
 	{
-		if (Constants.USE_ORIGINAL_SIZE)
-		{
-			pictureList = Helper.loadAllImages_FastBitmap(path);
-		}
-		else
-		{
+//		if (Constants.USE_ORIGINAL_SIZE)
+//		{
+//			pictureList = Helper.loadAllImages_FastBitmap(path);
+//		}
+//		else
+//		{
 			pictureList = Helper.loadAllImagesScaled_FastBitmap(path, Constants.IMAGE_HEIGHT, Constants.IMAGE_WIDTH);
-		}
+//		}
 		
 		if (!pictureList.isEmpty())
 		{			

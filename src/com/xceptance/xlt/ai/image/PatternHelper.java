@@ -3,8 +3,6 @@ package com.xceptance.xlt.ai.image;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import org.jaxen.function.ContainsFunction;
-
 /***
  * Helper class for storing the found pattern.
  * 

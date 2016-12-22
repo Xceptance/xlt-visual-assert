@@ -1,8 +1,5 @@
 package com.xceptance.xlt.ai.util;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 /***
  * Used constants for the program. 
  * @author Thomas Volkmann 

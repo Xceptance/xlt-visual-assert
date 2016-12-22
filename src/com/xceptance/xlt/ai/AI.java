@@ -4,15 +4,11 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.LinkOption;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
-import org.junit.Assert;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -217,19 +213,21 @@ public class AI implements WebDriverCustomModule
         else
         {  
         	trainingDirectory.mkdirs();
-       	
+        	screenshot = new FastBitmap(takeScreenshot(webdriver), exactScreenshotName, Constants.USE_ORIGINAL_SIZE);
+
+        	if (screenshot == null)
+        	{
+        		// TODO Has this to be handled in a different way?
+        		// webdriver cannot take the screenshot -> RETURN
+        		return;
+        	}         	
+        	
+        	Constants.IMAGE_WIDTH = screenshot.getWidth();
+        	Constants.IMAGE_HEIGHT = screenshot.getHeight();
+        	
           	an.scanFolderForChanges(
           			trainingScreenShotFile.getParent(), 
            			exactScreenshotName);
-          	
-          	 screenshot = new FastBitmap(takeScreenshot(webdriver), exactScreenshotName, Constants.USE_ORIGINAL_SIZE);
-
-            if (screenshot == null)
-            {
-            	// TODO Has this to be handled in a different way?
-                // webdriver cannot take the screenshot -> RETURN
-                return;
-            } 
           	
           	// load all images from the directory
             im = new ImageTransformation(

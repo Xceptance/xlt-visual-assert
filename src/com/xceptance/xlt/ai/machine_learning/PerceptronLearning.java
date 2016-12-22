@@ -28,7 +28,6 @@ import java.util.ArrayList;
 
 import com.xceptance.xlt.ai.machine_learning.ActivationNetwork;
 import com.xceptance.xlt.ai.machine_learning.Layer;
-import com.xceptance.xlt.ai.util.Constants;
 
 /**
  * Perceptron learning algorithm.
