@@ -114,9 +114,17 @@ public class AI implements WebDriverCustomModule
         // Get browser name and browser version for the subfolders
         final String browserName = getBrowserName(webdriver);
 
-        // Get the name of the action that called the visual assertion
-        final String currentActionName = Session.getCurrent().getCurrentActionName();
-
+        // Get the name of the action that called the visual verification
+        final String currentActionName;
+        if (arguments[0] == null)
+        {
+        	currentActionName = Session.getCurrent().getCurrentActionName();
+        }
+        else
+        {
+        	currentActionName = arguments[0];
+        }
+        
         //--------------------------------------------------------------------------------
         // Initialize the directory and file paths, create the directories if necessary
         //--------------------------------------------------------------------------------
@@ -141,14 +149,25 @@ public class AI implements WebDriverCustomModule
         // Update the index
         indexCounter.set(index);
 
+        String screenshotName = "";
+        
         // Name of the image file for the screenshot
-        final String screenshotName = String.format("%03d", index) + "-" + currentActionName;
+        if (arguments[0] == null)
+        {
+        	screenshotName = String.format("%03d", index) + "-" + currentActionName;
+        }
+        else
+        {
+        	// if the argument is not null, take the destination from the script and change everything according 
+        	screenshotName = Helper.checkFolderForMatch(targetDirectory + File.separator + RESULT_DIRECTORY_TRAINING, currentActionName) + currentActionName;
+        	Session.getCurrent().setID(Session.getCurrent().getID() + index );
+        }
 
         // Directory for the training images
         final File trainingDirectory = new File(new File(targetDirectory, RESULT_DIRECTORY_TRAINING), screenshotName);
         
         // Path of the screenshot image file
-        final String exactScreenshotName = screenshotName + Session.getCurrent().getID() + "." + Constants.FORMAT;
+        final String exactScreenshotName = Session.getCurrent().getCurrentActionName() + Session.getCurrent().getID() + "." + Constants.FORMAT;
         final File trainingScreenShotFile = new File(trainingDirectory, exactScreenshotName);
         
         // Directory of the network file
@@ -195,6 +214,8 @@ public class AI implements WebDriverCustomModule
                 return;
             }
            	
+            // if the network is not done with training check the training folder for changes 
+            // if there are changes, all unknwon images get loaded
            	imgList.add(screenshot);
            	if (an.getModusFlag())
            	{

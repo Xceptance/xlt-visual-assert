@@ -75,5 +75,7 @@
   <command name="clickAndWait" target="id=btnOrder"/>
   <command name="assertElementPresent" target="id=successMessage"/>
   <command name="assertText" target="id=btnCartOverview" value="regexp:.*0.*0.*"/>
-  <module name="posters.functional.modules.AI"/>
+  <module name="posters.functional.modules.AI">
+    <parameter name="name" value="OpenStartPage"/>
+  </module>
 </testcase>

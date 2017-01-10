@@ -129,10 +129,6 @@ public class FeaturePoint implements Comparable<FeaturePoint>, Comparator<Featur
     		sComp = y1.compareTo(y2);
     	}
     	return sComp;
-    	
-//    	if ()
-//    	
-//    	return fp1.x - fp2.x;
     }
 
     @Override

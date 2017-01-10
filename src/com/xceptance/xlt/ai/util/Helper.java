@@ -33,10 +33,7 @@ public class Helper
 		{
 			return true;
 		}
-		else
-		{
-			return false;
-		}
+		return false;	
 	}		
 		
 	/***
@@ -75,10 +72,7 @@ public class Helper
 		{
 			return value;
 		}
-		else
-		{
-			return result;
-		}
+		return result;
 	}
 	
 	/**
@@ -88,7 +82,7 @@ public class Helper
 	 */
 	public static void setImageParameter()
 	{
-		// values for the parameter THRESHOLD correspondent out of experience
+		// values for the parameter THRESHOLD correspondent out of experience and testing
 		int tmpMinGrpSize = 200;
 		int tmpThreshold = 20;
 		tmpMinGrpSize = (Constants.IMAGE_WIDTH + Constants.IMAGE_HEIGHT) / 6;
@@ -401,6 +395,31 @@ public class Helper
             return (false);
         }
     };
+    
+    public static String checkFolderForMatch(String path, String currentActionName)
+    {
+    	String result = new String();
+    	
+    	File test = new File(path);
+		File[] list = test.listFiles(new FilenameFilter() 
+		{			
+			@Override
+			public boolean accept(File dir, String name) 
+			{				
+				return new File(dir, name).isDirectory();
+			}
+		});
+		
+		for (File element : list)
+		{
+			if (element.toString().matches("(.*)"+currentActionName))
+			{
+				result = element.toString().replaceAll("[^-?0-9]+", ""); 
+			}
+		}
+		
+    	return result;
+    }
 	
 	/***
 	 * Convert a BufferedImage to a 2D double array.

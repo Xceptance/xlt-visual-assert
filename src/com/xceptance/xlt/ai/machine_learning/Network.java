@@ -188,7 +188,7 @@ public abstract class Network implements Serializable
 		   	{
 		   		result += layer.computeSum(internalList.get(rand.nextInt(internalList.size())).getPatternList());
 		   	}	    	
-		   	if ((result / size) > intendedPercentageMatch)
+		   	if ((result / size) >= intendedPercentageMatch)
 	    	{
 		   		internalList.clear();
 	    		trainingMode = false;
@@ -211,14 +211,7 @@ public abstract class Network implements Serializable
 		{
 			if (!overwatchList.contains(element.getName().hashCode()))
 			{
-//				if(Constants.USE_ORIGINAL_SIZE)
-//				{
-//					result.add(Helper.loadImage_FastBitmap(element.getAbsolutePath()));
-//				}
-//				else
-//				{
-					result.add(Helper.loadImageScaled_FastBitmap(element.getAbsolutePath(), Constants.IMAGE_HEIGHT, Constants.IMAGE_WIDTH));
-//				}
+				result.add(Helper.loadImageScaled_FastBitmap(element.getAbsolutePath(), Constants.IMAGE_HEIGHT, Constants.IMAGE_WIDTH));
 			}
 			tempList.add(element.getName().hashCode());
 		}		
