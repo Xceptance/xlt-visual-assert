@@ -24,6 +24,7 @@ public class Metric implements Serializable, Comparable<Metric>
 	 * Constructor which automatically generate the metric with the given parameter.
 	 * Stand for the chosen identification points of the group.
 	 * @param group found corners.
+	 * @param image FastBitmap of the original image, is used in {@link Metric}
 	 */
 	public Metric(ArrayList<FeaturePoint> group, FastBitmap image)
 	{
@@ -41,6 +42,7 @@ public class Metric implements Serializable, Comparable<Metric>
 	 * boundingBox (distance of the farthest points in the group)
 	 * centerOfGravity (most central point of all FeaturePoints in a group) 
 	 * @param group identified corners represented by FeaturePoints
+	 * @param image FastBitmap the original image to extract the colors for the histograms.
 	 */
     private void startMetricCalculation(ArrayList<FeaturePoint> group, FastBitmap image)
     { 

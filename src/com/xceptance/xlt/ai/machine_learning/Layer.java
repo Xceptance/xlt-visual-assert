@@ -93,7 +93,7 @@ public class Layer implements Serializable
 
     /**
      * Initializes a new instance of the Layer class.
-     * @param inputsCount Layer's inputs count.
+     * @param inputCount Layer's inputs count.
      */
     private Layer(int inputCount)
     {

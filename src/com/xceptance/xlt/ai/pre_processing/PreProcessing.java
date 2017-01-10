@@ -23,9 +23,9 @@ import com.xceptance.xlt.ai.util.Helper;
 public class PreProcessing 
 {
 	/***
-	 * Constructor which will automatically start the grouping of the edges {@link #findGroups(List)}.
-	 * @param pictureTag String name of the image
+	 * Constructor which will automatically start the grouping of the edges {@link #findGroups(List, FastBitmap)}.
 	 * @param edges List of {@link FeaturePoint}
+	 * @param currentImage FastBitmap the original image, is used in {@link Metric}.
 	 */
 	public PreProcessing(List<FeaturePoint> edges, FastBitmap currentImage)
 	{	
@@ -42,7 +42,7 @@ public class PreProcessing
 		return met;
 	}
 	
-	// Detector aka other Algorithm like FREAK ...
+	// Detector for all elements which are near enough to each other.
 	// 
 	// artifacts under a specific threshold will ignored
 	// Parameter for regulation are THRESHOLD and MINGROUPSIZE
@@ -50,6 +50,7 @@ public class PreProcessing
 	 * Segmentation and grouping of all edges, artifacts under a specific threshold will ignored.
 	 * Parameter are {@link Constants#THRESHOLD}, {@link Constants#MINGROUPSIZE}. 
 	 * @param edges List of {@link FeaturePoint}
+	 * @param currentImage fastBitmap of the current screenshot.
 	 */
 	private void findGroups(List<FeaturePoint> edges, FastBitmap currentImage)
 	{		

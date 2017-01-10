@@ -202,7 +202,7 @@ public class ImageHistogram {
 
     /**
      * Get the sum of pixels.
-     * @return 
+     * @return total 
      */
     public long getTotal() {
         return total;

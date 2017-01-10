@@ -91,8 +91,11 @@ public class ImageStatistics
     
     /**
      * Initialize a new instance of the ImageStatistics class.
+     * Calculate all necessary values for the histograms in the range to min and max {@link FeaturePoint} from the group.
      * @param fastBitmap Image to be processed.
      * @param bins Number of bins.
+     * @param min Minimum {@link FeaturePoint} from the found group.
+     * @param max Maximum {@link FeaturePoint} from the found group.
      */
     public ImageStatistics(FastBitmap fastBitmap, int bins, FeaturePoint min, FeaturePoint max)
     {        

@@ -137,6 +137,7 @@ public class FastBitmap
      * Initialize a new instance of the FastBitmap class.
      * @param bufferedImage Buffered image.
      * @param tagName String image name.
+     * @param useOriginalSize Boolean value if the original size should be used.
      */
     public FastBitmap(BufferedImage bufferedImage, String tagName, boolean useOriginalSize) 
     {
@@ -1342,6 +1343,7 @@ public class FastBitmap
     /**
      * Get Green.
      * @param x X axis coordinate.
+     * @param y Y axis coordinate.
      * @return Green channel's value.
      */
     public int getGreen(int x, int y)

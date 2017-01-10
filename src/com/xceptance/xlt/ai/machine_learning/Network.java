@@ -99,7 +99,6 @@ public abstract class Network implements Serializable
     /**
      * Initializes a new instance of the Network class.
      * @param inputsCount Network's inputs count.
-     * @param layersCount Network's layers count.
      */
     protected Network( int inputsCount)
     {    	
@@ -172,9 +171,10 @@ public abstract class Network implements Serializable
     }
     
     /**
-     * Check the neural network with already seen pattern for self test, if the {@link Constants@link }
-     * @param input
-     * @return
+     * Check the neural network with already seen pattern for self test, if the {@link Constants #INTENDED_PERCENTAGE_MATCH} is reached the network stop Learning.
+     * After finished training mode the network will categorize the screenshots in recognized and unrecognized.
+     * @param intendedPercentageMatch Destination value which should the network reach in comparison. 
+     * @return selfTest Boolean flag for training or not.
      */
     public boolean onSelfTest(double intendedPercentageMatch)
     { 
@@ -199,6 +199,14 @@ public abstract class Network implements Serializable
 	    return selfTest;
     }
     
+    /**
+     * Scan the given parameter path for images which are allowed after {@link Helper#IMAGE_FILTER} and compare all of them with the internal list.
+     * If the images are in the list nothing is done otherwise the HashCode of the images will be added to the list.
+     * This method is used for folder oversee.
+     * @param path String to the folder to scan
+     * @param screenshotName current screenshot ge added before saving in the folder, important for the next use of the network.
+     * @return result list with all loaded images.
+     */
     public ArrayList<FastBitmap> scanFolderForChanges(String path, String screenshotName)
     {
     	ArrayList<FastBitmap> result = new ArrayList<>();
@@ -224,8 +232,8 @@ public abstract class Network implements Serializable
     }
     
     /**
-     * Internal list for self test and changing images in the corresponding folder, of the network. 
-     * @param list
+     * Internal list for self test.
+     * @param list with all processed images.
      */
     public void setInternalList(ArrayList<PatternHelper> list)
     { 
@@ -234,7 +242,9 @@ public abstract class Network implements Serializable
 		   	for (PatternHelper element : list)
 		   	{
 		   		if (!internalList.contains(element))
-		   			internalList.add(element);        	
+		   		{
+		   			internalList.add(element);
+		   		}
 		    }
     	}
     }

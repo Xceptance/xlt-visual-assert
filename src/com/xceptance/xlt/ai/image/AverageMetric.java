@@ -25,6 +25,9 @@ public class AverageMetric implements Serializable
 	 * @param DistMin Distance from the point closest to coordinate origin (0.0 Screen coordinates)
 	 * @param DistMax Distance from the point farthest away from coordinate origin (0.0 Screen coordinates)
 	 * @param CenterOfGrav Average center of all group elements.
+	 * @param histoRedMean Mean value for the red histogram.
+	 * @param histoGreenMean Mean value for the green histogram.
+	 * @param histoBlueMean Mean value for the blue histogram.
 	 */
 	public AverageMetric(int GroupSize, double BoundingBox, double DistMin, double DistMax, FloatPoint CenterOfGrav, double histoRedMean, double histoGreenMean, double histoBlueMean)
 	{
@@ -39,13 +42,16 @@ public class AverageMetric implements Serializable
 		itemCounter 				= 2;
 	}
 	
-	/***
+	/**
 	 * Compute the average value in respective the already seen data. 
 	 * @param GroupSize Size of the found group. 
 	 * @param BoundingBox Amount of distance between the two points which are at the opposite side of the cloud.
 	 * @param DistMin Distance from the point closest to coordinate origin (0.0 Screen coordinates)
 	 * @param DistMax Distance from the point farthest away from coordinate origin (0.0 Screen coordinates)
 	 * @param CenterOfGrav Average center of all group elements.
+	 * @param histoRedMean Mean value for the red histogram.
+	 * @param histoGreenMean Mean value for the green histogram.
+	 * @param histoBlueMean Mean value for the blue histogram.
 	 */
 	public void update(int GroupSize, double BoundingBox, double DistMin, double DistMax, FloatPoint CenterOfGrav, double histoRedMean, double histoGreenMean, double histoBlueMean)
 	{		

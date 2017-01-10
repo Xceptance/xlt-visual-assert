@@ -190,7 +190,7 @@ public class AI implements WebDriverCustomModule
         }
 
         //--------------------------------------------------------------------------------
-        // Make the screenshot and load the network
+        // Make the screenshot and load the network or create a new one
         //--------------------------------------------------------------------------------
         
         // initialization 
@@ -279,7 +279,8 @@ public class AI implements WebDriverCustomModule
 			// ensure to get the last element in the list, which is always the current screenshot
 			result = an.checkForRecognitionAsDouble(patternList.get(patternList.size() - 1).getPatternList());
 		}
-			
+		
+		// console output
 		if (!selfTest)
 		{
 			System.out.println("Network result: " + result);
@@ -314,7 +315,7 @@ public class AI implements WebDriverCustomModule
 			recognizedInstanceDirectory.mkdirs();
 			Helper.saveImage(screenshot.toBufferedImage(), recognizedImageFile);
 		}
-}
+    }
 
     /**
      * Takes a screenshot if the underlying web driver instance is capable of doing it. Fails with a message only in

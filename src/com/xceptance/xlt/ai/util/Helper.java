@@ -77,8 +77,6 @@ public class Helper
 	
 	/**
 	 * Set the parameter for the image transformation algorithm, in reference to the image dimensions. 
-	 * @param width reference image width
-	 * @param height reference image height
 	 */
 	public static void setImageParameter()
 	{
@@ -128,9 +126,10 @@ public class Helper
 	}
 	
 	/***
-	 * 
-	 * @param img Image
-	 * @param imageType chosen int value of the target ImageType
+	 * transform an image to a {@link FastBitmap} for internal use 
+	 * @param img Image Given image to transform.
+	 * @param tagName String to identify the image.
+	 * @param imageType Integer value for the used image type.
 	 * @return fi FastBitmap
 	 */
 	public static FastBitmap imageToFastBitmap(Image img, String tagName, int imageType) 
@@ -141,11 +140,9 @@ public class Helper
 
 	/***
 	 * Transform Image to BufferedImage with new height and width for scaling.
-	 * @param img Image
-	 * @param imageType int value of the target ImageType
-	 * @param height height of the new BufferedImage
-	 * @param width width of the new bufferedImage
-	 * @return resizeBi Resized BufferedImage
+	 * @param img Image to transform.
+	 * @param tagName String value to identify to image.
+	 * @return fi FastBitmap.	
 	 */
 	public static FastBitmap imageToFastImageScaled(Image img, String tagName) 
 	{
@@ -189,8 +186,6 @@ public class Helper
 	 * Write a BufferedImage to HDD as a file.
 	 * @param img BufferedImage
 	 * @param filename String name of the file 
-	 * @param format String chosen format for the BufferedImage {@link Constants#FORMAT}
-	 * @param imageType int value of the target ImageType
 	 */
 	public static void saveImage(BufferedImage img, File filename) 
 	{		
@@ -226,7 +221,7 @@ public class Helper
 	
 	/**
 	 * Read an image file into FastBitmap.
-	 * @param filename
+	 * @param filename String full name to the file location.
 	 * @return FastBitmap
 	 */
 	public static FastBitmap loadImage_FastBitmap(String filename)
@@ -246,6 +241,8 @@ public class Helper
 	 /**
 	 * Read a image file into a BufferedImage and scale this image.
 	 * @param filename String full path name
+	 * @param width Integer value for the width of the loaded image.
+	 * @param height Integer value for the height of the loaded image.
 	 * @return img BufferedImage
 	 */
 	public static BufferedImage loadImageScaled(String filename, int width, int height) 
@@ -265,6 +262,8 @@ public class Helper
 	 /**
 	 * Read a image file into a FastBitmap and scale this image..
 	 * @param filename String full path name
+	 * @param width Integer value for the width of the loaded image.
+	 * @param height Integer value for the height of the loaded image
 	 * @return BufferedImage
 	 */
 	public static FastBitmap loadImageScaled_FastBitmap(String filename, int width, int height) 
@@ -396,6 +395,13 @@ public class Helper
         }
     };
     
+    /**
+     * If the option for a destination is used in the test script, this method try to get a match for the destination name.
+     * If a macth is found everything get sort into the destination. Otherwise there will be new folders with the given destination.
+     * @param path where the match should be
+     * @param currentActionName per argument given string out of the test script
+     * @return result if there is a match the identification number get extracted for further use, null otherwise
+     */
     public static String checkFolderForMatch(String path, String currentActionName)
     {
     	String result = new String();
@@ -409,15 +415,14 @@ public class Helper
 				return new File(dir, name).isDirectory();
 			}
 		});
-		
+		// check for matching name, if a match is found the identification number get extracted for further use.
 		for (File element : list)
 		{
-			if (element.toString().matches("(.*)"+currentActionName))
+			if (element.toString().matches("(.*)" + currentActionName))
 			{
 				result = element.toString().replaceAll("[^-?0-9]+", ""); 
 			}
-		}
-		
+		}		
     	return result;
     }
 	
