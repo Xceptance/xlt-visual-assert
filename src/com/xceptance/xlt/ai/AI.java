@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 
+import org.junit.Assert;
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -301,6 +302,7 @@ public class AI implements WebDriverCustomModule
 		    final File unrecognizedImageFile = new File(unrecognizedInstanceDirectory, exactScreenshotName);
 		    unrecognizedImageFile.mkdirs();
 			Helper.saveImage(screenshot.toBufferedImage(), unrecognizedImageFile);
+			Assert.fail("Failure during visual image assertion:");
 		}
 		else if (indentedPercentageMatch < result && selfTest)
 		{
