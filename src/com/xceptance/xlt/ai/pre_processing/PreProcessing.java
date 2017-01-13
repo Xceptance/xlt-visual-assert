@@ -48,7 +48,8 @@ public class PreProcessing
 	// Parameter for regulation are THRESHOLD and MINGROUPSIZE
 	/***
 	 * Segmentation and grouping of all edges, artifacts under a specific threshold will ignored.
-	 * Parameter are {@link Constants#THRESHOLD}, {@link Constants#MINGROUPSIZE}. 
+	 * Parameter are {@link Constants#THRESHOLD}, {@link Constants#MINGROUPSIZE}.
+	 * Both parameter get calculated in response to the dimensions of the image {@link Helper#setImageParameter()}. 
 	 * @param edges List of {@link FeaturePoint}
 	 * @param currentImage fastBitmap of the current screenshot.
 	 */

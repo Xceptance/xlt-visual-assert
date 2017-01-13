@@ -291,8 +291,6 @@ public class AI implements WebDriverCustomModule
 			System.out.println("Network not ready");
 			System.out.println("result: " + result);
 		}
-		// Save the network
-		an.Save(networkFile.toString(), im.getAverageMetric());
 			
 		// Save the screenshot
 		if (indentedPercentageMatch > result && !selfTest)
@@ -306,6 +304,8 @@ public class AI implements WebDriverCustomModule
 		}
 		else if (indentedPercentageMatch < result && selfTest)
 		{
+			// Save the network
+			an.Save(networkFile.toString(), im.getAverageMetric());
 			Helper.saveImage(screenshot.toBufferedImage(), trainingScreenShotFile);				
 		}
 		else
