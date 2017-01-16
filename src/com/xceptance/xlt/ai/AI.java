@@ -170,10 +170,11 @@ public class AI implements WebDriverCustomModule
         
         // Directory for the training images
         final File trainingDirectory = new File(new File(targetDirectory, RESULT_DIRECTORY_TRAINING), screenshotName);
+        final File trainingDirectory_uft = new File(trainingDirectory, RESULT_DIRECTORY_TRAINING_LEARN);
         
         // Path of the screenshot image file
         final String exactScreenshotName = Session.getCurrent().getCurrentActionName()+ "_" + Session.getCurrent().getID() + "." + Constants.FORMAT;
-        final File trainingScreenShotFile = new File(trainingDirectory, exactScreenshotName);
+        final File trainingScreenShotFile = new File(trainingDirectory_uft, exactScreenshotName);
         
         // Directory of the network file
         final File networkDirectoryPath = new File(targetDirectory, RESULT_DIRECTORY_NETWORKS);
@@ -193,8 +194,6 @@ public class AI implements WebDriverCustomModule
         {
             Thread.currentThread().interrupt();
         }
-
-        
         
         //--------------------------------------------------------------------------------
         // Make the screenshot and load the network or create a new one
@@ -227,6 +226,7 @@ public class AI implements WebDriverCustomModule
            	if (Constants.NETWORK_MODE)
            	{
            		trainingDirectory.mkdirs();
+           		trainingDirectory_uft.mkdir();
            		imgList.addAll(an.scanFolderForChanges(
            				trainingScreenShotFile.getParent(), 
            				exactScreenshotName));
@@ -241,6 +241,7 @@ public class AI implements WebDriverCustomModule
         else
         {  
         	trainingDirectory.mkdirs();
+        	trainingDirectory_uft.mkdir();
         	screenshot = new FastBitmap(takeScreenshot(webdriver), exactScreenshotName, Constants.USE_ORIGINAL_SIZE);
 
         	if (screenshot == null)
@@ -281,15 +282,15 @@ public class AI implements WebDriverCustomModule
 			
 		double result = 2.0;
 		
-//		if (!selfTest)
-		if (!Constants.NETWORK_MODE)
+		if (!selfTest)
+//		if (!Constants.NETWORK_MODE)
 		{	
 			// ensure to get the last element in the list, which is always the current screenshot
 			result = an.checkForRecognitionAsDouble(patternList.get(patternList.size() - 1).getPatternList());
 		}
 		
 		// console output
-		if (!Constants.NETWORK_MODE)
+		if (!selfTest)
 		{
 			System.out.println("Network result: " + result);
 			
@@ -301,7 +302,7 @@ public class AI implements WebDriverCustomModule
 		}
 			
 		// Save the screenshot
-		if (indentedPercentageMatch > result && !Constants.NETWORK_MODE)
+		if (indentedPercentageMatch > result && !Constants.NETWORK_MODE && !selfTest)
 		{
 			// Directory for the unrecognized images of the current test run
 			final File unrecognizedInstanceDirectory = new File(new File(targetDirectory, RESULT_DIRECTORY_UNRECOGNIZED), screenshotName);
@@ -311,18 +312,18 @@ public class AI implements WebDriverCustomModule
 			Helper.saveImage(screenshot.toBufferedImage(), unrecognizedImageFile);
 			Assert.fail("Failure during visual image assertion:");
 		}
-		else if (indentedPercentageMatch < result && Constants.NETWORK_MODE)
-		{
-			// Save the network
-			an.Save(networkFile.toString(), im.getAverageMetric());
-			Helper.saveImage(screenshot.toBufferedImage(), trainingScreenShotFile);				
-		}
-		else
+		else if (indentedPercentageMatch < result && !Constants.NETWORK_MODE && !selfTest)
 		{
 			final File recognizedInstanceDirectory = new File(new File(targetDirectory, RESULT_DIRECTORY_RECOGNIZED), screenshotName);
 			final File recognizedImageFile = new File(recognizedInstanceDirectory, exactScreenshotName);
 			recognizedInstanceDirectory.mkdirs();
-			Helper.saveImage(screenshot.toBufferedImage(), recognizedImageFile);
+			Helper.saveImage(screenshot.toBufferedImage(), recognizedImageFile);		
+		}
+		else
+		{
+			// Save the network
+			an.Save(networkFile.toString(), im.getAverageMetric());
+			Helper.saveImage(screenshot.toBufferedImage(), trainingScreenShotFile);				
 		}
     }
 

@@ -108,7 +108,6 @@ public abstract class Network implements Serializable
         internalList 			= new ArrayList<>();
         overwatchList 			= new ArrayList<>();
         selfTest 				= true;
-        trainingMode			= true;
         useColor				= Constants.USE_COLOR_FOR_COMPARISON;
         useOriginSize			= Constants.USE_ORIGINAL_SIZE;
         referenceImageHeight 	= Constants.IMAGE_HEIGHT;
@@ -151,15 +150,6 @@ public abstract class Network implements Serializable
     }
     
     /**
-     * Get the result from the network self test. 
-     * @return boolean training mode enabled or disabled
-     */
-    public boolean getModusFlag()
-    {
-    	return trainingMode;
-    }
-    
-    /**
      * Set the internal used constants. 
      */
     public void setConstants()
@@ -178,20 +168,16 @@ public abstract class Network implements Serializable
      */
     public boolean onSelfTest(double intendedPercentageMatch)
     { 
-	    if (internalList.size() > 6 && selfTest)
+	    if (internalList.size() > 3 && selfTest)
 	    {
-			Random rand = new Random();
-	
-	    	double result = 0.0;
-	    	int size = internalList.size() / 3;
-		   	for (int index = 0; index < size; ++index)
+	    	double result = 0.0;	    	
+		   	for (PatternHelper element : internalList)
 		   	{
-		   		result += layer.computeSum(internalList.get(rand.nextInt(internalList.size())).getPatternList());
+		   		result += layer.computeSum(element.getPatternList());
 		   	}	    	
-		   	if ((result / size) >= intendedPercentageMatch)
+		   	if ((result / internalList.size()) >= intendedPercentageMatch)
 	    	{
 		   		internalList.clear();
-	    		trainingMode = false;
 	    		selfTest = false;
 	    		return selfTest;
 	    	}  
@@ -321,11 +307,6 @@ public abstract class Network implements Serializable
      * Saved average metric of all seen Images.
      */
 	private Map<Integer, AverageMetric> averMet;	
-	
-	/**
-	 * Flag if the network is already trained and usable for new data or not.
-	 */
-	private boolean trainingMode;
     
 	/**
 	 * Flag if the network is already proper trained.

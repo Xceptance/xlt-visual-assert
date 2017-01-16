@@ -258,11 +258,11 @@ public class ImageTransformation
 	private void load(FastBitmap img,String path)
 	{
 		pictureList = Helper.loadAllImagesScaled_FastBitmap(path, Constants.IMAGE_HEIGHT, Constants.IMAGE_WIDTH);
+		Constants.NETWORK_MODE 	= true;
 		
 		if (!pictureList.isEmpty())
 		{			
-			Helper.setImageParameter();
-			Constants.NETWORK_MODE 		= true;
+			Helper.setImageParameter();			
 			pictureList.add(img);			
 		}
 		else
