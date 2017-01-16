@@ -49,24 +49,27 @@ public class AI implements WebDriverCustomModule
     private final String RESULT_DIRECTORY = "results" + File.separator + "ai";
 
     // subdirectories
-    private final String RESULT_DIRECTORY_TRAINING 		= "training";
-    private final String RESULT_DIRECTORY_NETWORKS 		= "networks";
-    private final String RESULT_DIRECTORY_UNRECOGNIZED 	= "unrecognized";
-    private final String RESULT_DIRECTORY_RECOGNIZED 	= "recognized";
+    private final String RESULT_DIRECTORY_TRAINING 				= "training";
+    private final String RESULT_DIRECTORY_TRAINING_LEARN 		= "used for training";
+    private final String RESULT_DIRECTORY_TRAINING_VALIDATE 	= "used for validation";
+    private final String RESULT_DIRECTORY_NETWORKS 				= "networks";
+    private final String RESULT_DIRECTORY_UNRECOGNIZED 			= "unrecognized";
+    private final String RESULT_DIRECTORY_RECOGNIZED 			= "recognized";
 
     // the property names
-    public final String PROPERTY_ENABLED = PREFIX + "enabled";
-    public final String PROPERTY_RESULT_DIRECTORY = PREFIX + "resultDirectory";
-    public final String PROPERTY_ID = PREFIX + "ID";
-    public final String PROPERTY_WAITING_TIME = PREFIX + "waitingTime";
-    public final String PROPERTY_USE_ORIGINAL_SIZE = PREFIX + "USE_ORIGINAL_SIZE";
-    public final String PROPERTY_USE_COLOR_FOR_COMPARISON = PREFIX + "USE_COLOR_FOR_COMPARISON";
-    public final String PROPERTY_LEARNING_RATE = PREFIX + "LEARNING_RATE"; 
-    public final String PROPERTY_INTENDED_PERCENTAGE_MATCH = PREFIX + "INTENDED_PERCENTAGE_MATCH";
-    public final String PROPERTY_PERCENTAGE_DIFFERENCE = PREFIX + "PERCENTAGE_DIFFERENCE";
-    public final String PROPERTY_IMAGE_HEIGHT = PREFIX + "IMAGE_HEIGHT";
-    public final String PROPERTY_IMAGE_WIDTH = PREFIX + "IMAGE_WIDTH";
-    public final String PROPERTY_FORMAT = PREFIX + "FORMAT";
+    public final String PROPERTY_ENABLED 					= PREFIX + "enabled";
+    public final String PROPERTY_RESULT_DIRECTORY 			= PREFIX + "resultDirectory";
+    public final String PROPERTY_ID 						= PREFIX + "ID";
+    public final String PROPERTY_MODE						= PREFIX + "TRAINING";
+    public final String PROPERTY_WAITING_TIME 				= PREFIX + "WAITINGTIME";
+    public final String PROPERTY_USE_ORIGINAL_SIZE 			= PREFIX + "USE_ORIGINAL_SIZE";
+    public final String PROPERTY_USE_COLOR_FOR_COMPARISON 	= PREFIX + "USE_COLOR_FOR_COMPARISON";
+    public final String PROPERTY_LEARNING_RATE 				= PREFIX + "LEARNING_RATE"; 
+    public final String PROPERTY_INTENDED_PERCENTAGE_MATCH 	= PREFIX + "INTENDED_PERCENTAGE_MATCH";
+    public final String PROPERTY_PERCENTAGE_DIFFERENCE 		= PREFIX + "PERCENTAGE_DIFFERENCE";
+    public final String PROPERTY_IMAGE_HEIGHT 				= PREFIX + "IMAGE_HEIGHT";
+    public final String PROPERTY_IMAGE_WIDTH 				= PREFIX + "IMAGE_WIDTH";
+    public final String PROPERTY_FORMAT 					= PREFIX + "FORMAT";
 
     @Override
     public void execute(final WebDriver webdriver, final String... arguments)
@@ -93,6 +96,7 @@ public class AI implements WebDriverCustomModule
         final int waitTime = props.getProperty(PROPERTY_WAITING_TIME, Constants.WAITINGTIME);
         final int percentageDifferenceValue = props.getProperty(PROPERTY_PERCENTAGE_DIFFERENCE, Constants.PERCENTAGE_DIFFERENCE);
         
+        Constants.NETWORK_MODE				= props.getProperty(PROPERTY_MODE, Constants.NETWORK_MODE);
         Constants.IMAGE_HEIGHT 				= props.getProperty(PROPERTY_IMAGE_HEIGHT, Constants.IMAGE_HEIGHT);
         Constants.IMAGE_WIDTH 				= props.getProperty(PROPERTY_IMAGE_WIDTH, Constants.IMAGE_WIDTH);
         Constants.FORMAT 					= props.getProperty(PROPERTY_FORMAT, Constants.FORMAT);        
@@ -137,7 +141,7 @@ public class AI implements WebDriverCustomModule
                 
         targetDirectory.mkdirs();
 
-        // Retrieve current index counter for the image file names
+        // Retrieve current index counter for the image file names, only used internal
         Integer index = indexCounter.get();
         if (index == null)
         {
@@ -155,7 +159,7 @@ public class AI implements WebDriverCustomModule
         // Name of the image file for the screenshot
         if (arguments[0] == null)
         {
-        	screenshotName = String.format("%03d", index) + "-" + currentActionName;
+        	screenshotName = currentActionName;
         }
         else
         {
@@ -163,12 +167,12 @@ public class AI implements WebDriverCustomModule
         	screenshotName = Helper.checkFolderForMatch(targetDirectory + File.separator + RESULT_DIRECTORY_TRAINING, currentActionName) + currentActionName;
         	Session.getCurrent().setID(Session.getCurrent().getID() + index );
         }
-
+        
         // Directory for the training images
         final File trainingDirectory = new File(new File(targetDirectory, RESULT_DIRECTORY_TRAINING), screenshotName);
         
         // Path of the screenshot image file
-        final String exactScreenshotName = Session.getCurrent().getCurrentActionName() + Session.getCurrent().getID() + "." + Constants.FORMAT;
+        final String exactScreenshotName = Session.getCurrent().getCurrentActionName()+ "_" + Session.getCurrent().getID() + "." + Constants.FORMAT;
         final File trainingScreenShotFile = new File(trainingDirectory, exactScreenshotName);
         
         // Directory of the network file
@@ -190,11 +194,13 @@ public class AI implements WebDriverCustomModule
             Thread.currentThread().interrupt();
         }
 
+        
+        
         //--------------------------------------------------------------------------------
         // Make the screenshot and load the network or create a new one
         //--------------------------------------------------------------------------------
         
-        // initialization 
+        // initialization         
         final FastBitmap screenshot;
         ActivationNetwork an = new ActivationNetwork(new BipolarSigmoidFunction(), 1); 
         ImageTransformation im;
@@ -218,7 +224,7 @@ public class AI implements WebDriverCustomModule
             // if the network is not done with training check the training folder for changes 
             // if there are changes, all unknwon images get loaded
            	imgList.add(screenshot);
-           	if (an.getModusFlag())
+           	if (Constants.NETWORK_MODE)
            	{
            		trainingDirectory.mkdirs();
            		imgList.addAll(an.scanFolderForChanges(
@@ -229,7 +235,7 @@ public class AI implements WebDriverCustomModule
             im = new ImageTransformation(
                		imgList,                		
                		an.getAverageMetric(), 
-               		an.getModusFlag());                
+               		Constants.NETWORK_MODE);                
             imgList = null;
         }
         else
@@ -262,7 +268,7 @@ public class AI implements WebDriverCustomModule
     	PerceptronLearning pl = new PerceptronLearning(an, learningRate);
     	pl.setLearningRate(learningRate);	
     	
-    	if (an.getModusFlag())
+    	if (Constants.NETWORK_MODE)
     	{
 			for (PatternHelper pattern : patternList)
 			{
@@ -275,14 +281,15 @@ public class AI implements WebDriverCustomModule
 			
 		double result = 2.0;
 		
-		if (!selfTest)
+//		if (!selfTest)
+		if (!Constants.NETWORK_MODE)
 		{	
 			// ensure to get the last element in the list, which is always the current screenshot
 			result = an.checkForRecognitionAsDouble(patternList.get(patternList.size() - 1).getPatternList());
 		}
 		
 		// console output
-		if (!selfTest)
+		if (!Constants.NETWORK_MODE)
 		{
 			System.out.println("Network result: " + result);
 			
@@ -294,7 +301,7 @@ public class AI implements WebDriverCustomModule
 		}
 			
 		// Save the screenshot
-		if (indentedPercentageMatch > result && !selfTest)
+		if (indentedPercentageMatch > result && !Constants.NETWORK_MODE)
 		{
 			// Directory for the unrecognized images of the current test run
 			final File unrecognizedInstanceDirectory = new File(new File(targetDirectory, RESULT_DIRECTORY_UNRECOGNIZED), screenshotName);
@@ -304,7 +311,7 @@ public class AI implements WebDriverCustomModule
 			Helper.saveImage(screenshot.toBufferedImage(), unrecognizedImageFile);
 			Assert.fail("Failure during visual image assertion:");
 		}
-		else if (indentedPercentageMatch < result && selfTest)
+		else if (indentedPercentageMatch < result && Constants.NETWORK_MODE)
 		{
 			// Save the network
 			an.Save(networkFile.toString(), im.getAverageMetric());

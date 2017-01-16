@@ -6,6 +6,8 @@ package com.xceptance.xlt.ai.util;
  */
 public class Constants 
 {
+	// State of the network to work in training or in classification mode.
+	public static boolean NETWORK_MODE = true;
 	// Desired percentage value for the self test, until this barrier is confirmed the network will 
 	// still learn (use several images which where already seen)
 	public static String INTENDED_PERCENTAGE_MATCH = "0.80";

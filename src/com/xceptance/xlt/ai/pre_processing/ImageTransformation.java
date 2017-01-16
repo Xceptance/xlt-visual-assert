@@ -40,7 +40,7 @@ public class ImageTransformation
 	{		
 		maxSize 			= 0;
 		averMet 			= averageMet;
-		this.trainingFlag 	= trainingFlag;
+		this.trainingFlag 	= trainingFlag;				
 		pp = new ArrayList<>();
 		process(imgList);
 		applyTransformation(); 
@@ -235,7 +235,7 @@ public class ImageTransformation
 		List<FeaturePoint> tempList = null;
 		for (FastBitmap element : pictureList)
 		{
-			//long startTime = System.nanoTime();
+			long startTime = System.nanoTime();
 			// convolution take too much time and is therefore disabled, improve the performance up to 3 times
 			// but also decrease accuracy 
 			//conv.applyInPlace(element);			
@@ -244,8 +244,8 @@ public class ImageTransformation
 			// sorting with the comparator set in FeaturePoints, sorting order is ascending x and y values
 			Collections.sort(tempList, new FeaturePoint());			
 			pp.add(new PreProcessing(tempList, element));			
-			//long estimatedTime = System.nanoTime() - startTime;
-			//System.out.println((double)estimatedTime / 1000000000.0);
+			long estimatedTime = System.nanoTime() - startTime;
+			System.out.println((double)estimatedTime / 1000000000.0);
 		}	
 	}
 
@@ -262,11 +262,12 @@ public class ImageTransformation
 		if (!pictureList.isEmpty())
 		{			
 			Helper.setImageParameter();
-			pictureList.add(img);
+			Constants.NETWORK_MODE 		= true;
+			pictureList.add(img);			
 		}
 		else
-		{
-			ArrayList<FastBitmap> temp = new ArrayList<>();
+		{			
+			ArrayList<FastBitmap> temp 	= new ArrayList<>();
 			temp.add(img);
 			process(temp);
 		}
