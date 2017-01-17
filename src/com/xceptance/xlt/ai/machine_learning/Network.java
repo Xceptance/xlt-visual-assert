@@ -31,7 +31,6 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Random;
 
 import com.xceptance.xlt.ai.image.AverageMetric;
 import com.xceptance.xlt.ai.image.FastBitmap;
@@ -166,16 +165,24 @@ public abstract class Network implements Serializable
      * @param intendedPercentageMatch Destination value which should the network reach in comparison. 
      * @return selfTest Boolean flag for training or not.
      */
-    public boolean onSelfTest(double intendedPercentageMatch)
+    public boolean onSelfTest(double intendedPercentageMatch, String validationFolder)
     { 
-	    if (internalList.size() > 3 && selfTest)
+	    if (internalList.size() > 2 && selfTest)
 	    {
-	    	double result = 0.0;	    	
+	    	double resultVerfication = 0.0;	    	
 		   	for (PatternHelper element : internalList)
 		   	{
-		   		result += layer.computeSum(element.getPatternList());
-		   	}	    	
-		   	if ((result / internalList.size()) >= intendedPercentageMatch)
+		   		resultVerfication += layer.computeSum(element.getPatternList());
+		   	}	
+		   	
+		   	ArrayList<FastBitmap> validationList = scanFolderForChanges(validationFolder);
+		   	
+		   	if (!validationList.isEmpty())
+		   	{
+		   		double resultValidation = 0.0;
+		   	}
+		   	
+		   	if ((resultVerfication / internalList.size()) >= intendedPercentageMatch)
 	    	{
 		   		internalList.clear();
 	    		selfTest = false;
@@ -214,6 +221,20 @@ public abstract class Network implements Serializable
 		overwatchList.add(screenshotName.hashCode());
 		overwatchList.addAll(tempList);
 		
+    	return result;
+    }
+    
+    public ArrayList<FastBitmap> scanFolderForChanges(String path)
+    {
+    	ArrayList<FastBitmap> result = new ArrayList<>();    	
+    	File test = new File(path);
+		File[] list = test.listFiles(Helper.IMAGE_FILTER);
+		
+		for (File element : list)
+		{
+			result.add(Helper.loadImageScaled_FastBitmap(element.getAbsolutePath(), Constants.IMAGE_HEIGHT, Constants.IMAGE_WIDTH));
+
+		}	
     	return result;
     }
     

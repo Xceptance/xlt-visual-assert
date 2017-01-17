@@ -5,9 +5,13 @@ package com.xceptance.xlt.ai.util;
  * @author Thomas Volkmann 
  */
 public class Constants 
-{
+{	
 	// State of the network to work in training or in classification mode.
 	public static boolean NETWORK_MODE = true;
+	// Determine if the name of the current test case is used for folder creation or not.
+	public static boolean TESTCASE_BOUND = true;
+	// Name of the not attached network folder.
+	public static String TESTCASE_BOUND_NAME = "unbound";
 	// Desired percentage value for the self test, until this barrier is confirmed the network will 
 	// still learn (use several images which where already seen)
 	public static String INTENDED_PERCENTAGE_MATCH = "0.80";

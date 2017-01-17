@@ -56,10 +56,12 @@ public class AI implements WebDriverCustomModule
     private final String RESULT_DIRECTORY_UNRECOGNIZED 			= "unrecognized";
     private final String RESULT_DIRECTORY_RECOGNIZED 			= "recognized";
 
-    // the property names
+    // the property names        
     public final String PROPERTY_ENABLED 					= PREFIX + "enabled";
     public final String PROPERTY_RESULT_DIRECTORY 			= PREFIX + "resultDirectory";
     public final String PROPERTY_ID 						= PREFIX + "ID";
+    public final String PROPERTY_TESTCASE_BOUND				= PREFIX + "TESTCASE_BOUND";
+    public final String PROPERTY_TESTCASE_NAME				= PREFIX + "TESTCASE_NAME";
     public final String PROPERTY_MODE						= PREFIX + "TRAINING";
     public final String PROPERTY_WAITING_TIME 				= PREFIX + "WAITINGTIME";
     public final String PROPERTY_USE_ORIGINAL_SIZE 			= PREFIX + "USE_ORIGINAL_SIZE";
@@ -96,6 +98,8 @@ public class AI implements WebDriverCustomModule
         final int waitTime = props.getProperty(PROPERTY_WAITING_TIME, Constants.WAITINGTIME);
         final int percentageDifferenceValue = props.getProperty(PROPERTY_PERCENTAGE_DIFFERENCE, Constants.PERCENTAGE_DIFFERENCE);
         
+        Constants.TESTCASE_BOUND_NAME		= props.getProperty(PROPERTY_TESTCASE_NAME, Constants.TESTCASE_BOUND_NAME);
+        Constants.TESTCASE_BOUND			= props.getProperty(PROPERTY_TESTCASE_BOUND, Constants.TESTCASE_BOUND);
         Constants.NETWORK_MODE				= props.getProperty(PROPERTY_MODE, Constants.NETWORK_MODE);
         Constants.IMAGE_HEIGHT 				= props.getProperty(PROPERTY_IMAGE_HEIGHT, Constants.IMAGE_HEIGHT);
         Constants.IMAGE_WIDTH 				= props.getProperty(PROPERTY_IMAGE_WIDTH, Constants.IMAGE_WIDTH);
@@ -114,7 +118,15 @@ public class AI implements WebDriverCustomModule
         //--------------------------------------------------------------------------------
 
         // Get the name of the test case for the correct folder identifier
-        final String currentTestCaseName = Session.getCurrent().getUserName();
+        final String currentTestCaseName;
+        if (Constants.TESTCASE_BOUND)
+        {
+        	currentTestCaseName = Session.getCurrent().getUserName();
+        }
+        else
+        {
+        	currentTestCaseName = Constants.TESTCASE_BOUND_NAME;
+        }
 
         // Get browser name and browser version for the subfolders
         final String browserName = getBrowserName(webdriver);
@@ -171,6 +183,7 @@ public class AI implements WebDriverCustomModule
         // Directory for the training images
         final File trainingDirectory = new File(new File(targetDirectory, RESULT_DIRECTORY_TRAINING), screenshotName);
         final File trainingDirectory_uft = new File(trainingDirectory, RESULT_DIRECTORY_TRAINING_LEARN);
+        final File trainingDirectory_val = new File(trainingDirectory, RESULT_DIRECTORY_TRAINING_VALIDATE);
         
         // Path of the screenshot image file
         final String exactScreenshotName = Session.getCurrent().getCurrentActionName()+ "_" + Session.getCurrent().getID() + "." + Constants.FORMAT;
@@ -227,6 +240,7 @@ public class AI implements WebDriverCustomModule
            	{
            		trainingDirectory.mkdirs();
            		trainingDirectory_uft.mkdir();
+           		trainingDirectory_val.mkdir();
            		imgList.addAll(an.scanFolderForChanges(
            				trainingScreenShotFile.getParent(), 
            				exactScreenshotName));
@@ -242,6 +256,7 @@ public class AI implements WebDriverCustomModule
         {  
         	trainingDirectory.mkdirs();
         	trainingDirectory_uft.mkdir();
+        	trainingDirectory_val.mkdir();
         	screenshot = new FastBitmap(takeScreenshot(webdriver), exactScreenshotName, Constants.USE_ORIGINAL_SIZE);
 
         	if (screenshot == null)
@@ -278,7 +293,7 @@ public class AI implements WebDriverCustomModule
     	}
     	// test the corresponding network the new and all therefore seen pattern
     	// if the self test is correct there is no further training necessary
-		boolean selfTest = an.onSelfTest(indentedPercentageMatch);
+		boolean selfTest = an.onSelfTest(indentedPercentageMatch, trainingDirectory_val.getPath());
 			
 		double result = 2.0;
 		

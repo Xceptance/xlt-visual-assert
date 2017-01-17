@@ -291,11 +291,11 @@ public class ImageTransformation
 		else
 		{
 			for (FastBitmap img : imgList)
-			{
+			{				
 				pictureList.add(Helper.imageToFastImageScaled(img.toBufferedImage(), img.getTagName()));
 			}
 		}		
-		Helper.setImageParameter();
+		
 		recognizeFlag = false;	
 	}
 	
