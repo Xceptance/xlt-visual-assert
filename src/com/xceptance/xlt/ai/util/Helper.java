@@ -148,14 +148,14 @@ public class Helper
 	{
 		int width = Constants.IMAGE_WIDTH;
 		int height = Constants.IMAGE_HEIGHT;
-		
-		Image tmp = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-	    BufferedImage resizedBI = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-	    Graphics2D g2d = resizedBI.createGraphics();
-	    g2d.drawImage(tmp, 0, 0, null);
-	    g2d.dispose();
-	    
-		FastBitmap fi = new FastBitmap(resizedBI, tagName, Constants.USE_ORIGINAL_SIZE); 
+//		
+//		Image tmp = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+//	    BufferedImage resizedBI = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+//	    Graphics2D g2d = resizedBI.createGraphics();
+//	    g2d.drawImage(tmp, 0, 0, null);
+//	    g2d.dispose();
+//	    
+		FastBitmap fi = new FastBitmap(imageToBufferedImage(img, BufferedImage.TYPE_INT_RGB), tagName, Constants.USE_ORIGINAL_SIZE); 
 		return fi;
 	}
 	
@@ -339,7 +339,7 @@ public class Helper
 			for (File element : list)
 			{
 				BufferedImage tempimage = loadImage(path + File.separator + element.getName());
-				pictureList.add(new FastBitmap(imageToBufferedImageScaled(tempimage, 1, heigth, width), element.getName(), Constants.USE_ORIGINAL_SIZE));				
+				pictureList.add(new FastBitmap(tempimage, element.getName(), Constants.USE_ORIGINAL_SIZE));
 			}
 		}
 		return pictureList;

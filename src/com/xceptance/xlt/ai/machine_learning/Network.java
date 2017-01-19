@@ -172,16 +172,16 @@ public abstract class Network implements Serializable
 	    	double resultVerfication = 0.0;	    	
 		   	for (PatternHelper element : internalList)
 		   	{
-		   		resultVerfication += layer.computeSum(element.getPatternList());
+		   		resultVerfication += layer.computeSum(element.getPatternList());		   		
 		   	}	
 		   	
-		   	ArrayList<FastBitmap> validationList = scanFolderForChanges(validationFolder);
-		   	
-		   	if (!validationList.isEmpty())
-		   	{
-		   		double resultValidation = 0.0;
-		   	}
-		   	
+//		   	ArrayList<FastBitmap> validationList = scanFolderForChanges(validationFolder);
+//		   	
+//		   	if (!validationList.isEmpty())
+//		   	{
+//		   		double resultValidation = 0.0;
+//		   	}
+		   	System.out.println("Selftest Value: " + (resultVerfication / internalList.size()));
 		   	if ((resultVerfication / internalList.size()) >= intendedPercentageMatch)
 	    	{
 		   		internalList.clear();

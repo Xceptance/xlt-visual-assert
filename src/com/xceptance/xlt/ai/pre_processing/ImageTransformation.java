@@ -1,5 +1,6 @@
 package com.xceptance.xlt.ai.pre_processing;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,8 +31,8 @@ import com.xceptance.xlt.ai.util.Helper;
 public class ImageTransformation 
 {
 	/***
-	 * Constructor for first initialization, in this case the program is run for the first time.
-	 * Load the images out of a folder and start the analyze with {@link #applyTransformation()}
+	 * Constructor if there already is a network which can be used for further learning or comparison. 
+	 * If the trainingFlag is on false there is just a comparison to the already learned average metric.
 	 * @param imgList ArrayList of FastBitmap with all found images.
 	 * @param averageMet Loaded {@link AverageMetric} from the network.
 	 * @param trainingFlag boolean value if the network need further training or not.
@@ -47,9 +48,8 @@ public class ImageTransformation
 	}
 	
 	/***
-	 * Constructor if there already is a network which can be used for further learning or comparison.
+	 * Constructor for first initialization, in this case the program is run for the first time.
 	 * Load the images out of a folder and start the analyze with {@link #applyTransformation()}
-	 * If the flag is on false there is just a comparison to the already learned average metric.
 	 * @param img FastBitmap the current screenshot.
 	 * @param path String to the folder.
 	 */
@@ -60,6 +60,22 @@ public class ImageTransformation
 		trainingFlag		= true;
 		pp = new ArrayList<>();
 		load(img, path);
+		applyTransformation();
+	}
+	
+	/***
+	 * Constructor for networkTrainer tool.
+	 * Load the images out of a folder and start the analyze with {@link #applyTransformation()}
+	 * @param img FastBitmap the current screenshot.
+	 * @param path String to the folder.
+	 */
+	public ImageTransformation(String path)
+	{
+		averMet 			= new HashMap<Integer, AverageMetric>();
+		maxSize 			= 0;
+		trainingFlag		= true;
+		pp = new ArrayList<>();
+		load(path);
 		applyTransformation();
 	}
 	
@@ -233,6 +249,7 @@ public class ImageTransformation
 		FastCornersDetector fcd = new FastCornersDetector(Algorithm.FAST_9);		
 		fcd.setSuppression(false);
 		List<FeaturePoint> tempList = null;
+		int index = 0;
 		for (FastBitmap element : pictureList)
 		{
 			long startTime = System.nanoTime();
@@ -245,8 +262,10 @@ public class ImageTransformation
 			Collections.sort(tempList, new FeaturePoint());			
 			pp.add(new PreProcessing(tempList, element));			
 			long estimatedTime = System.nanoTime() - startTime;
-			System.out.println((double)estimatedTime / 1000000000.0);
+			System.out.println("Image " + index + " finshed in: " + (double)estimatedTime / 1000000000.0 + " from " + pictureList.size());
+			index++;
 		}	
+		System.out.println("");
 	}
 
 	
@@ -269,6 +288,28 @@ public class ImageTransformation
 		{			
 			ArrayList<FastBitmap> temp 	= new ArrayList<>();
 			temp.add(img);
+			process(temp);
+		}
+		recognizeFlag = false;	
+	}
+	
+	/***
+	 * Load all images out of a given folder path.
+	 * @param img FastBitmap current screenshot.
+	 * @param path String full path name to folder.
+	 */
+	private void load(String path)
+	{
+		pictureList = Helper.loadAllImagesScaled_FastBitmap(path, Constants.IMAGE_HEIGHT, Constants.IMAGE_WIDTH);
+		Constants.NETWORK_MODE 	= true;
+		
+		if (!pictureList.isEmpty())
+		{			
+			Helper.setImageParameter();							
+		}
+		else
+		{			
+			ArrayList<FastBitmap> temp 	= new ArrayList<>();
 			process(temp);
 		}
 		recognizeFlag = false;	
