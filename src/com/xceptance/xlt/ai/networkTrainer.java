@@ -1,7 +1,12 @@
 package com.xceptance.xlt.ai;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Properties;
+
+import javax.tools.FileObject;
 
 import com.xceptance.xlt.ai.image.PatternHelper;
 import com.xceptance.xlt.ai.machine_learning.ActivationNetwork;
@@ -35,6 +40,7 @@ public class networkTrainer
 		final String PROPERTY_FORMAT 					= PREFIX + "FORMAT";
 		
 		final XltProperties props = XltProperties.getInstance();
+
 	    // check if we have to do anything?
 	    final boolean enabled = props.getProperty(PROPERTY_ENABLED, true);
 	    if (!enabled)
@@ -68,22 +74,15 @@ public class networkTrainer
         // Directory of the network file
         final File networkDirectoryPath = new File(PROPERTY_RESULT_DIRECTORY, "");
         networkDirectoryPath.mkdirs();
-        // Path of the network file
         
+        // Path to working folder
         if (args.length == 0)
         {
         	System.out.println("No directory path was given as Parameter 1");        	   
         	return;
         }
         
-        if (args.length == 2)
-       	{
-       		networkName = args[1];
-       	}
-       	else
-       	{
-       		networkName = "unnamed";
-       	}
+        networkName = (args.length == 2 ? args[1] : "unnamed");
         
         final File networkFile = new File(networkDirectoryPath, networkName);
 
@@ -104,7 +103,7 @@ public class networkTrainer
 			pl.Run(pattern.getPatternList());
 		}
     	
-    	an.onSelfTest(indentedPercentageMatch, "");	
+    	an.onSelfTest(indentedPercentageMatch, new ArrayList<PatternHelper>(), true);	
 		an.Save(networkFile.toString(), im.getAverageMetric());
 	}
 }

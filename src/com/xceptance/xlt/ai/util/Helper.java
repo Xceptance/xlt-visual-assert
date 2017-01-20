@@ -146,15 +146,6 @@ public class Helper
 	 */
 	public static FastBitmap imageToFastImageScaled(Image img, String tagName) 
 	{
-		int width = Constants.IMAGE_WIDTH;
-		int height = Constants.IMAGE_HEIGHT;
-//		
-//		Image tmp = img.getScaledInstance(width, height, Image.SCALE_SMOOTH);
-//	    BufferedImage resizedBI = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-//	    Graphics2D g2d = resizedBI.createGraphics();
-//	    g2d.drawImage(tmp, 0, 0, null);
-//	    g2d.dispose();
-//	    
 		FastBitmap fi = new FastBitmap(imageToBufferedImage(img, BufferedImage.TYPE_INT_RGB), tagName, Constants.USE_ORIGINAL_SIZE); 
 		return fi;
 	}
@@ -425,6 +416,41 @@ public class Helper
 		}		
     	return result;
     }
+
+    /**
+     * Progress bar which is used to visualize the progress for the command line tool.
+     * Does not work properly in eclipse. 
+     * @param progress Double value of the current progress.
+     */
+	public static void updatePercentageBar(double progress) 
+	{		
+	    int percent = (int) Math.round(progress * 100);
+	    if (Math.abs(percent - lastPercent) >= 1) 
+	    {	    	
+	        StringBuilder template = new StringBuilder("\r[");
+	        for (int i = 0; i < 50; i++) 
+	        {
+	            if (i < percent * .5) 
+	            {
+	                template.append("=");
+	            } 
+	            else if (i == percent * .5) 
+	            {
+	                template.append(">");
+	            } 
+	            else 
+	            {
+	                template.append(" ");
+	            }
+	        }
+	        template.append("] %s   ");
+	        if (percent >= 100) {
+	            template.append("%n");
+	        }
+	        System.out.printf(template.toString(), percent + "%");
+	        lastPercent = percent;
+	    }
+	}
 	
 	/***
 	 * Convert a BufferedImage to a 2D double array.
@@ -491,4 +517,6 @@ public class Helper
 	      }
 	      return result;
 	}
+	
+	private static int lastPercent;
 }

@@ -1,6 +1,5 @@
 package com.xceptance.xlt.ai.pre_processing;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -249,10 +248,10 @@ public class ImageTransformation
 		FastCornersDetector fcd = new FastCornersDetector(Algorithm.FAST_9);		
 		fcd.setSuppression(false);
 		List<FeaturePoint> tempList = null;
-		int index = 0;
+		int index = 1;
 		for (FastBitmap element : pictureList)
 		{
-			long startTime = System.nanoTime();
+			//long startTime = System.nanoTime();
 			// convolution take too much time and is therefore disabled, improve the performance up to 3 times
 			// but also decrease accuracy 
 			//conv.applyInPlace(element);			
@@ -261,13 +260,13 @@ public class ImageTransformation
 			// sorting with the comparator set in FeaturePoints, sorting order is ascending x and y values
 			Collections.sort(tempList, new FeaturePoint());			
 			pp.add(new PreProcessing(tempList, element));			
-			long estimatedTime = System.nanoTime() - startTime;
-			System.out.println("Image " + index + " finshed in: " + (double)estimatedTime / 1000000000.0 + " from " + pictureList.size());
+			//long estimatedTime = System.nanoTime() - startTime;
+			//System.out.println("Image " + index + " finshed in: " + (double)estimatedTime / 1000000000.0 + " from " + pictureList.size());
+			Helper.updatePercentageBar( (double)index / (double)pictureList.size() );
 			index++;
 		}	
 		System.out.println("");
 	}
-
 	
 	/***
 	 * Load all images out of a given folder path and the current screenshot.

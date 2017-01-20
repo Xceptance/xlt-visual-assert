@@ -226,10 +226,10 @@ public class AI implements WebDriverCustomModule
            	ArrayList<FastBitmap> imgList = new ArrayList<>();   
             screenshot = new FastBitmap(takeScreenshot(webdriver), exactScreenshotName, Constants.USE_ORIGINAL_SIZE);
             
+        	// TODO Has this to be handled in a different way?
+            // webdriver cannot take the screenshot -> RETURN
             if (screenshot == null)
             {
-            	// TODO Has this to be handled in a different way?
-                // webdriver cannot take the screenshot -> RETURN
                 return;
             }
            	
@@ -259,10 +259,10 @@ public class AI implements WebDriverCustomModule
         	trainingDirectory_val.mkdir();
         	screenshot = new FastBitmap(takeScreenshot(webdriver), exactScreenshotName, Constants.USE_ORIGINAL_SIZE);
 
+    		// TODO Has this to be handled in a different way?
+    		// webdriver cannot take the screenshot -> RETURN
         	if (screenshot == null)
         	{
-        		// TODO Has this to be handled in a different way?
-        		// webdriver cannot take the screenshot -> RETURN
         		return;
         	}         	
         	
@@ -291,14 +291,24 @@ public class AI implements WebDriverCustomModule
 				pl.Run(pattern.getPatternList());
 			}
     	}
+    	
     	// test the corresponding network the new and all therefore seen pattern
     	// if the self test is correct there is no further training necessary
-		boolean selfTest = an.onSelfTest(indentedPercentageMatch, trainingDirectory_val.getPath());
+    	
+	   	
+    	ArrayList<FastBitmap> validationList = an.scanFolderForChanges(trainingDirectory_val.toString());		   	
+    	ArrayList<PatternHelper> validationPatternList = new ArrayList<>();
+		if (!validationList.isEmpty())
+		{
+			ImageTransformation imt = new ImageTransformation(validationList, an.getAverageMetric(), false);
+			validationPatternList = imt.computeAverageMetric(percentageDifferenceValue);
+		}	
+    	
+		boolean selfTest = an.onSelfTest(indentedPercentageMatch, validationPatternList, Constants.NETWORK_MODE);
 			
 		double result = 2.0;
-		
-		if (!selfTest)
-//		if (!Constants.NETWORK_MODE)
+
+		if (!Constants.NETWORK_MODE && !selfTest)
 		{	
 			// ensure to get the last element in the list, which is always the current screenshot
 			result = an.checkForRecognitionAsDouble(patternList.get(patternList.size() - 1).getPatternList());
