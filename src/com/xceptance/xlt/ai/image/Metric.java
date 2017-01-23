@@ -32,7 +32,6 @@ public class Metric implements Serializable, Comparable<Metric>
 		boundingBox 	= new ArrayList<>();
 		centerOfGravity = new FloatPoint();
 		coordOrigin		= new IntPoint(0,0);
-		histo			= null;	
 		imageStat		= null;		
 		startMetricCalculation(group, image);
 	}
@@ -183,11 +182,6 @@ public class Metric implements Serializable, Comparable<Metric>
 	 */
 	private ImageStatistics imageStat;	
 	
-	/***
-	 * Holds the histogram informations from the region created by the bounding box.
-	 */
-	public final ImageStatistics histo;
-
 	/***
 	 * Metric comparison in reference to another metric with groupSize.
 	 */

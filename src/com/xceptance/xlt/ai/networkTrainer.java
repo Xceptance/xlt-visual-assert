@@ -65,7 +65,7 @@ public class networkTrainer
 			pl.Run(pattern.getPatternList());
 		}
     	
-    	an.onSelfTest(Constants.INTENDED_PERCENTAGE_MATCH, new ArrayList<PatternHelper>(), true);	
+    	an.onSelfTest(new ArrayList<PatternHelper>(), true);	
 		an.Save(networkFile.toString(), im.getAverageMetric());
 	}
 }

@@ -20,7 +20,7 @@ public class Constants
 	public static boolean USE_COLOR_FOR_COMPARISON = false;
 	// Parameter for enabling down scaling from screenshots or not, this can drastically change 
 	// the performance of the algorithm
-	public static boolean USE_ORIGINAL_SIZE = false;
+	public static boolean USE_ORIGINAL_SIZE = true;
 	// Fixed Size for the histogram creation in Metric
 	public static final int BINSIZE = 10;
 	// Distance from current point for grouping

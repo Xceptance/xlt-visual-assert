@@ -417,7 +417,7 @@ public class Helper
 			for (File element : list)
 			{
 				BufferedImage tempimage = loadImage(path + File.separator + element.getName());
-				pictureList.add(imageToBufferedImageScaled(tempimage, 1, heigth, width));
+				pictureList.add(imageToBufferedImageScaled(tempimage, BufferedImage.TYPE_INT_RGB, heigth, width));
 			}
 		}
 		return pictureList;

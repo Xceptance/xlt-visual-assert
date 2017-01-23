@@ -155,7 +155,7 @@ public class FastBitmap
         	this.bufferedImage 	= dimg;
     	}
     	else
-    	{
+    	{    		
     		this.bufferedImage = bufferedImage;
     	}
         prepare();

@@ -165,7 +165,7 @@ public abstract class Network implements Serializable
      * @param intendedPercentageMatch Destination value which should the network reach in comparison. 
      * @return selfTest Boolean flag for training or not.
      */
-    public boolean onSelfTest(double intendedPercentageMatch, ArrayList<PatternHelper> validationList, boolean flag)
+    public boolean onSelfTest(ArrayList<PatternHelper> validationList, Boolean flag)
     { 
 	    if (internalList.size() > 2 && flag)
 	    {
@@ -179,13 +179,14 @@ public abstract class Network implements Serializable
 		   	for (PatternHelper element : validationList)
 		   	{
 		   		resultValidation += layer.computeSum(element.getPatternList());		   		
-		   	}		   		
-		  			   	
+		   	}	   		
 		   	System.out.println("Selftest Value training dir: " + (resultVerfication / internalList.size()));
 		   	System.out.println("Selftest Value Validation dir: " + (resultValidation / internalList.size()));
+
+		   	int validationSize = (validationList.size() != 0 ? validationList.size() : 1);
 		   	
-		   	if ((resultVerfication / internalList.size()) >= intendedPercentageMatch &&
-		   		 resultValidation  / validationList.size() < intendedPercentageMatch)
+		   	if ((resultVerfication / internalList.size()) >= Constants.INTENDED_PERCENTAGE_MATCH &&
+		   		 resultValidation  / validationSize < Constants.INTENDED_PERCENTAGE_MATCH)
 	    	{
 		   		internalList.clear();
 	    		selfTest = false;

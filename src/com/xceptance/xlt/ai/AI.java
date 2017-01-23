@@ -106,12 +106,8 @@ public class AI implements WebDriverCustomModule
         Constants.FORMAT 					= props.getProperty(PROPERTY_FORMAT, Constants.FORMAT);        
         Constants.USE_ORIGINAL_SIZE 		= props.getProperty(PROPERTY_USE_ORIGINAL_SIZE, Constants.USE_COLOR_FOR_COMPARISON);
         Constants.USE_COLOR_FOR_COMPARISON 	= props.getProperty(PROPERTY_USE_COLOR_FOR_COMPARISON, Constants.USE_COLOR_FOR_COMPARISON);
-        
-        final String learningRateValue = props.getProperty(PROPERTY_LEARNING_RATE, Constants.LEARNING_RATE);
-        final double learningRate = Double.parseDouble(learningRateValue);
-        
-        final String indentedPercentageMatchValue = props.getProperty(PROPERTY_INTENDED_PERCENTAGE_MATCH, Constants.INTENDED_PERCENTAGE_MATCH);
-        final double indentedPercentageMatch = Double.parseDouble(indentedPercentageMatchValue);
+        Constants.LEARNING_RATE				= Double.valueOf(props.getProperty(PROPERTY_LEARNING_RATE, Double.toString(Constants.LEARNING_RATE)));
+        Constants.INTENDED_PERCENTAGE_MATCH	= Double.valueOf(props.getProperty(PROPERTY_INTENDED_PERCENTAGE_MATCH, Double.toString(Constants.INTENDED_PERCENTAGE_MATCH)));
 
         //--------------------------------------------------------------------------------
         // Get the current environment
@@ -278,11 +274,11 @@ public class AI implements WebDriverCustomModule
                		screenshot,
                		trainingScreenShotFile.getParent());
         }
-        patternList = im.computeAverageMetric(percentageDifferenceValue);
+        patternList = im.computeAverageMetric();
         // internal list in network for self testing and image confirmation        
         an.setInternalList(patternList);            
-    	PerceptronLearning pl = new PerceptronLearning(an, learningRate);
-    	pl.setLearningRate(learningRate);	
+    	PerceptronLearning pl = new PerceptronLearning(an);
+    	pl.setLearningRate(Constants.LEARNING_RATE);	
     	
     	if (Constants.NETWORK_MODE)
     	{
@@ -301,33 +297,28 @@ public class AI implements WebDriverCustomModule
 		if (!validationList.isEmpty())
 		{
 			ImageTransformation imt = new ImageTransformation(validationList, an.getAverageMetric(), false);
-			validationPatternList = imt.computeAverageMetric(percentageDifferenceValue);
+			validationPatternList = imt.computeAverageMetric();
 		}	
     	
-		boolean selfTest = an.onSelfTest(indentedPercentageMatch, validationPatternList, Constants.NETWORK_MODE);
+		boolean selfTest = an.onSelfTest(validationPatternList, Constants.NETWORK_MODE);
 			
 		double result = 2.0;
 
-		if (!Constants.NETWORK_MODE && !selfTest)
+		if (!Constants.NETWORK_MODE || !selfTest)
 		{	
 			// ensure to get the last element in the list, which is always the current screenshot
 			result = an.checkForRecognitionAsDouble(patternList.get(patternList.size() - 1).getPatternList());
+			System.out.println("Recognition result: " + result);
 		}
 		
 		// console output
-		if (!selfTest)
-		{
-			System.out.println("Network result: " + result);
-			
-		}
-		else
+		if (selfTest)
 		{
 			System.out.println("Network not ready");
-			System.out.println("result: " + result);
 		}
 			
 		// Save the screenshot
-		if (indentedPercentageMatch > result && !Constants.NETWORK_MODE && !selfTest)
+		if (Constants.INTENDED_PERCENTAGE_MATCH > result && !Constants.NETWORK_MODE && !selfTest)
 		{
 			// Directory for the unrecognized images of the current test run
 			final File unrecognizedInstanceDirectory = new File(new File(targetDirectory, RESULT_DIRECTORY_UNRECOGNIZED), screenshotName);
@@ -337,7 +328,7 @@ public class AI implements WebDriverCustomModule
 			Helper.saveImage(screenshot.toBufferedImage(), unrecognizedImageFile);
 			Assert.fail("Failure during visual image assertion:");
 		}
-		else if (indentedPercentageMatch < result && !Constants.NETWORK_MODE && !selfTest)
+		else if (Constants.INTENDED_PERCENTAGE_MATCH < result && !Constants.NETWORK_MODE && !selfTest)
 		{
 			final File recognizedInstanceDirectory = new File(new File(targetDirectory, RESULT_DIRECTORY_RECOGNIZED), screenshotName);
 			final File recognizedImageFile = new File(recognizedInstanceDirectory, exactScreenshotName);
