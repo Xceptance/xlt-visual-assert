@@ -104,7 +104,7 @@ public class ImageTransformation
 	 * @param percentageDifference Value to reach for the network to be considered as trained.
 	 * @return foundPattern ArrayList of {@link PatternHelper} of all found pattern if there was more than one image in the folder.
 	 */
-	public ArrayList<PatternHelper> computeAverageMetric(int percentageDifference)
+	public ArrayList<PatternHelper> computeAverageMetric()
 	{
 		int groupSize 								= 0;
 		double boundingBoxSize						= 0.0;
@@ -170,12 +170,12 @@ public class ImageTransformation
 						// and if the new metric match the average metric (with a percentage difference) the average metric get an update
 						// and mark them as recognize in the pattern indicated as 1
 						key = iter.next();
-						if (Helper.isInRange(averMet.get(key).getAverageGroupSize(), groupSize, percentageDifference) && 
-							Helper.isInRange(averMet.get(key).getAverageBoundingBoxSize(),boundingBoxSize , percentageDifference) 
+						if (Helper.isInRange(averMet.get(key).getAverageGroupSize(), groupSize) && 
+							Helper.isInRange(averMet.get(key).getAverageBoundingBoxSize(),boundingBoxSize) 
 							&&
-							Helper.isInRange(averMet.get(key).getAverageHistogramRedMean(), histoRedMean, percentageDifference) &&
-							Helper.isInRange(averMet.get(key).getAverageHistogramGreenMean(), histoGreenMean, percentageDifference) &&
-							Helper.isInRange(averMet.get(key).getAverageHistogramBlueMean(), histoBlueMean, percentageDifference)
+							Helper.isInRange(averMet.get(key).getAverageHistogramRedMean(), histoRedMean) &&
+							Helper.isInRange(averMet.get(key).getAverageHistogramGreenMean(), histoGreenMean) &&
+							Helper.isInRange(averMet.get(key).getAverageHistogramBlueMean(), histoBlueMean)
 							)
 						{								
 							averMet.get(key).update(groupSize, boundingBoxSize, distanceMin, distanceMax, centerOfGravity, histoRedMean, histoGreenMean, histoBlueMean);
@@ -196,12 +196,12 @@ public class ImageTransformation
 					while (iter.hasNext())
 					{
 						key = iter.next();
-						if (Helper.isInRange(averMet.get(key).getAverageGroupSize(), groupSize, percentageDifference) && 
-							Helper.isInRange(averMet.get(key).getAverageBoundingBoxSize(), boundingBoxSize , percentageDifference) 
+						if (Helper.isInRange(averMet.get(key).getAverageGroupSize(), groupSize) && 
+							Helper.isInRange(averMet.get(key).getAverageBoundingBoxSize(), boundingBoxSize) 
 							&& 
-							Helper.isInRange(averMet.get(key).getAverageHistogramRedMean(), histoRedMean, percentageDifference)&&
-							Helper.isInRange(averMet.get(key).getAverageHistogramGreenMean(), histoGreenMean, percentageDifference) &&
-							Helper.isInRange(averMet.get(key).getAverageHistogramBlueMean(), histoBlueMean, percentageDifference)
+							Helper.isInRange(averMet.get(key).getAverageHistogramRedMean(), histoRedMean)&&
+							Helper.isInRange(averMet.get(key).getAverageHistogramGreenMean(), histoGreenMean) &&
+							Helper.isInRange(averMet.get(key).getAverageHistogramBlueMean(), histoBlueMean)
 							)
 						{
 							recognizeFlag = true;

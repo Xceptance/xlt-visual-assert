@@ -63,7 +63,7 @@ public class PerceptronLearning implements ISupervisedLearning
      * @param network Network to teach.
      * @param learningRate Double value for learning speed of the network.
      */
-    public PerceptronLearning(ActivationNetwork network, double learningRate) 
+    public PerceptronLearning(ActivationNetwork network) 
     {
         this.network = network;
     }

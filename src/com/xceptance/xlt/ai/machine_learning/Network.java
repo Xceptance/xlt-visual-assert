@@ -185,7 +185,7 @@ public abstract class Network implements Serializable
 		   	System.out.println("Selftest Value Validation dir: " + (resultValidation / internalList.size()));
 		   	
 		   	if ((resultVerfication / internalList.size()) >= intendedPercentageMatch &&
-		   		 resultValidation  / validationList.size() <= intendedPercentageMatch)
+		   		 resultValidation  / validationList.size() < intendedPercentageMatch)
 	    	{
 		   		internalList.clear();
 	    		selfTest = false;
@@ -207,8 +207,7 @@ public abstract class Network implements Serializable
     {
     	ArrayList<FastBitmap> result = new ArrayList<>();
     	
-    	File test = new File(path);
-		File[] list = test.listFiles(Helper.IMAGE_FILTER);
+		File[] list = Helper.scanFolder(path);
 		ArrayList<Integer> tempList = new ArrayList<>();
 		
 		for (File element : list)
@@ -229,9 +228,8 @@ public abstract class Network implements Serializable
     
     public ArrayList<FastBitmap> scanFolderForChanges(String path)
     {
-    	ArrayList<FastBitmap> result = new ArrayList<>();    	
-    	File test = new File(path);
-		File[] list = test.listFiles(Helper.IMAGE_FILTER);
+    	ArrayList<FastBitmap> result = new ArrayList<>();   
+		File[] list = Helper.scanFolder(path);
 		
 		for (File element : list)
 		{

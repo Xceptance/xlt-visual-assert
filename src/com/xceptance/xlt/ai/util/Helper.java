@@ -5,10 +5,14 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import javax.imageio.ImageIO;
 import com.xceptance.xlt.ai.image.FastBitmap;
@@ -43,10 +47,10 @@ public class Helper
 	 * @param percentageDifference int percentage difference for vary
 	 * @return true if the values are in range to another, false otherwise
 	 */
-	public static boolean isInRange(double value1, double value2, int percentageDifference)
+	public static boolean isInRange(double value1, double value2)
 	{	
-		if ( value2 >  (value1 - getPercentageDifference(value1, percentageDifference)) &&  
-			 value2 <  (value1 + getPercentageDifference(value1, percentageDifference)))
+		if ( value2 >  (value1 - getPercentageDifference(value1)) &&  
+			 value2 <  (value1 + getPercentageDifference(value1)))
 		{
 			return true;
 		}
@@ -60,8 +64,9 @@ public class Helper
 	 * @param percentageDifference int percentage difference
 	 * @return value
 	 */
-	private static double getPercentageDifference(double value, int percentageDifference)
+	private static double getPercentageDifference(double value)
 	{	
+		int percentageDifference = Constants.PERCENTAGE_DIFFERENCE;
 		if (percentageDifference <= 0)
 		{
 			percentageDifference = 1;
@@ -73,6 +78,67 @@ public class Helper
 			return value;
 		}
 		return result;
+	}
+	
+	public static void readProperties(String path) throws IOException
+	{
+	    // the property names       
+		final String PREFIX = "com.xceptance.xlt.ai.";
+		final String PROPERTY_ENABLED 					= PREFIX + "enabled";
+		final String PROPERTY_TESTCASE_BOUND			= PREFIX + "TESTCASE_BOUND";
+		final String PROPERTY_TESTCASE_NAME				= PREFIX + "TESTCASE_NAME";
+		final String PROPERTY_MODE						= PREFIX + "TRAINING";
+		final String PROPERTY_USE_ORIGINAL_SIZE 		= PREFIX + "USE_ORIGINAL_SIZE";
+		final String PROPERTY_USE_COLOR_FOR_COMPARISON 	= PREFIX + "USE_COLOR_FOR_COMPARISON";
+		final String PROPERTY_LEARNING_RATE 			= PREFIX + "LEARNING_RATE"; 
+		final String PROPERTY_INTENDED_PERCENTAGE_MATCH = PREFIX + "INTENDED_PERCENTAGE_MATCH";
+		final String PROPERTY_PERCENTAGE_DIFFERENCE 	= PREFIX + "PERCENTAGE_DIFFERENCE";
+		final String PROPERTY_IMAGE_HEIGHT 				= PREFIX + "IMAGE_HEIGHT";
+		final String PROPERTY_IMAGE_WIDTH 				= PREFIX + "IMAGE_WIDTH";
+		final String PROPERTY_FORMAT 					= PREFIX + "FORMAT";
+		
+		Properties props = new Properties();
+		
+		try 
+		{
+			//File file = new File(path);
+			inputStream = new FileInputStream(path);
+			if (inputStream != null)
+			{
+				props.load(inputStream);
+			}
+			else
+			{
+				throw new FileNotFoundException("could not load " + path);
+			}
+			
+		    final String enabled = props.getProperty(PROPERTY_ENABLED, "true");
+		    if (!enabled.contains("true"))
+		    {
+		    	// skipped silently
+		    	return;
+		    }
+		    
+	        Constants.TESTCASE_BOUND_NAME		= props.getProperty(PROPERTY_TESTCASE_NAME, Constants.TESTCASE_BOUND_NAME);
+	        Constants.TESTCASE_BOUND			= Boolean.parseBoolean(props.getProperty(PROPERTY_TESTCASE_BOUND, Boolean.toString(Constants.TESTCASE_BOUND)));
+	        Constants.NETWORK_MODE				= Boolean.parseBoolean(props.getProperty(PROPERTY_MODE, Boolean.toString(Constants.NETWORK_MODE)));
+	        Constants.IMAGE_HEIGHT 				= Integer.parseInt(props.getProperty(PROPERTY_IMAGE_HEIGHT, Integer.toString(Constants.IMAGE_HEIGHT)));
+	        Constants.IMAGE_WIDTH 				= Integer.parseInt(props.getProperty(PROPERTY_IMAGE_WIDTH, Integer.toString(Constants.IMAGE_WIDTH)));
+	        Constants.FORMAT 					= props.getProperty(PROPERTY_FORMAT, Constants.FORMAT);        
+	        Constants.USE_ORIGINAL_SIZE 		= Boolean.parseBoolean(props.getProperty(PROPERTY_USE_ORIGINAL_SIZE, Boolean.toString(Constants.USE_ORIGINAL_SIZE)));
+	        Constants.USE_COLOR_FOR_COMPARISON 	= Boolean.parseBoolean(props.getProperty(PROPERTY_USE_COLOR_FOR_COMPARISON, Boolean.toString(Constants.USE_COLOR_FOR_COMPARISON)));
+	        Constants.LEARNING_RATE 			= Double.parseDouble(props.getProperty(PROPERTY_LEARNING_RATE, Double.toString(Constants.LEARNING_RATE)));
+	        Constants.INTENDED_PERCENTAGE_MATCH = Double.parseDouble(props.getProperty(PROPERTY_INTENDED_PERCENTAGE_MATCH, Double.toString(Constants.INTENDED_PERCENTAGE_MATCH)));
+	        Constants.PERCENTAGE_DIFFERENCE		= Integer.parseInt(props.getProperty(PROPERTY_PERCENTAGE_DIFFERENCE, Integer.toString(Constants.PERCENTAGE_DIFFERENCE)));
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}
+		finally 
+		{
+			inputStream.close();
+		}
 	}
 	
 	/**
@@ -279,8 +345,7 @@ public class Helper
 	public static ArrayList<BufferedImage> loadAllImages_BufferedImage(String path)
 	{
 		ArrayList<BufferedImage> pictureList = new ArrayList<>();
-		File test = new File(path);
-		File[] list = test.listFiles(IMAGE_FILTER);
+		File[] list = scanFolder(path);
 		if (list != null)
 		{
 			for (File element : list)
@@ -299,8 +364,7 @@ public class Helper
 	public static ArrayList<FastBitmap> loadAllImages_FastBitmap(String path)
 	{
 		ArrayList<FastBitmap> pictureList = new ArrayList<>();
-		File test = new File(path);
-		File[] list = test.listFiles(IMAGE_FILTER);
+		File[] list = scanFolder(path);
 		if (list != null)
 		{
 			for (File element : list)
@@ -323,8 +387,7 @@ public class Helper
 	public static ArrayList<FastBitmap> loadAllImagesScaled_FastBitmap(String path ,int heigth, int width)
 	{
 		ArrayList<FastBitmap> pictureList = new ArrayList<>();
-		File test = new File(path);
-		File[] list = test.listFiles(IMAGE_FILTER);
+		File[] list = scanFolder(path);
 		if (list != null)
 		{
 			for (File element : list)
@@ -348,8 +411,7 @@ public class Helper
 	public static ArrayList<BufferedImage> loadAllImagesScaled_BufferedImage(String path ,int heigth, int width)
 	{
 		ArrayList<BufferedImage> pictureList = new ArrayList<>();
-		File test = new File(path);
-		File[] list = test.listFiles(IMAGE_FILTER);
+		File[] list = scanFolder(path);
 		if (list != null)
 		{
 			for (File element : list)
@@ -452,6 +514,14 @@ public class Helper
 	    }
 	}
 	
+	public static File[] scanFolder(String path)
+	{  	
+    	File test = new File(path);
+		File[] list = test.listFiles(IMAGE_FILTER);
+		
+		return list;		
+	}
+	
 	/***
 	 * Convert a BufferedImage to a 2D double array.
 	 * This method didn't use the getRBG method it calculate the values native with bit shifting of the Integer values of the pixel.
@@ -519,4 +589,5 @@ public class Helper
 	}
 	
 	private static int lastPercent;
+	private static FileInputStream inputStream;
 }

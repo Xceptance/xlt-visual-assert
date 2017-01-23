@@ -14,7 +14,7 @@ public class Constants
 	public static String TESTCASE_BOUND_NAME = "unbound";
 	// Desired percentage value for the self test, until this barrier is confirmed the network will 
 	// still learn (use several images which where already seen)
-	public static String INTENDED_PERCENTAGE_MATCH = "0.80";
+	public static Double INTENDED_PERCENTAGE_MATCH = 0.80;
 	// Color will also be used for image comparison, not recommended for websides with many images
 	// or consequently changing content 
 	public static boolean USE_COLOR_FOR_COMPARISON = false;
@@ -31,7 +31,7 @@ public class Constants
 	public static int PERCENTAGE_DIFFERENCE = 10;		
 	// value for the learning algorithm allowed values are between 0.0 - 1.0
 	// default is 0.2
-	public static final String LEARNING_RATE = "0.2";
+	public static Double LEARNING_RATE = 0.2;
 	// image format for saving
 	public static String FORMAT = "png";
 	// value for the height of the image
