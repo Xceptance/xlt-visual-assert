@@ -155,8 +155,13 @@ public class FastBitmap
         	this.bufferedImage 	= dimg;
     	}
     	else
-    	{    		
-    		this.bufferedImage = bufferedImage;
+    	{  
+    		BufferedImage dimg 	= new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_INT_RGB);
+    		Image tmp 			= bufferedImage;
+        	Graphics2D g2d 		= dimg.createGraphics();
+        	g2d.drawImage(tmp, 0, 0, null);
+        	g2d.dispose();    		
+    		this.bufferedImage = dimg;
     	}
         prepare();
         refresh();
