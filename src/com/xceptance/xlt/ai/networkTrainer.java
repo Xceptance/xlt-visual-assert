@@ -60,12 +60,21 @@ public class networkTrainer
         an.setInternalList(patternList);            
     	PerceptronLearning pl = new PerceptronLearning(an);
     	pl.setLearningRate(Constants.LEARNING_RATE);
+    	
+    	double resultVerfication = 0.0;	 
     	for (PatternHelper pattern : patternList)
 		{
 			pl.Run(pattern.getPatternList());
+			resultVerfication += an.getLayer().computeSum(pattern.getPatternList());
 		}
     	
-    	an.onSelfTest(new ArrayList<PatternHelper>(), true);	
+    	System.out.println("Selftest value summed: " + (resultVerfication / patternList.size()));     	
+    	
+    	for (PatternHelper pattern : patternList)
+    	{
+    		System.out.println("Recognized value of image " + pattern.getTagName() + " = " + an.checkForRecognitionAsString(pattern.getPatternList()) + " %");
+    	}
+    	
 		an.Save(networkFile.toString(), im.getAverageMetric());
 	}
 }
