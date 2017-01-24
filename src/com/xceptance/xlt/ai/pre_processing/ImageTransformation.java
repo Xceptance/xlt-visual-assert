@@ -40,9 +40,11 @@ public class ImageTransformation
 	{		
 		maxSize 			= 0;
 		averMet 			= averageMet;
-		this.trainingFlag 	= trainingFlag;				
-		pp = new ArrayList<>();
-		process(imgList);
+		this.trainingFlag 	= trainingFlag;
+		recognizeFlag 		= false;
+		pp 					= new ArrayList<>();
+		pictureList 		= imgList;
+//		process(imgList);
 		applyTransformation(); 
 	}
 	
@@ -52,13 +54,16 @@ public class ImageTransformation
 	 * @param img FastBitmap the current screenshot.
 	 * @param path String to the folder.
 	 */
-	public ImageTransformation(FastBitmap img, String path)
+	public ImageTransformation(ArrayList<FastBitmap> imgList)
 	{
-		averMet 			= new HashMap<Integer, AverageMetric>();
-		maxSize 			= 0;
-		trainingFlag		= true;
-		pp = new ArrayList<>();
-		load(img, path);
+		averMet 				= new HashMap<Integer, AverageMetric>();
+		maxSize 				= 0;
+		trainingFlag			= true;
+		recognizeFlag 			= false;
+		pp 						= new ArrayList<>();
+		pictureList				= imgList;
+		Constants.NETWORK_MODE 	= true;
+//		load(img, path);
 		applyTransformation();
 	}
 	
@@ -73,6 +78,7 @@ public class ImageTransformation
 		averMet 			= new HashMap<Integer, AverageMetric>();
 		maxSize 			= 0;
 		trainingFlag		= true;
+		recognizeFlag 		= false;
 		pp = new ArrayList<>();
 		load(path);
 		applyTransformation();
@@ -251,7 +257,7 @@ public class ImageTransformation
 		int index = 1;
 		for (FastBitmap element : pictureList)
 		{
-			//long startTime = System.nanoTime();
+			long startTime = System.nanoTime();
 			// convolution take too much time and is therefore disabled, improve the performance up to 3 times
 			// but also decrease accuracy 
 			//conv.applyInPlace(element);			
@@ -260,36 +266,12 @@ public class ImageTransformation
 			// sorting with the comparator set in FeaturePoints, sorting order is ascending x and y values
 			Collections.sort(tempList, new FeaturePoint());			
 			pp.add(new PreProcessing(tempList, element));			
-			//long estimatedTime = System.nanoTime() - startTime;
+			long estimatedTime = System.nanoTime() - startTime;
 			//System.out.println("Image " + index + " finshed in: " + (double)estimatedTime / 1000000000.0 + " from " + pictureList.size());
-			Helper.updatePercentageBar( (double)index / (double)pictureList.size() );
+			Helper.updatePercentageBar((double)index / (double)pictureList.size(), estimatedTime);
 			index++;
 		}	
 		System.out.println("");
-	}
-	
-	/***
-	 * Load all images out of a given folder path and the current screenshot.
-	 * @param img FastBitmap current screenshot.
-	 * @param path String full path name to folder.
-	 */
-	private void load(FastBitmap img,String path)
-	{
-		pictureList = Helper.loadAllImagesScaled_FastBitmap(path, Constants.IMAGE_HEIGHT, Constants.IMAGE_WIDTH);
-		Constants.NETWORK_MODE 	= true;
-		
-		if (!pictureList.isEmpty())
-		{			
-			Helper.setImageParameter();			
-			pictureList.add(img);			
-		}
-		else
-		{			
-			ArrayList<FastBitmap> temp 	= new ArrayList<>();
-			temp.add(img);
-			process(temp);
-		}
-		recognizeFlag = false;	
 	}
 	
 	/***
@@ -311,7 +293,6 @@ public class ImageTransformation
 			ArrayList<FastBitmap> temp 	= new ArrayList<>();
 			process(temp);
 		}
-		recognizeFlag = false;	
 	}
 	
 	/**
@@ -321,22 +302,7 @@ public class ImageTransformation
 	private void process(ArrayList<FastBitmap> imgList)
 	{
 		pictureList = new ArrayList<>();
-		if (Constants.USE_ORIGINAL_SIZE)
-		{
-			for (FastBitmap img : imgList)
-			{
-				pictureList.add(img);
-			}
-		}
-		else
-		{
-			for (FastBitmap img : imgList)
-			{				
-				pictureList.add(Helper.imageToFastImageScaled(img.toBufferedImage(), img.getTagName()));
-			}
-		}		
-		
-		recognizeFlag = false;	
+		pictureList.addAll(imgList);	
 	}
 	
 	/***

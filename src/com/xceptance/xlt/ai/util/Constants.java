@@ -26,9 +26,9 @@ public class Constants
 	// Distance from current point for grouping
 	public static int THRESHOLD = 20; 
 	// Points cloud minimum value
-	public static int MINGROUPSIZE = 200;	
+	public static int MINGROUPSIZE = 300;	
 	// procedural value for the difference level, to compare images
-	public static int PERCENTAGE_DIFFERENCE = 10;		
+	public static double PERCENTAGE_DIFFERENCE = 0.1;		
 	// value for the learning algorithm allowed values are between 0.0 - 1.0
 	// default is 0.2
 	public static Double LEARNING_RATE = 0.2;

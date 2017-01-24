@@ -96,7 +96,6 @@ public class AI implements WebDriverCustomModule
 
         // Wait time for the page to load completely
         final int waitTime = props.getProperty(PROPERTY_WAITING_TIME, Constants.WAITINGTIME);
-        final int percentageDifferenceValue = props.getProperty(PROPERTY_PERCENTAGE_DIFFERENCE, Constants.PERCENTAGE_DIFFERENCE);
         
         Constants.TESTCASE_BOUND_NAME		= props.getProperty(PROPERTY_TESTCASE_NAME, Constants.TESTCASE_BOUND_NAME);
         Constants.TESTCASE_BOUND			= props.getProperty(PROPERTY_TESTCASE_BOUND, Constants.TESTCASE_BOUND);
@@ -108,6 +107,7 @@ public class AI implements WebDriverCustomModule
         Constants.USE_COLOR_FOR_COMPARISON 	= props.getProperty(PROPERTY_USE_COLOR_FOR_COMPARISON, Constants.USE_COLOR_FOR_COMPARISON);
         Constants.LEARNING_RATE				= Double.valueOf(props.getProperty(PROPERTY_LEARNING_RATE, Double.toString(Constants.LEARNING_RATE)));
         Constants.INTENDED_PERCENTAGE_MATCH	= Double.valueOf(props.getProperty(PROPERTY_INTENDED_PERCENTAGE_MATCH, Double.toString(Constants.INTENDED_PERCENTAGE_MATCH)));
+        Constants.PERCENTAGE_DIFFERENCE		= Double.valueOf(props.getProperty(PROPERTY_PERCENTAGE_DIFFERENCE, Double.toString(Constants.PERCENTAGE_DIFFERENCE)));
 
         //--------------------------------------------------------------------------------
         // Get the current environment
@@ -212,6 +212,7 @@ public class AI implements WebDriverCustomModule
         final FastBitmap screenshot;
         ActivationNetwork an = new ActivationNetwork(new BipolarSigmoidFunction(), 1); 
         ImageTransformation im;
+        ArrayList<FastBitmap> imgList = new ArrayList<>();  
         ArrayList<PatternHelper> patternList = new ArrayList<>();
 
         if (networkFile.exists())
@@ -219,7 +220,6 @@ public class AI implements WebDriverCustomModule
         	// load the corresponding network and all settings which are saved 
           	an = (ActivationNetwork) an.Load(networkFile.getPath()); 
           	an.setConstants();
-           	ArrayList<FastBitmap> imgList = new ArrayList<>();   
             screenshot = new FastBitmap(takeScreenshot(webdriver), exactScreenshotName, Constants.USE_ORIGINAL_SIZE);
             
         	// TODO Has this to be handled in a different way?
@@ -254,7 +254,8 @@ public class AI implements WebDriverCustomModule
         	trainingDirectory_uft.mkdir();
         	trainingDirectory_val.mkdir();
         	screenshot = new FastBitmap(takeScreenshot(webdriver), exactScreenshotName, Constants.USE_ORIGINAL_SIZE);
-
+        	
+        	imgList.add(screenshot);
     		// TODO Has this to be handled in a different way?
     		// webdriver cannot take the screenshot -> RETURN
         	if (screenshot == null)
@@ -265,14 +266,12 @@ public class AI implements WebDriverCustomModule
         	Constants.IMAGE_WIDTH = screenshot.getWidth();
         	Constants.IMAGE_HEIGHT = screenshot.getHeight();
         	
-          	an.scanFolderForChanges(
+          	imgList = an.scanFolderForChanges(
           			trainingScreenShotFile.getParent(), 
            			exactScreenshotName);
           	
           	// load all images from the directory
-            im = new ImageTransformation(
-               		screenshot,
-               		trainingScreenShotFile.getParent());
+            im = new ImageTransformation(imgList);
         }
         patternList = im.computeAverageMetric();
         // internal list in network for self testing and image confirmation        
@@ -304,7 +303,7 @@ public class AI implements WebDriverCustomModule
 			
 		double result = 2.0;
 
-		if (!Constants.NETWORK_MODE || !selfTest)
+		if (!Constants.NETWORK_MODE)
 		{	
 			// ensure to get the last element in the list, which is always the current screenshot
 			result = an.checkForRecognitionAsDouble(patternList.get(patternList.size() - 1).getPatternList());
@@ -314,7 +313,7 @@ public class AI implements WebDriverCustomModule
 		// console output
 		if (selfTest)
 		{
-			System.out.println("Network not ready");
+			System.out.println("Network not ready and not learning cause of TRAINING Flag ");
 		}
 			
 		// Save the screenshot
@@ -338,6 +337,9 @@ public class AI implements WebDriverCustomModule
 		else
 		{
 			// Save the network
+        	trainingDirectory.mkdirs();
+        	trainingDirectory_uft.mkdir();
+        	trainingDirectory_val.mkdir();
 			an.Save(networkFile.toString(), im.getAverageMetric());
 			Helper.saveImage(screenshot.toBufferedImage(), trainingScreenShotFile);				
 		}

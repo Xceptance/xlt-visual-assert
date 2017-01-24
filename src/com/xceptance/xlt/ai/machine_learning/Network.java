@@ -81,7 +81,7 @@ public abstract class Network implements Serializable
      * Get Network's layers count.
      * @return Network's layers count.
      */
-    public Layer getLayers() 
+    public Layer getLayer() 
     {
         return layer;
     }
@@ -135,7 +135,7 @@ public abstract class Network implements Serializable
      */
     public String checkForRecognitionAsString(ArrayList<Integer> input)
     {
-		return Helper.numberConverter(layer.computeSum(input));
+		return Helper.numberConverterToPercent(layer.computeSum(input));
     }
     
     /**
@@ -180,8 +180,8 @@ public abstract class Network implements Serializable
 		   	{
 		   		resultValidation += layer.computeSum(element.getPatternList());		   		
 		   	}	   		
-		   	System.out.println("Selftest Value training dir: " + (resultVerfication / internalList.size()));
-		   	System.out.println("Selftest Value Validation dir: " + (resultValidation / internalList.size()));
+		   	System.out.println("Selftest value training dir: " + (resultVerfication / internalList.size()));
+		   	System.out.println("Selftest value validation dir: " + (resultValidation / internalList.size()));
 
 		   	int validationSize = (validationList.size() != 0 ? validationList.size() : 1);
 		   	
@@ -232,11 +232,13 @@ public abstract class Network implements Serializable
     	ArrayList<FastBitmap> result = new ArrayList<>();   
 		File[] list = Helper.scanFolder(path);
 		
-		for (File element : list)
+		if (list != null)
 		{
-			result.add(Helper.loadImageScaled_FastBitmap(element.getAbsolutePath(), Constants.IMAGE_HEIGHT, Constants.IMAGE_WIDTH));
-
-		}	
+			for (File element : list)
+			{
+				result.add(Helper.loadImageScaled_FastBitmap(element.getAbsolutePath(), Constants.IMAGE_HEIGHT, Constants.IMAGE_WIDTH));
+			}	
+    	}
     	return result;
     }
     

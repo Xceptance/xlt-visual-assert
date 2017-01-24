@@ -9,7 +9,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Properties;
@@ -66,12 +65,12 @@ public class Helper
 	 */
 	private static double getPercentageDifference(double value)
 	{	
-		int percentageDifference = Constants.PERCENTAGE_DIFFERENCE;
+		double percentageDifference = Constants.PERCENTAGE_DIFFERENCE;
 		if (percentageDifference <= 0)
 		{
-			percentageDifference = 1;
+			percentageDifference = 0.1;
 		}		
-		double result =  (value / 100) * percentageDifference;
+		double result =  value * percentageDifference;
 		// percentage difference is between 1% - 100%
 		if (result > value)
 		{
@@ -129,7 +128,7 @@ public class Helper
 	        Constants.USE_COLOR_FOR_COMPARISON 	= Boolean.parseBoolean(props.getProperty(PROPERTY_USE_COLOR_FOR_COMPARISON, Boolean.toString(Constants.USE_COLOR_FOR_COMPARISON)));
 	        Constants.LEARNING_RATE 			= Double.parseDouble(props.getProperty(PROPERTY_LEARNING_RATE, Double.toString(Constants.LEARNING_RATE)));
 	        Constants.INTENDED_PERCENTAGE_MATCH = Double.parseDouble(props.getProperty(PROPERTY_INTENDED_PERCENTAGE_MATCH, Double.toString(Constants.INTENDED_PERCENTAGE_MATCH)));
-	        Constants.PERCENTAGE_DIFFERENCE		= Integer.parseInt(props.getProperty(PROPERTY_PERCENTAGE_DIFFERENCE, Integer.toString(Constants.PERCENTAGE_DIFFERENCE)));
+	        Constants.PERCENTAGE_DIFFERENCE		= Double.parseDouble(props.getProperty(PROPERTY_PERCENTAGE_DIFFERENCE, Double.toString(Constants.PERCENTAGE_DIFFERENCE)));
 		} 
 		catch (IOException e) 
 		{
@@ -147,9 +146,9 @@ public class Helper
 	public static void setImageParameter()
 	{
 		// values for the parameter THRESHOLD correspondent out of experience and testing
-		int tmpMinGrpSize = 200;
+		int tmpMinGrpSize = 300;
 		int tmpThreshold = 20;
-		tmpMinGrpSize = (Constants.IMAGE_WIDTH + Constants.IMAGE_HEIGHT) / 6;
+		tmpMinGrpSize = (Constants.IMAGE_WIDTH + Constants.IMAGE_HEIGHT) / 5;
 		
 		if (tmpMinGrpSize > 500)
 		{
@@ -423,10 +422,16 @@ public class Helper
 		return pictureList;
 	}
 	
-	public static String numberConverter(double input)
+	public static String numberConverterToPercent(double input)
 	{
 		DecimalFormat df = new DecimalFormat("##.##");		
 		return df.format(input * 100);
+	}
+	
+	public static String numberConverterToTime(double input)
+	{
+		DecimalFormat df = new DecimalFormat("#.##");		
+		return df.format(input);
 	}
 	
 	/***
@@ -484,7 +489,7 @@ public class Helper
      * Does not work properly in eclipse. 
      * @param progress Double value of the current progress.
      */
-	public static void updatePercentageBar(double progress) 
+	public static void updatePercentageBar(double progress, long estimatedTime) 
 	{		
 	    int percent = (int) Math.round(progress * 100);
 	    if (Math.abs(percent - lastPercent) >= 1) 
@@ -508,8 +513,8 @@ public class Helper
 	        template.append("] %s   ");
 	        if (percent >= 100) {
 	            template.append("%n");
-	        }
-	        System.out.printf(template.toString(), percent + "%");
+	        }	        
+	        System.out.printf(template.toString(), percent + "%  estimated time " + Helper.numberConverterToTime((double)estimatedTime / 1000000000.0) + " s");
 	        lastPercent = percent;
 	    }
 	}
@@ -517,8 +522,7 @@ public class Helper
 	public static File[] scanFolder(String path)
 	{  	
     	File test = new File(path);
-		File[] list = test.listFiles(IMAGE_FILTER);
-		
+		File[] list = test.listFiles(IMAGE_FILTER);		
 		return list;		
 	}
 	
