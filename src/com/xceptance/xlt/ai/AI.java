@@ -272,6 +272,7 @@ public class AI implements WebDriverCustomModule
           	
           	// load all images from the directory
             im = new ImageTransformation(imgList);
+            imgList = null;
         }
         patternList = im.computeAverageMetric();
         // internal list in network for self testing and image confirmation        
