@@ -31,15 +31,10 @@ import com.xceptance.xlt.ai.machine_learning.Layer;
 
 /**
  * Perceptron learning algorithm.
- * @author Diego Catalano
+ * @author Diego Catalano edited by Thomas Volkmann
  */
 public class PerceptronLearning implements ISupervisedLearning
 {    
-    // network to teach
-    private ActivationNetwork network;
-    
-    // learning rate
-    private double learningRate = 0.1;    
     /**
      * Get Learning rate. Range[0, 1].
      * @return Learning rate.
@@ -61,7 +56,6 @@ public class PerceptronLearning implements ISupervisedLearning
     /**
      * Initializes a new instance of the PerceptronLearning class.
      * @param network Network to teach.
-     * @param learningRate Double value for learning speed of the network.
      */
     public PerceptronLearning(ActivationNetwork network) 
     {
@@ -122,4 +116,10 @@ public class PerceptronLearning implements ISupervisedLearning
         // return summary error
         return error;
     }
+    
+    // network to teach
+    private ActivationNetwork network;
+    
+    // learning rate
+    private double learningRate = 0.1;   
 }

@@ -6,7 +6,7 @@ import com.xceptance.xlt.ai.core.FloatPoint;
 
 /***
  * Representation of the merged metrics of different Images, which where analyzed and compared.
- * This class represent one found group and the comparison in an Image and in reference to all other found groups.
+ * This class represent one found group and the comparison in an Image and in reference to all other images where this group exist.
  * Through the possibility to update and weight the seen data this class represent a part of machine learning.
  * @author Thomas Volkmann
  *

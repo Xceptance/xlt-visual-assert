@@ -40,11 +40,10 @@ public class Helper
 	}		
 		
 	/***
-	 * Check the range around value1 with percentage difference through {@link Helper#getPercentageDifference(double, int)} to value2.
-	 * @param value1 double value to vary by
-	 * @param value2 double value to check against
-	 * @param percentageDifference int percentage difference for vary
-	 * @return true if the values are in range to another, false otherwise
+	 * Check the range around value1 with percentage difference through {@link Helper#getPercentageDifference(double)} to value2.
+	 * @param value1 Double value to vary by.
+	 * @param value2 Double value to check against.
+	 * @return true if the values are in range to another, false otherwise.
 	 */
 	public static boolean isInRange(double value1, double value2)
 	{	
@@ -81,7 +80,7 @@ public class Helper
 	/**
 	 * Properties file reader for the ai.properties file. Read and convert all properties for the program.
 	 * @param path String path to the ai.properties file.
-	 * @throws IOException
+	 * @throws IOException Error if the there is an IOException.
 	 */
 	public static void readProperties(String path) throws IOException
 	{
@@ -323,8 +322,6 @@ public class Helper
 	 /**
 	 * Read an image file and transform it into a scaled {@link FastBitmap}.
 	 * @param filename String full path name
-	 * @param width Integer value for the width of the loaded image.
-	 * @param height Integer value for the height of the loaded image
 	 * @return BufferedImage
 	 */
 	public static FastBitmap loadImageScaled_FastBitmap(String filename) 
@@ -511,6 +508,8 @@ public class Helper
      * Does not work properly in eclipse. 
      * @param progress Double value of the current progress.
      * @param estimatedTime long value for used time
+     * @param size Size of the Progress bar. 
+     * @param index Current position in the progress bar.
      */
 	public static void updatePercentageBar(double progress, long estimatedTime, int size, int index) 
 	{

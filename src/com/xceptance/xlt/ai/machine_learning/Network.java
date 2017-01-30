@@ -45,19 +45,14 @@ import com.xceptance.xlt.ai.util.Helper;
 public abstract class Network implements Serializable
 {    
     /**
-	 * Auto generated serial number.
-	 */
-	private static final long serialVersionUID = 1L;
-
+     * Network's layers.
+     */
+    public Layer layer;
+	
     /**
      * Network's layers count.
      */
     protected int layersCount;
-    
-    /**
-     * Network's layers.
-     */
-    public Layer layer;
 
     /**
      * Get Network's inputs count.
@@ -78,7 +73,7 @@ public abstract class Network implements Serializable
     }
     
     /**
-     * Get Network's layers count.
+     * Get Network layer, the perceptron has only one layer.
      * @return Network's layers count.
      */
     public Layer getLayer() 
@@ -101,8 +96,7 @@ public abstract class Network implements Serializable
      */
     protected Network( int inputsCount)
     {    	
-        this.inputsCount = Math.max( 1, inputsCount );        
-        // create collection of layers
+        this.inputsCount 		= Math.max( 1, inputsCount );        
         this.layer 				= Layer.getInstance(inputsCount);
         internalList 			= new ArrayList<>();
         overwatchList 			= new ArrayList<>();
@@ -160,21 +154,24 @@ public abstract class Network implements Serializable
     }
     
     /**
-     * Check the neural network with already seen pattern for self test, if the {@link Constants #INTENDED_PERCENTAGE_MATCH} is reached the network stop Learning.
+     * Check the neural network with already seen pattern for self test, if the {@link Constants #INTENDED_PERCENTAGE_MATCH} is reached the network stop learning.
      * After finished training mode the network will categorize the screenshots in recognized and unrecognized.
-     * @param intendedPercentageMatch Destination value which should the network reach in comparison. 
-     * @return selfTest Boolean flag for training or not.
+     * @param validationList ArrayList of patterns which are used for counter example calculation.
+     * @param flag Use of {@link Constants#NETWORK_MODE}.
+     * @return selfTest Boolean flag for self test or not.
      */
     public boolean onSelfTest(ArrayList<PatternHelper> validationList, Boolean flag)
     { 
 	    if (internalList.size() > 2 && flag)
 	    {
+	    	// compute the summed value for already seen pattern
 	    	double resultVerfication = 0.0;	    	
 		   	for (PatternHelper element : internalList)
 		   	{
 		   		resultVerfication += layer.computeSum(element.getPatternList());		   		
 		   	}	
 	   		
+		   	// compute the summed value for counter examples
 	   		double resultValidation = 0.0;
 		   	for (PatternHelper element : validationList)
 		   	{
@@ -184,10 +181,12 @@ public abstract class Network implements Serializable
 		   	System.out.println("Selftest value validation dir: " + (resultValidation / internalList.size()));
 
 		   	int validationSize = (validationList.size() != 0 ? validationList.size() : 1);
-		   	
+		   	// check if the summed value for recognition is near the intended barrier
+		   	// and check if the summed counter example value is under the intended barrier 
 		   	if ((resultVerfication / internalList.size()) >= Constants.INTENDED_PERCENTAGE_MATCH &&
 		   		 resultValidation  / validationSize < Constants.INTENDED_PERCENTAGE_MATCH)
 	    	{
+		   		// disable self test for further use
 		   		internalList.clear();
 	    		selfTest = false;
 	    		return selfTest;
@@ -227,6 +226,11 @@ public abstract class Network implements Serializable
     	return result;
     }
     
+    /**
+     * Scan the given parameter path for images which are allowed after {@link Helper#IMAGE_FILTER} and load them into a ArrayList.
+     * @param path Full path name to the folder to scan.
+     * @return result ArrayList of {@link FastBitmap}.
+     */
     public ArrayList<FastBitmap> scanFolderForChanges(String path)
     {
     	ArrayList<FastBitmap> result = new ArrayList<>();   
@@ -319,6 +323,11 @@ public abstract class Network implements Serializable
         return network;
     }
     	
+    /**
+	 * Auto generated serial number.
+	 */
+	private static final long serialVersionUID = 1L;
+    
     /**
      * Flag for image comparison.
      */

@@ -40,7 +40,7 @@ public class Metric implements Serializable, Comparable<Metric>
 	 * Calculate the metric for each group. Calculated metrics are:
 	 * boundingBox (distance of the farthest points in the group)
 	 * centerOfGravity (most central point of all FeaturePoints in a group) 
-	 * @param group identified corners represented by FeaturePoints
+	 * @param group Identified corners represented by FeaturePoints.
 	 * @param image FastBitmap the original image to extract the colors for the histograms.
 	 */
     private void startMetricCalculation(ArrayList<FeaturePoint> group, FastBitmap image)

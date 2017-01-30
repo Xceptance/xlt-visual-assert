@@ -23,7 +23,7 @@ package com.xceptance.xlt.ai.machine_learning;
 
 /**
  * Activation network.
- * @author Diego Catalano
+ * @author Diego Catalano edited by Thomas Volkmann
  */
 public class ActivationNetwork extends Network
 {

@@ -23,8 +23,7 @@ public class PatternHelper implements Serializable
 	public PatternHelper(String tagName)
 	{
 		this.tagName = tagName;
-		patternList = new ArrayList<>();
-		
+		patternList = new ArrayList<>();		
 	}
 	
 	/***
@@ -91,22 +90,6 @@ public class PatternHelper implements Serializable
 	{
 		return tagName;
 	}	
-	
-//	@Override
-//	public boolean equals(Object obj) 
-//	{
-//		if (obj instanceof PatternHelper)
-//		{
-//			return this.hashCode() == obj.hashCode();
-//		}
-//		return false;
-//	};
-//	
-//	@Override
-//	public int hashCode()
-//	{
-//		return patternList.hashCode() + (int)modTime;
-//	}	
 	
 	/***
 	 * Holds the value for the found pattern (0,1).

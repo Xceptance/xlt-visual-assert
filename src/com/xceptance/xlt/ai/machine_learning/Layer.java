@@ -30,11 +30,6 @@ import java.util.ArrayList;
  */
 public class Layer implements Serializable
 {    
-    /**
-	 * Auto generated serial number.
-	 */
-	private static final long serialVersionUID = 1L;
-	
 	/**
      * Layer's inputs count.
      */
@@ -50,14 +45,19 @@ public class Layer implements Serializable
      */
     protected ArrayList<Double> output;
 
-//    /**
-//     * Get Layer's inputs count.
-//     * @return Layer's inputs count.
-//     */
-//    public int getInputsCount() 
-//    {
-//        return inputsCount;
-//    }
+    /**
+     * Singleton pattern for the Layer.
+     * @param inputCount Size of the input.
+     * @return Layer Instance of the Layer.
+     */
+    public static Layer getInstance(int inputCount)
+    {
+    	if (Layer.instance == null)
+    	{
+    		Layer.instance  = new Layer(inputCount);
+    	}
+    	return Layer.instance;
+    }
     
     /**
      * Get Neurons from layer.
@@ -69,7 +69,7 @@ public class Layer implements Serializable
     }
     
     /***
-     * Get specified neuron from layer.
+     * Get specified neuron from Layer.
      * @return Neuron.
      */
     public ActivationNeuron getActivationNeuron()
@@ -77,6 +77,10 @@ public class Layer implements Serializable
         return activeNeuron;
     }
     
+    /**
+     * Set the {@link ActivationNeuron}.
+     * @param actNeuron {@link ActivationNeuron}.
+     */
     public void setActivationNeuron(ActivationNeuron actNeuron)
     {
     	activeNeuron = actNeuron;
@@ -100,19 +104,8 @@ public class Layer implements Serializable
         this.inputsCount = Math.max( 1, inputsCount);
     }
     
-    private static Layer instance;
-    
-    public static Layer getInstance(int inputCount)
-    {
-    	if (Layer.instance == null)
-    	{
-    		Layer.instance  = new Layer(inputCount);
-    	}
-    	return Layer.instance;
-    }
-    
     /**
-     * Compute output vector of the layer.
+     * Compute output vector of the Layer.
      * @param input Input vector.
      * @return Returns layer's output vector.
      */
@@ -158,4 +151,15 @@ public class Layer implements Serializable
         
         return result;
     }
+    
+    /**
+	 * Auto generated serial number.
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	/**
+	 * Instance of {@link Layer}.
+	 */
+    private static Layer instance;
+	
 }

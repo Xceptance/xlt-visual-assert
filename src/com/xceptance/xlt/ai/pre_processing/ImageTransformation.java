@@ -30,9 +30,9 @@ import com.xceptance.xlt.ai.util.Helper;
 public class ImageTransformation 
 {
 	/***
-	 * Constructor if there already is a network which can be used for further learning or comparison. 
+	 * Constructor if there is a network which can be used for further learning or comparison. 
 	 * If the trainingFlag is on false there is just a comparison to the already learned average metric.
-	 * @param imgList ArrayList of FastBitmap with all found images.
+	 * @param imgList ArrayList of {@link FastBitmap} with all found images.
 	 * @param averageMet Loaded {@link AverageMetric} from the network.
 	 * @param trainingFlag boolean value if the network need further training or not.
 	 */
@@ -44,15 +44,13 @@ public class ImageTransformation
 		recognizeFlag 		= false;
 		pp 					= new ArrayList<>();
 		pictureList 		= imgList;
-//		process(imgList);
 		applyTransformation(); 
 	}
 	
 	/***
 	 * Constructor for first initialization, in this case the program is run for the first time.
 	 * Load the images out of a folder and start the analyze with {@link #applyTransformation()}
-	 * @param img FastBitmap the current screenshot.
-	 * @param path String to the folder.
+	 * @param imgList ArrayList {@link FastBitmap} current and eventually other FastBitmaps. 
 	 */
 	public ImageTransformation(ArrayList<FastBitmap> imgList)
 	{
@@ -63,14 +61,12 @@ public class ImageTransformation
 		pp 						= new ArrayList<>();
 		pictureList				= imgList;
 		Constants.NETWORK_MODE 	= true;
-//		load(img, path);
 		applyTransformation();
 	}
 	
 	/***
-	 * Constructor for networkTrainer tool.
+	 * Constructor for NetworkTrainer tool.
 	 * Load the images out of a folder and start the analyze with {@link #applyTransformation()}
-	 * @param img FastBitmap the current screenshot.
 	 * @param path String to the folder.
 	 */
 	public ImageTransformation(String path)
@@ -85,7 +81,7 @@ public class ImageTransformation
 	}
 	
 	/***
-	 * ArrayList of all pre-processed images.
+	 * ArrayList of all preprocessed images.
 	 * Get the current MetricCurator for an image. 
 	 * @return pp ArrayList of MetricCurator for every image.
 	 */
@@ -107,7 +103,6 @@ public class ImageTransformation
 	 * Compute the pattern for the network in relevance to the average metric.
 	 * Provide the data for the neural network and transform the image in a way it is linear seperable.
 	 * This step is important so the perceptron network can learn the patterns and distinguish the different images.
-	 * @param percentageDifference Value to reach for the network to be considered as trained.
 	 * @return foundPattern ArrayList of {@link PatternHelper} of all found pattern if there was more than one image in the folder.
 	 */
 	public ArrayList<PatternHelper> computeAverageMetric()
@@ -260,14 +255,13 @@ public class ImageTransformation
 			long startTime = System.nanoTime();
 			// convolution take too much time and is therefore disabled, improve the performance up to 3 times
 			// but also decrease accuracy 
-			//conv.applyInPlace(element);			
+			// conv.applyInPlace(element);			
 			// apply the fast corner detection to the image
 			tempList = fcd.ProcessImage(element);
 			// sorting with the comparator set in FeaturePoints, sorting order is ascending x and y values
 			Collections.sort(tempList, new FeaturePoint());			
 			pp.add(new PreProcessing(tempList, element));			
 			long estimatedTime = System.nanoTime() - startTime;
-			//System.out.println("Image " + index + " finshed in: " + (double)estimatedTime / 1000000000.0 + " from " + pictureList.size());
 			Helper.updatePercentageBar((double)index / (double)pictureList.size(), estimatedTime, pictureList.size(), index);
 			index++;
 		}	
@@ -276,7 +270,6 @@ public class ImageTransformation
 	
 	/***
 	 * Load all images out of a given folder path.
-	 * @param img FastBitmap current screenshot.
 	 * @param path String full path name to folder.
 	 */
 	private void load(String path)

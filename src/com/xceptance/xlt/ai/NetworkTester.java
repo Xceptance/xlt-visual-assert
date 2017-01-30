@@ -11,7 +11,7 @@ import com.xceptance.xlt.ai.util.Constants;
 
 /**
  * The NetworkTester tool take two arguments. The first argument is for the network location. 
- * This network will be loaded and used for all images. This images nedd to be under the location of the
+ * This network will be loaded and used for all images. This images need to be under the location of the
  * second argument. Both need to be strings.
  * @author Thomas Volkmann 
  * 

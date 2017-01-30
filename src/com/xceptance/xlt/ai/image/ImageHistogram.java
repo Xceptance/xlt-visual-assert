@@ -26,46 +26,52 @@ package com.xceptance.xlt.ai.image;
 
 /**
  * Image Histogram for random values.
- * @author Diego Catalano
+ * @author Diego Catalano edited by Thomas Volkmann
  */
-public class ImageHistogram {
-    
-    private int[]   values;
-    
-    private double  mean = 0;
-    private double  stdDev = 0;
-    private double  entropy = 0;
-    private double  kurtosis = 0;
-    private double  skewness = 0;
-    private int     median = 0;
-    private int     mode;
-    private int     min;
-    private int     max;
-    private long    total;
-    
-    public static int[] MatchHistograms(int[] histA, int[] histB){
+public class ImageHistogram 
+{     
+    /**
+     * Compare two histograms values to each other.
+     * @param histA Integer array of all values.
+     * @param histB Integer array of all values.
+     * @return f Integer array with all equal entries from both parameters. 
+     */
+    public static int[] MatchHistograms(int[] histA, int[] histB)
+    {
         int length = histA.length;
         double[] PA = CDF(histA);
         double[] PB = CDF(histB);
-        int[] F = new int[length];
+        int[] f = new int[length];
         
-        for (int a = 0; a < length; a++) {
+        for (int a = 0; a < length; a++) 
+        {
             int j = length - 1;
-            do {
-                F[a] = j;
+            do 
+            {
+                f[a] = j;
                 j--;
-            } while (j >= 0 && PA[a] <= PB[j]);
-        }
-        
-        return F;
+            } 
+            while (j >= 0 && PA[a] <= PB[j]);
+        }        
+        return f;
     }
     
+    /**
+     * Compare two histograms to each other.
+     * @param histA ImageHistogram first histogram.
+     * @param histB ImageHistogram second histogram.
+     * @return {@link #MatchHistograms(int[], int[])}
+     */
     public static int[] MatchHistograms(ImageHistogram histA, ImageHistogram histB)
     {
         return MatchHistograms(histA.values, histB.values);
     }
     
-    // cumulative distribution function
+    /**
+     * Cumulative distribution function of values. 
+     * @param values Integer array of all values.
+     * @return p Double array result of the CDF.
+     */
     public static double[] CDF(int[] values)
     {
         int length = values.length;
@@ -76,19 +82,24 @@ public class ImageHistogram {
             n += values[i];
         }
         
-        double[] P = new double[length];
+        double[] p = new double[length];
         int c = values[0];
-        P[0] = (double) c / n;
+        p[0] = (double) c / n;
         for (int i = 1; i < length; i++) 
         {
             c += values[i];
-            P[i] = (double) c / n;
-        }
-        
-        return P;
+            p[i] = (double) c / n;
+        }        
+        return p;
     }
     
-    public static double[] CDF(ImageHistogram hist){
+    /**
+     * Cumulative distribution function of the histogram.
+     * @param hist ImageHistogram
+     * @return {@link #CDF(int[])}
+     */
+    public static double[] CDF(ImageHistogram hist)
+    {
         return CDF(hist.values);
     }
     
@@ -97,17 +108,19 @@ public class ImageHistogram {
      * @param values Values.
      * @return Normalized histogram.
      */
-    public static double[] Normalize(int[] values){
+    public static double[] Normalize(int[] values)
+    {
         int sum = 0;
-        for (int i = 0; i < values.length; i++) {
+        for (int i = 0; i < values.length; i++) 
+        {
             sum += values[i];
         }
         
         double[] norm = new double[values.length];
-        for (int i = 0; i < norm.length; i++) {
+        for (int i = 0; i < norm.length; i++) 
+        {
             norm[i] = values[i] / (double)sum;
-        }
-        
+        }        
         return norm;
     }
 
@@ -115,40 +128,45 @@ public class ImageHistogram {
      * Initializes a new instance of the Histogram class.
      * @param values Values.
      */
-    public ImageHistogram(int[] values) {
+    public ImageHistogram(int[] values) 
+    {
         this.values = values;
         update();
     }
 
     /**
      * Get values of the histogram.
-     * @return Values.
+     * @return values Integer array of all values.
      */
-    public int[] getValues() {
+    public int[] getValues() 
+    {
         return values;
     }
 
     /**
      * Get mean value.
-     * @return Mean.
+     * @return mean.
      */
-    public double getMean() {
+    public double getMean() 
+    {
         return mean;
     }
 
     /**
-     * Get standart deviation value.
-     * @return Standart deviation.
+     * Get standard deviation value.
+     * @return stdDev.
      */
-    public double getStdDev() {
+    public double getStdDev() 
+    {
         return stdDev;
     }
     
     /**
      * Get entropy value.
-     * @return Entropy.
+     * @return entropy.
      */
-    public double getEntropy(){
+    public double getEntropy()
+    {
         return entropy;
     }
 
@@ -156,7 +174,8 @@ public class ImageHistogram {
      * Get kurtosis value.
      * @return Kurtosis.
      */
-    public double getKurtosis() {
+    public double getKurtosis() 
+    {
         return kurtosis;
     }
 
@@ -164,7 +183,8 @@ public class ImageHistogram {
      * Get skewness value.
      * @return Skewness.
      */
-    public double getSkewness() {
+    public double getSkewness() 
+    {
         return skewness;
     }
 
@@ -172,7 +192,8 @@ public class ImageHistogram {
      * Get median value.
      * @return Median.
      */
-    public int getMedian() {
+    public int getMedian() 
+    {
         return median;
     }
     
@@ -180,7 +201,8 @@ public class ImageHistogram {
      * Get mode value.
      * @return Mode.
      */
-    public int getMode(){
+    public int getMode()
+    {
         return mode;
     }
 
@@ -188,7 +210,8 @@ public class ImageHistogram {
      * Get minimum value.
      * @return Minimum.
      */
-    public int getMin() {
+    public int getMin() 
+    {
         return min;
     }
 
@@ -196,7 +219,8 @@ public class ImageHistogram {
      * Get maximum value.
      * @return Maximum.
      */
-    public int getMax() {
+    public int getMax() 
+    {
         return max;
     }
 
@@ -204,38 +228,65 @@ public class ImageHistogram {
      * Get the sum of pixels.
      * @return total 
      */
-    public long getTotal() {
+    public long getTotal() 
+    {
         return total;
     }
     
     /**
      * Update histogram.
      */
-    private void update(){
-        
+    private void update()
+    {        
         total = 0;
-        for (int i = 0; i < values.length; i++) {
+        for (int i = 0; i < values.length; i++) 
+        {
             total += values[i];
         }
 
-        mean   = HistogramStatistics.Mean( values );
-//        stdDev = HistogramStatistics.StdDev( values, mean );
-//        kurtosis = HistogramStatistics.Kurtosis(values, mean, stdDev);
-//        skewness = HistogramStatistics.Skewness(values, mean, stdDev);
-//        median = HistogramStatistics.Median( values );
-//        mode = HistogramStatistics.Mode(values);
-//        entropy = HistogramStatistics.Entropy(values);
+        mean = HistogramStatistics.Mean(values);
+//      stdDev = HistogramStatistics.StdDev( values, mean );
+//      kurtosis = HistogramStatistics.Kurtosis(values, mean, stdDev);
+//      skewness = HistogramStatistics.Skewness(values, mean, stdDev);
+//      median = HistogramStatistics.Median( values );
+//      mode = HistogramStatistics.Mode(values);
+//      entropy = HistogramStatistics.Entropy(values);
     }
     
     /**
      * Normalize histogram.
      * @return Normalized histogram.
      */
-    public double[] Normalize(){
+    public double[] Normalize()
+    {
         double[] h = new double[values.length];
-        for (int i = 0; i < h.length; i++) {
+        for (int i = 0; i < h.length; i++) 
+        {
             h[i] = values[i] / (double)total;
         }
         return h;
     }
+    
+    // Array for all values.
+    private int[]   values;
+    // mean value
+    private double  mean = 0;
+    // Standard derivation value.
+    private double  stdDev = 0;
+    // Entropy value.
+    private double  entropy = 0;
+    // Kurtosis value.
+    private double  kurtosis = 0;
+    // Skewness value.
+    private double  skewness = 0;
+    // Median value.
+    private int     median = 0;
+    // Mode value.
+    private int     mode;
+    // Minimum value.
+    private int     min;
+    // Maximum value.
+    private int     max;
+    // Total amount of elements.
+    private long    total;
 }

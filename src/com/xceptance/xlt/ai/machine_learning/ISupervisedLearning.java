@@ -25,7 +25,7 @@ import java.util.ArrayList;
 
 /**
  * Supervised learning interface.
- * @author Diego Catalano
+ * @author Diego Catalano edited by Thomas Volkmann
  */
 public interface ISupervisedLearning 
 {

@@ -134,7 +134,8 @@ public class FastBitmap
     }
     
     /**
-     * Initialize a new instance of the FastBitmap class.
+     * Initialize a new instance of the FastBitmap class. Generate a new FastBitmap in original
+     * or in scaled Dimensions.
      * @param bufferedImage Buffered image.
      * @param tagName String image name.
      * @param useOriginalSize Boolean value if the original size should be used.
@@ -180,7 +181,7 @@ public class FastBitmap
     
     /**
      * Initialize a new instance of the FastBitmap class.
-     * @param ico Ico.
+     * @param ico ImageIcon.
      */
     public FastBitmap(ImageIcon ico)
     {

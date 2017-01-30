@@ -83,7 +83,7 @@ public final class HistogramStatistics
         // for all values
         for ( int i = 0; i < n; i++ )
         {
-            // accumalate total
+            // accumulate total
             total += values[i];
         }
 
@@ -164,7 +164,7 @@ public final class HistogramStatistics
             hits = values[i];
             // accumulate mean
             mean += i * hits;
-            // accumalate total
+            // accumulate total
             total += hits;
         }
         return ( total == 0 ) ? 0 : mean / total;
@@ -182,7 +182,7 @@ public final class HistogramStatistics
         // for all values
         for ( int i = 0; i < n; i++ )
         {
-            // accumalate total
+            // accumulate total
             total += values[i];
         }
 
@@ -257,9 +257,9 @@ public final class HistogramStatistics
     }
     
     /**
-     * Calculate standart deviation.
+     * Calculate standard deviation.
      * @param values Values.
-     * @return Standart deviation.
+     * @return Standard deviation.
      */
     public static double StdDev( int[] values )
     {
@@ -267,10 +267,10 @@ public final class HistogramStatistics
     }
     
     /**
-     * Calculate standart deviation.
+     * Calculate standard deviation.
      * @param values Values.
      * @param mean Mean.
-     * @return Standart deviation.
+     * @return Standard deviation.
      */
     public static double StdDev( int[] values, double mean )
     {
@@ -286,7 +286,7 @@ public final class HistogramStatistics
             diff = (double) i - mean;
             // accumulate std.dev.
             stddev += diff * diff * hits;
-            // accumalate total
+            // accumulate total
             total += hits;
         }
 

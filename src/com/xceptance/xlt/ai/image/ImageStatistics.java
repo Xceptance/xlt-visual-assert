@@ -26,7 +26,7 @@ import com.xceptance.xlt.ai.image.FastBitmap;
 
 /**
  * Gather statistics about image in Gray or RGB color space.
- * @author Diego Catalano
+ * @author Diego Catalano edited by Thomas Vokmann
  */
 public class ImageStatistics 
 {    
@@ -41,7 +41,8 @@ public class ImageStatistics
      * Image histogram of gray channel.
      * @return Histogram.
      */
-    public ImageHistogram getHistogramGray(){
+    public ImageHistogram getHistogramGray()
+    {
         if (gray == null)
             throw new IllegalArgumentException("Histogram gray is null");
         
@@ -52,7 +53,8 @@ public class ImageStatistics
      * Image histogram of red channel.
      * @return Histogram.
      */
-    public ImageHistogram getHistogramRed() {
+    public ImageHistogram getHistogramRed() 
+    {
         if (red == null)
             throw new IllegalArgumentException("Histogram red is null");
         
@@ -63,7 +65,8 @@ public class ImageStatistics
      * Image histogram of green channel.
      * @return Histogram.
      */
-    public ImageHistogram getHistogramGreen() {
+    public ImageHistogram getHistogramGreen() 
+    {
         if (green == null)
             throw new IllegalArgumentException("Histogram green is null");
         
@@ -74,7 +77,8 @@ public class ImageStatistics
      * Image histogram of blue channel.
      * @return Histogram.
      */
-    public ImageHistogram getHistogramBlue() {
+    public ImageHistogram getHistogramBlue() 
+    {
         if (blue == null)
             throw new IllegalArgumentException("Histogram blue is null");
         
@@ -85,7 +89,8 @@ public class ImageStatistics
      * Initialize a new instance of the ImageStatistics class.
      * @param fastBitmap Image to be processed.
      */
-    public ImageStatistics(FastBitmap fastBitmap) {
+    public ImageStatistics(FastBitmap fastBitmap) 
+    {
         this(fastBitmap, 256);
     }
     
@@ -123,6 +128,7 @@ public class ImageStatistics
             gray = new ImageHistogram(g);
             
         }
+        // generate the histograms for each canal
         else if (fastBitmap.isRGB())
         {
             int[] r = new int[bins];
@@ -176,6 +182,7 @@ public class ImageStatistics
             gray = new ImageHistogram(g);
             
         }
+        // generate the histograms for each canal
         else if (fastBitmap.isRGB())
         {
             int[] r = new int[bins];
@@ -204,7 +211,8 @@ public class ImageStatistics
      * Count pixels.
      * @return amount of pixels.
      */
-    public int PixelsCount() {
+    public int PixelsCount() 
+    {
         return pixels;
     }
     
@@ -213,7 +221,8 @@ public class ImageStatistics
      * @param fastBitmap Image to be processed.
      * @return Mean.
      */
-    public static float Mean(FastBitmap fastBitmap){
+    public static float Mean(FastBitmap fastBitmap)
+    {
         return Mean(fastBitmap, 0, 0, fastBitmap.getWidth(), fastBitmap.getHeight());
     }
     
@@ -226,17 +235,22 @@ public class ImageStatistics
      * @param height Height.
      * @return Mean.
      */
-    public static float Mean(FastBitmap fastBitmap, int startX, int startY, int width, int height){
+    public static float Mean(FastBitmap fastBitmap, int startX, int startY, int width, int height)
+    {
         float mean = 0;
-        if (fastBitmap.isGrayscale()){
-            for (int i = startX; i < height; i++) {
-                for (int j = startY; j < width; j++) {
+        if (fastBitmap.isGrayscale())
+        {
+            for (int i = startX; i < height; i++) 
+            {
+                for (int j = startY; j < width; j++) 
+                {
                     mean += fastBitmap.getGray(i, j);
                 }
             }
             return mean / (width * height);
         }
-        else{
+        else
+        {
             throw new IllegalArgumentException("ImageStatistics: Only compute mean in grayscale images.");
         }
     }
@@ -246,7 +260,8 @@ public class ImageStatistics
      * @param fastBitmap Image to be processed.
      * @return Variance.
      */
-    public static float Variance(FastBitmap fastBitmap){
+    public static float Variance(FastBitmap fastBitmap)
+    {
         float mean = Mean(fastBitmap);
         return Variance(fastBitmap, mean);
     }
@@ -257,7 +272,8 @@ public class ImageStatistics
      * @param mean Mean.
      * @return Variance.
      */
-    public static float Variance(FastBitmap fastBitmap, float mean){
+    public static float Variance(FastBitmap fastBitmap, float mean)
+    {
         return Variance(fastBitmap, mean, 0, 0, fastBitmap.getWidth(), fastBitmap.getHeight());
     }
     
@@ -271,18 +287,21 @@ public class ImageStatistics
      * @param height Height.
      * @return Variance.
      */
-    public static float Variance(FastBitmap fastBitmap, float mean, int startX, int startY, int width, int height){
-        
+    public static float Variance(FastBitmap fastBitmap, float mean, int startX, int startY, int width, int height)
+    {
         float sum = 0;
         if (fastBitmap.isGrayscale()){
-            for (int i = startX; i < height; i++) {
-                for (int j = startY; j < width; j++) {
+            for (int i = startX; i < height; i++) 
+            {
+                for (int j = startY; j < width; j++) 
+                {
                     sum += Math.pow(fastBitmap.getGray(i, j) - mean, 2);
                 }
             }
             return sum / (float)((width * height) - 1);
         }
-        else{
+        else
+        {
             throw new IllegalArgumentException("ImageStatistics: Only compute variance in grayscale images.");
         }
     }
@@ -292,7 +311,8 @@ public class ImageStatistics
      * @param fastBitmap Image to be processed.
      * @return Maximum gray.
      */
-    public static int Maximum (FastBitmap fastBitmap){
+    public static int Maximum (FastBitmap fastBitmap)
+    {
         return Maximum(fastBitmap, 0, 0, fastBitmap.getWidth(), fastBitmap.getHeight());
     }
     
@@ -305,12 +325,16 @@ public class ImageStatistics
      * @param height Height.
      * @return Maximum gray.
      */
-    public static int Maximum(FastBitmap fastBitmap, int startX, int startY, int width, int height){
+    public static int Maximum(FastBitmap fastBitmap, int startX, int startY, int width, int height)
+    {
         int max = 0;
-        for (int i = startX; i < height; i++) {
-            for (int j = startY; j < width; j++) {
+        for (int i = startX; i < height; i++) 
+        {
+            for (int j = startY; j < width; j++) 
+            {
                 int gray = fastBitmap.getGray(i, j);
-                if (gray > max) {
+                if (gray > max) 
+                {
                     max = gray;
                 }
             }
@@ -323,7 +347,8 @@ public class ImageStatistics
      * @param fastBitmap Image to be processed.
      * @return minimum gray.
      */
-    public static int Minimum (FastBitmap fastBitmap){
+    public static int Minimum (FastBitmap fastBitmap)
+    {
         return Minimum(fastBitmap, 0, 0, fastBitmap.getWidth(), fastBitmap.getHeight());
     }
     
@@ -336,12 +361,16 @@ public class ImageStatistics
      * @param height Height.
      * @return Minimum gray.
      */
-    public static int Minimum(FastBitmap fastBitmap, int startX, int startY, int width, int height){
+    public static int Minimum(FastBitmap fastBitmap, int startX, int startY, int width, int height)
+    {
         int min = 255;
-        for (int i = startX; i < height; i++) {
-            for (int j = startY; j < width; j++) {
+        for (int i = startX; i < height; i++) 
+        {
+            for (int j = startY; j < width; j++) 
+            {
                 int gray = fastBitmap.getGray(i, j);
-                if (gray < min) {
+                if (gray < min) 
+                {
                     min = gray;
                 }
             }

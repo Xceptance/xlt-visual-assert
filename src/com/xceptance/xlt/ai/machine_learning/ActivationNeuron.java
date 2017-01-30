@@ -28,28 +28,32 @@ import java.util.ArrayList;
  * @author Diego Catalano edited by Thomas Volkmann
  */
 public class ActivationNeuron extends Neuron
-{    
-    /**
-	 * Auto generated serial number.
+{  
+	
+	/**
+	 * Value for threshold, which represent the dynamic change value for separation.
 	 */
-	private static final long serialVersionUID = 1L;
-
 	protected double threshold = 0.0;
     
+	/**
+	 * Interface function value.
+	 */
     protected IActivationFunction function = null;
-    
-    private ArrayList<Neuron> neurons;
-
+	
     /**
      * Get Threshold value.
      * The value is added to inputs weighted sum before it is passed to activation function.
-     * @return Threshold value.
+     * @return threshold value.
      */
     public double getThreshold() 
     {
         return threshold;
     }
 
+    /**
+     * get all neurons.
+     * @return neurons ArrayList with all neurons in the layer.
+     */
     public ArrayList<Neuron> getNeurons()
     {
     	return neurons;
@@ -116,4 +120,15 @@ public class ActivationNeuron extends Neuron
 
         return output;
     }
+    
+    /**
+	 * Auto generated serial number.
+	 */
+	private static final long serialVersionUID = 1L;
+
+    /**
+     * All neurons in this layer.
+     */
+    private ArrayList<Neuron> neurons;
+
 }

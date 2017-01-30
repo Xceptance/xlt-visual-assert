@@ -34,12 +34,7 @@ import java.util.Random;
  * @author Diego Catalano edited by Thomas Volkmann
  */
 public class Neuron implements Serializable
-{    
-    /**
-	 * Auto generated serial number.
-	 */
-	private static final long serialVersionUID = 1L;
-
+{   
 	/**
      * Neuron's inputs count.
      */
@@ -104,8 +99,8 @@ public class Neuron implements Serializable
     }
     
     /**
-     * Get Neuron's weights accessor.
-     * @return Weights.
+     * Get Neuron weight.
+     * @return weights Double value of the weight.
      */
     public double getWeight()
     {
@@ -113,7 +108,7 @@ public class Neuron implements Serializable
     }
     
     /**
-     * Set Neuron's weights accessor.
+     * Set Neuron weight.
      * @param weight Weights.
      */
     public void setWeight(double weight)
@@ -138,5 +133,11 @@ public class Neuron implements Serializable
     {
         double d = range.length();        
         weight = r.nextDouble( ) * d + range.getMin();                
-    }    
+    }  
+    
+    /**
+	 * Auto generated serial number.
+	 */
+	private static final long serialVersionUID = 1L;
+
 }
