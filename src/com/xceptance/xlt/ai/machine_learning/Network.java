@@ -215,7 +215,7 @@ public abstract class Network implements Serializable
 		{
 			if (!overwatchList.contains(element.getName().hashCode()))
 			{
-				result.add(Helper.loadImageScaled_FastBitmap(element.getAbsolutePath(), Constants.IMAGE_HEIGHT, Constants.IMAGE_WIDTH));
+				result.add(Helper.loadImageScaled_FastBitmap(element.getAbsolutePath()));
 			}
 			tempList.add(element.getName().hashCode());
 		}		
@@ -236,7 +236,7 @@ public abstract class Network implements Serializable
 		{
 			for (File element : list)
 			{
-				result.add(Helper.loadImageScaled_FastBitmap(element.getAbsolutePath(), Constants.IMAGE_HEIGHT, Constants.IMAGE_WIDTH));
+				result.add(Helper.loadImageScaled_FastBitmap(element.getAbsolutePath()));
 			}	
     	}
     	return result;

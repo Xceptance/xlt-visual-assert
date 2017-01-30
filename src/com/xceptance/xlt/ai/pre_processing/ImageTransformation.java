@@ -268,7 +268,7 @@ public class ImageTransformation
 			pp.add(new PreProcessing(tempList, element));			
 			long estimatedTime = System.nanoTime() - startTime;
 			//System.out.println("Image " + index + " finshed in: " + (double)estimatedTime / 1000000000.0 + " from " + pictureList.size());
-			Helper.updatePercentageBar((double)index / (double)pictureList.size(), estimatedTime);
+			Helper.updatePercentageBar((double)index / (double)pictureList.size(), estimatedTime, pictureList.size(), index);
 			index++;
 		}	
 		System.out.println("");
