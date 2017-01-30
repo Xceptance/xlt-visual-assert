@@ -1,6 +1,5 @@
 package com.xceptance.xlt.ai;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import com.xceptance.xlt.ai.image.FastBitmap;
 import com.xceptance.xlt.ai.image.PatternHelper;
@@ -9,13 +8,20 @@ import com.xceptance.xlt.ai.machine_learning.BipolarSigmoidFunction;
 import com.xceptance.xlt.ai.machine_learning.PerceptronLearning;
 import com.xceptance.xlt.ai.pre_processing.ImageTransformation;
 import com.xceptance.xlt.ai.util.Constants;
-import com.xceptance.xlt.ai.util.Helper;
 
-public class networkTester 
-{
-
-	// args[0] = network location
-	// args[1] = folder to check the images
+/**
+ * The NetworkTester tool take two arguments. The first argument is for the network location. 
+ * This network will be loaded and used for all images. This images nedd to be under the location of the
+ * second argument. Both need to be strings.
+ * @author Thomas Volkmann 
+ * 
+ */
+public class NetworkTester 
+{	
+	/**
+	 * Entry point for running the network tester. 
+	 * @param args String array which contains the arguments, only two arguments will be used but are mandatory.
+	 */
 	public static void main(String[] args) 
 	{
 		Constants.NETWORK_MODE = true;

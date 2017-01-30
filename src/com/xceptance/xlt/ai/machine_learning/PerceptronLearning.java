@@ -77,7 +77,7 @@ public class PerceptronLearning implements ISupervisedLearning
     	if (input.size() != layer.getActivationNeuron().getNeurons().size())
         {
     		layer.inputsCount = input.size();
-    		for (;layer.getActivationNeuron().getNeurons().size() < input.size();)
+    		while (layer.getActivationNeuron().getNeurons().size() < input.size())
     		{ 			
     			layer.getActivationNeuron().getNeurons().add(new Neuron());
     		}
@@ -93,7 +93,6 @@ public class PerceptronLearning implements ISupervisedLearning
         for ( int j = 0; j < input.size() ; j++ )
         {        	
         	double er = input.get(j) - networkOutput.get(j);
-
             // if the prediction of the network was right no learning is necessary
         	// Math.floor(e * 10) / 10 for less precision
             if ( Math.floor(er * 100) / 100 != 0 )

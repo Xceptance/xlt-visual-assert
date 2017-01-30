@@ -12,11 +12,28 @@ import com.xceptance.xlt.ai.pre_processing.ImageTransformation;
 import com.xceptance.xlt.ai.util.Constants;
 import com.xceptance.xlt.ai.util.Helper;
 
-public class networkTrainer 
+/**
+ * The network trainer is a tool for creating networks. A network is the result from loading and analyzing images. 
+ * The analyzing is the learning of the structure within the images. 
+ * The network trainer need three parameters to work:
+ * 1. path to folder where the images are saved
+ * 2. path to properties file (by default under git_folder/xlt-vissual-asser/config/ai.properties)
+ * 3. optional network name, could also be changed afterwards
+ * The network trainer learn every images under the first argument using the parameters in the properties file.
+ * After processing all images the network trainer test himself, with all images and deliver a percentage recognized value for each image.
+ * The network is saved under NetworkTrainer.results.
+ * @author Thomas Volkmann
+ *
+ */
+public class NetworkTrainer 
 {
     // args[0] = path to the learning folder
     // args[1] = path to properties file
 	// args[2] = optional network name 
+	/**
+	 * Entry point for running the network trainer. 
+	 * @param args String array first two arguments are mandatory, third argument is optional.
+	 */
 	public static void main(String[] args) 
 	{	
         //--------------------------------------------------------------------------------
@@ -34,7 +51,7 @@ public class networkTrainer
 
         String networkName = "";
         // Directory of the network file
-        final File networkDirectoryPath = new File("networkTrainer.result");
+        final File networkDirectoryPath = new File("NetworkTrainer.result");
         networkDirectoryPath.mkdirs();
         
         // Path to working folder

@@ -59,8 +59,7 @@ public class Helper
 	/***
 	 * Apply the percentage difference in the given range around the value.
 	 * The value will always between 1% - 100% to avoid errors, even if it get changed from outside. 
-	 * @param value double value to calculate the difference
-	 * @param percentageDifference int percentage difference
+	 * @param value double value to calculate the difference 
 	 * @return value
 	 */
 	private static double getPercentageDifference(double value)
@@ -79,6 +78,11 @@ public class Helper
 		return result;
 	}
 	
+	/**
+	 * Properties file reader for the ai.properties file. Read and convert all properties for the program.
+	 * @param path String path to the ai.properties file.
+	 * @throws IOException
+	 */
 	public static void readProperties(String path) throws IOException
 	{
 	    // the property names       
@@ -118,6 +122,7 @@ public class Helper
 		    	return;
 		    }
 		    
+		    // parse all properties to the correct format.
 	        Constants.TESTCASE_BOUND_NAME		= props.getProperty(PROPERTY_TESTCASE_NAME, Constants.TESTCASE_BOUND_NAME);
 	        Constants.TESTCASE_BOUND			= Boolean.parseBoolean(props.getProperty(PROPERTY_TESTCASE_BOUND, Boolean.toString(Constants.TESTCASE_BOUND)));
 	        Constants.NETWORK_MODE				= Boolean.parseBoolean(props.getProperty(PROPERTY_MODE, Boolean.toString(Constants.NETWORK_MODE)));
@@ -160,9 +165,9 @@ public class Helper
 	}
 
 	/***
-	 * 
-	 * @param img Image
-	 * @param imageType chosen int value of the target ImageType
+	 * Transform a given image to an BufferedImkage with with exact same width and height as the original.
+	 * @param img Image to transform into BuferedImage.
+	 * @param imageType Chosen int value of the target ImageType.
 	 * @return bi BufferedImage
 	 */
 	public static BufferedImage imageToBufferedImage(Image img, int imageType) 
@@ -174,7 +179,7 @@ public class Helper
 	}
 
 	/***
-	 * Transform Image to BufferedImage with new height and width for scaling.
+	 * Transform Image to BufferedImage with new height and width for scaling. Also change the ImageType to needed type.
 	 * @param img Image
 	 * @param imageType int value of the target ImageType
 	 * @param height height of the new BufferedImage
@@ -191,10 +196,10 @@ public class Helper
 	}
 	
 	/***
-	 * transform an image to a {@link FastBitmap} for internal use 
-	 * @param img Image Given image to transform.
+	 * Transform an image to a {@link FastBitmap} for internal use.
+	 * @param img Image given image to transform.
 	 * @param tagName String to identify the image.
-	 * @param imageType Integer value for the used image type.
+	 * @param imageType Integer value for the used ImageType.
 	 * @return fi FastBitmap
 	 */
 	public static FastBitmap imageToFastBitmap(Image img, String tagName, int imageType) 
@@ -204,12 +209,12 @@ public class Helper
 	}
 
 	/***
-	 * Transform Image to BufferedImage with new height and width for scaling.
+	 * Transform image to {@link FastBitmap} with new height and width for scaling.
 	 * @param img Image to transform.
 	 * @param tagName String value to identify to image.
 	 * @return fi FastBitmap.	
 	 */
-	public static FastBitmap imageToFastImageScaled(Image img, String tagName) 
+	public static FastBitmap imageToFastImage(Image img, String tagName) 
 	{
 		FastBitmap fi = new FastBitmap(imageToBufferedImage(img, BufferedImage.TYPE_INT_RGB), tagName, Constants.USE_ORIGINAL_SIZE); 
 		return fi;
@@ -239,7 +244,7 @@ public class Helper
 	}
 		
 	/***
-	 * Write a BufferedImage to HDD as a file.
+	 * Write a BufferedImage to HDD as a file, with the chosen format under {@link Constants#FORMAT}.
 	 * @param img BufferedImage
 	 * @param filename String name of the file 
 	 */
@@ -276,7 +281,7 @@ public class Helper
 	}
 	
 	/**
-	 * Read an image file into FastBitmap.
+	 * Read an image file into {@link FastBitmap}.
 	 * @param filename String full name to the file location.
 	 * @return FastBitmap
 	 */
@@ -316,13 +321,13 @@ public class Helper
 	}
 	
 	 /**
-	 * Read a image file into a FastBitmap and scale this image..
+	 * Read an image file and transform it into a scaled {@link FastBitmap}.
 	 * @param filename String full path name
 	 * @param width Integer value for the width of the loaded image.
 	 * @param height Integer value for the height of the loaded image
 	 * @return BufferedImage
 	 */
-	public static FastBitmap loadImageScaled_FastBitmap(String filename, int width, int height) 
+	public static FastBitmap loadImageScaled_FastBitmap(String filename) 
 	{
 		BufferedImage img = null;
 		try 
@@ -333,11 +338,11 @@ public class Helper
 		{ 
 			System.out.println("File Not Found"); 
 		}		
-		return imageToFastImageScaled(img, filename);
+		return imageToFastImage(img, filename);
 	}
 	
 	/***
-	 * Load all Images from the given folder path. Use an image filter for only allowed images and only images.
+	 * Load all images from the given folder path. Use an image filter for only allowed images and only images.
 	 * @param path String full path name to the folder 
 	 * @return ArrayList all found BufferedImages in the folder
 	 */
@@ -356,9 +361,9 @@ public class Helper
 	}
 	
 	/***
-	 * Load all Images from the given folder path. Use an image filter for only allowed images and only images.
+	 * Load all images from the given folder path. Use an image filter {@link Constants#EXTENSIONS} for only allowed images and only images.
 	 * @param path String full path name to the folder 
-	 * @return ArrayList all found FastBitmap in the folder
+	 * @return ArrayList all found {@link FastBitmap} in the folder
 	 */
 	public static ArrayList<FastBitmap> loadAllImages_FastBitmap(String path)
 	{
@@ -375,8 +380,8 @@ public class Helper
 	}
 	
 	/***
-	 * Load all Images from the given folder path. Use an image filter for only allowed images and only images. 
-	 * Images must end with one of the allowed endings ".jpg", ".png", ".bmp" , ".jpeg".
+	 * Load all images from the given folder path. Use an image filter {@link Constants#EXTENSIONS} for only allowed images and only images.
+	 * Images must end with one of the allowed endings {@link Constants#EXTENSIONS}. 
 	 * Takes also a width and height for scaling {@link Helper#imageToBufferedImageScaled(Image, int, int, int)} 
 	 * @param path String full path name to the folder 
 	 * @param heigth int value for scaling
@@ -400,7 +405,7 @@ public class Helper
 
 	/***
 	 * Load all Images from the given folder path. Use an image filter for only allowed images and only images.
-	 * Images must end with one of the allowed endings ".jpg", ".png", ".bmp" , ".jpeg".
+	 * Images must end with one of the allowed endings {@link Constants#EXTENSIONS}.
 	 * Takes also a width and height for scaling {@link Helper#imageToBufferedImageScaled(Image, int, int, int)}
 	 * @param path String full path name to the folder 
 	 * @param heigth int value for scaling
@@ -422,12 +427,24 @@ public class Helper
 		return pictureList;
 	}
 	
+	/**
+	 * Convert a double value into a string. 
+	 * The string have a format from (##.##) as percentage representation. 
+	 * @param input Double value.
+	 * @return df Format rounded to suit percentage representation.
+	 */
 	public static String numberConverterToPercent(double input)
 	{
 		DecimalFormat df = new DecimalFormat("##.##");		
 		return df.format(input * 100);
 	}
 	
+	/**
+	 * Convert a double value into a string. 
+	 * The string have a format from (#.##) as time value representation. 
+	 * @param input Double value.
+	 * @return df Format rounded to suit time representation.
+	 */
 	public static String numberConverterToTime(double input)
 	{
 		DecimalFormat df = new DecimalFormat("#.##");		
@@ -435,7 +452,8 @@ public class Helper
 	}
 	
 	/***
-	 * Create a new FilenameFilter, to check for image extensions. 
+	 * Create a new FilenameFilter, to check for image extensions.
+	 * Allowed extensions are {@link Constants#EXTENSIONS} 
 	 */
 	public static final FilenameFilter IMAGE_FILTER = new FilenameFilter() 
 	{
@@ -455,7 +473,7 @@ public class Helper
     
     /**
      * If the option for a destination is used in the test script, this method try to get a match for the destination name.
-     * If a macth is found everything get sort into the destination. Otherwise there will be new folders with the given destination.
+     * If a match is found everything get sort into the destination. Otherwise there will be new folders with the given destination.
      * @param path where the match should be
      * @param currentActionName per argument given string out of the test script
      * @return result if there is a match the identification number get extracted for further use, null otherwise
@@ -474,13 +492,17 @@ public class Helper
 			}
 		});
 		// check for matching name, if a match is found the identification number get extracted for further use.
-		for (File element : list)
+		if (list != null)
 		{
-			if (element.toString().matches("(.*)" + currentActionName))
+			for (File element : list)
 			{
-				result = element.toString().replaceAll("[^-?0-9]+", ""); 
+				if (element.toString().matches("(.*)" + currentActionName))
+				{
+					result = element.toString().replaceAll("[^-?0-9]+", "");
+					break;
+				}
 			}
-		}		
+		}
     	return result;
     }
 
@@ -488,9 +510,10 @@ public class Helper
      * Progress bar which is used to visualize the progress for the command line tool.
      * Does not work properly in eclipse. 
      * @param progress Double value of the current progress.
+     * @param estimatedTime long value for used time
      */
-	public static void updatePercentageBar(double progress, long estimatedTime) 
-	{		
+	public static void updatePercentageBar(double progress, long estimatedTime, int size, int index) 
+	{
 	    int percent = (int) Math.round(progress * 100);
 	    if (Math.abs(percent - lastPercent) >= 1) 
 	    {	    	
@@ -513,8 +536,10 @@ public class Helper
 	        template.append("] %s   ");
 	        if (percent >= 100) {
 	            template.append("%n");
-	        }	        
-	        System.out.printf(template.toString(), percent + "%  estimated time " + Helper.numberConverterToTime((double)estimatedTime / 1000000000.0) + " s");
+	        }       
+	        String approximatedTime = Helper.numberConverterToTime((((double)estimatedTime / 1000000000.0) * (size + 1 - index)));	        
+	        System.out.printf(template.toString(), percent + "%  estimated time " + Helper.numberConverterToTime((double)estimatedTime / 1000000000.0) + "s" + 
+	        " approximated time " + approximatedTime + "s");
 	        lastPercent = percent;
 	    }
 	}
@@ -528,7 +553,7 @@ public class Helper
 	
 	/***
 	 * Convert a BufferedImage to a 2D double array.
-	 * This method didn't use the getRBG method it calculate the values native with bit shifting of the Integer values of the pixel.
+	 * This method did not use the getRBG method it calculate the values native with bit shifting of the Integer values of the pixel.
 	 * The alpha channel is also in consideration and get get special treatment.
 	 * @param image BufferedImage	  
 	 * @return result double[][] matrix of the image
@@ -592,6 +617,8 @@ public class Helper
 	      return result;
 	}
 	
+	// last percent value for percentage bar.
 	private static int lastPercent;
+	// input stream for the properties reader.
 	private static FileInputStream inputStream;
 }
