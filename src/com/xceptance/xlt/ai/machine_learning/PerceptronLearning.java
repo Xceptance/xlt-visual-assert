@@ -92,7 +92,7 @@ public class PerceptronLearning implements ISupervisedLearning
             if ( Math.floor(er * 100) / 100 != 0 )
             {            	
             	// update weights            
-            	layer.activeNeuron.getNeurons().get(j).setWeight(layer.activeNeuron.getNeurons().get(j).weight + learningRate * er * (input.get(j) == 0 ? -learningRate : 1));
+            	layer.activeNeuron.getNeurons().get(j).setWeight(layer.activeNeuron.getNeurons().get(j).weight + learningRate * er * (input.get(j) == 0 ? -0.2 : 1));
                 // update threshold value
                 layer.activeNeuron.setThreshold(layer.activeNeuron.getThreshold() + learningRate * er );
                 ++misclassified;

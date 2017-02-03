@@ -49,12 +49,12 @@ public class AI implements WebDriverCustomModule
     private final String RESULT_DIRECTORY = "results" + File.separator + "ai";
 
     // subdirectories
-    private final String RESULT_DIRECTORY_TRAINING 				= "training";
-    private final String RESULT_DIRECTORY_TRAINING_LEARN 		= "used for training";
-    private final String RESULT_DIRECTORY_TRAINING_VALIDATE 	= "used for validation";
-    private final String RESULT_DIRECTORY_NETWORKS 				= "networks";
-    private final String RESULT_DIRECTORY_UNRECOGNIZED 			= "unrecognized";
-    private final String RESULT_DIRECTORY_RECOGNIZED 			= "recognized";
+    private final String RESULT_DIRECTORY_TRAINING 			= "training";
+    private final String RESULT_DIRECTORY_TRAINING_LEARN 	= "used for training";
+    private final String RESULT_DIRECTORY_TRAINING_VALIDATE = "used for validation";
+    private final String RESULT_DIRECTORY_NETWORKS 			= "networks";
+    private final String RESULT_DIRECTORY_UNRECOGNIZED 		= "unrecognized";
+    private final String RESULT_DIRECTORY_RECOGNIZED 		= "recognized";
 
     // the property names        
     public final String PROPERTY_ENABLED 					= PREFIX + "enabled";
@@ -274,8 +274,9 @@ public class AI implements WebDriverCustomModule
             im = new ImageTransformation(imgList);
             imgList = null;
         }
+        
         patternList = im.computeAverageMetric();
-        // internal list in network for self testing and image confirmation        
+        // internal list in network for self testing and image confirmation   
         an.setInternalList(patternList);            
     	PerceptronLearning pl = new PerceptronLearning(an);
     	pl.setLearningRate(Constants.LEARNING_RATE);	
@@ -345,7 +346,7 @@ public class AI implements WebDriverCustomModule
 			Helper.saveImage(screenshot.toBufferedImage(), trainingScreenShotFile);				
 		}
     }
-
+    
     /**
      * Takes a screenshot if the underlying web driver instance is capable of doing it. Fails with a message only in
      * case the webdriver cannot take screenshots. Avoids issue when certain drivers are used.

@@ -151,6 +151,8 @@ public abstract class Network implements Serializable
     	Constants.IMAGE_WIDTH 				= referenceImageWidth;
     	Constants.USE_COLOR_FOR_COMPARISON 	= useColor;
     	Constants.USE_ORIGINAL_SIZE 		= useOriginSize;
+    	Constants.PERCENTAGE_DIFFERENCE		= percentageDifference;
+    	Constants.LEARNING_RATE				= learningRate;
     }
     
     /**
@@ -165,7 +167,8 @@ public abstract class Network implements Serializable
 	    if (internalList.size() > 2 && flag)
 	    {
 	    	// compute the summed value for already seen pattern
-	    	double resultVerfication = 0.0;	    	
+	    	double resultVerfication = 0.0;	 
+	    	
 		   	for (PatternHelper element : internalList)
 		   	{
 		   		resultVerfication += layer.computeSum(element.getPatternList());		   		
@@ -276,6 +279,8 @@ public abstract class Network implements Serializable
     	useOriginSize 			= Constants.USE_ORIGINAL_SIZE;
     	referenceImageHeight 	= Constants.IMAGE_HEIGHT;
     	referenceImageWidth 	= Constants.IMAGE_WIDTH;
+    	percentageDifference	= Constants.PERCENTAGE_DIFFERENCE;
+    	learningRate			= Constants.LEARNING_RATE;
     	
         try 
         {        	
@@ -328,6 +333,16 @@ public abstract class Network implements Serializable
 	 */
 	private static final long serialVersionUID = 1L;
     
+	/**
+	 * Set the learning rate for all images in this network.
+	 */
+	private double learningRate;
+	
+	/**
+	 * Set the percentage difference level for all images in this network.
+	 */
+	private double percentageDifference;
+	
     /**
      * Flag for image comparison.
      */

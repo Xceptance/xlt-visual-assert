@@ -237,6 +237,91 @@ public class ImageTransformation
 		return foundPattern;
 	}
 	
+	public ArrayList<PatternHelper> updateInternalPattern(Map<Integer, AverageMetric> averMetr, ArrayList<PreProcessing> ppList)
+	{
+		int groupSize 								= 0;
+		double boundingBoxSize						= 0.0;
+		double distanceMin							= 0.0;
+		double distanceMax							= 0.0;
+		double histoRedMean							= 1.0;
+		double histoGreenMean						= 1.0;
+		double histoBlueMean						= 1.0; 
+		FloatPoint centerOfGravity 					= new FloatPoint(0,0);		
+		ArrayList<PatternHelper> foundPattern 		= new ArrayList<>();
+		PatternHelper pattern;
+		
+		// main loop for all images which are stored in PreProcessing
+		for (int index = 0; index < ppList.size(); ++index)			
+		{
+			MetricCurator mc = ppList.get(index).getMetricCurator();
+			maxSize = mc.metricList.size();
+			pattern = new PatternHelper(mc.getTagName());
+			// empty initialization to ensure the capacity for the pattern 
+			for (int inde = 0; inde < averMetr.keySet().size(); ++inde)
+			{
+				pattern.addElementToPattern(0);
+			}			
+			// loop to create the pattern
+			// also compare the pattern in respective to found or not found
+			for (int ind = 0; ind < maxSize; ++ind)
+			{
+				int key 			= 0;
+				groupSize 		 	= ppList.get(index).getMetricCurator().metricList.get(ind).getGroupSize();
+				boundingBoxSize 	= ppList.get(index).getMetricCurator().metricList.get(ind).getBoundingBoxDistance();
+				distanceMin 		= ppList.get(index).getMetricCurator().metricList.get(ind).getMinDistanceToZero();
+				distanceMax 		= ppList.get(index).getMetricCurator().metricList.get(ind).getMaxDistanceToZero();		
+				centerOfGravity.Add(ppList.get(index).getMetricCurator().metricList.get(ind).getCenterOfGravity());
+				
+				if (Constants.USE_COLOR_FOR_COMPARISON)
+				{
+					histoRedMean		= ppList.get(index).getMetricCurator().metricList.get(ind).getImageStatistic().getHistogramRed().getMean();
+					histoGreenMean		= ppList.get(index).getMetricCurator().metricList.get(ind).getImageStatistic().getHistogramGreen().getMean();
+					histoBlueMean		= ppList.get(index).getMetricCurator().metricList.get(ind).getImageStatistic().getHistogramBlue().getMean();
+				}
+	
+				Iterator<Integer> iter = averMetr.keySet().iterator();
+				// alternative path if the network has already learned and now just compare the new metrics to the found average metric
+				while (iter.hasNext())
+				{
+					key = iter.next();
+					if (Helper.isInRange(averMetr.get(key).getAverageGroupSize(), groupSize) && 
+						Helper.isInRange(averMetr.get(key).getAverageBoundingBoxSize(), boundingBoxSize) 
+						&& 
+						Helper.isInRange(averMetr.get(key).getAverageHistogramRedMean(), histoRedMean)&&
+						Helper.isInRange(averMetr.get(key).getAverageHistogramGreenMean(), histoGreenMean) &&
+						Helper.isInRange(averMetr.get(key).getAverageHistogramBlueMean(), histoBlueMean)
+						)
+					{
+						recognizeFlag = true;
+						break;
+					}						
+				}
+				// set the pattern in respect to the recognizeFlag
+				if (pattern.getSize() < averMetr.keySet().size())
+				{
+					pattern.addElementToPattern(recognizeFlag ? 1 : 0);
+				}
+				else
+				{
+					pattern.setElement(key, recognizeFlag ? 1 : 0);
+				}
+				recognizeFlag = false;								
+			} 
+			groupSize 			= 0;
+			boundingBoxSize 	= 0.0;
+			distanceMin 		= 0.0;
+			distanceMax 		= 0.0;
+			centerOfGravity.x 	= 0;
+			centerOfGravity.y 	= 0;
+			histoRedMean		= 1.0;
+			histoGreenMean		= 1.0;
+			histoBlueMean		= 1.0; 
+			recognizeFlag 		= false;
+			foundPattern.add(pattern);			
+		}
+		return foundPattern;
+	}
+	
 	/***
 	 * Transformation of the image for further use.
 	 * First a {@link Convolution} with a Laplace and Gaussian kernel is performed.

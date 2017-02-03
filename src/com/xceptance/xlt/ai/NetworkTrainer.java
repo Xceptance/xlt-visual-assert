@@ -72,8 +72,9 @@ public class NetworkTrainer
         
         im = new ImageTransformation(args[0]);
         
-        patternList = im.computeAverageMetric();
-        // internal list in network for self testing and image confirmation        
+        im.computeAverageMetric();
+        // internal list in network for self testing and image confirmation 
+        patternList = im.updateInternalPattern(im.getAverageMetric(), im.getCurator());
         an.setInternalList(patternList);            
     	PerceptronLearning pl = new PerceptronLearning(an);
     	pl.setLearningRate(Constants.LEARNING_RATE);
@@ -81,16 +82,16 @@ public class NetworkTrainer
     	double resultVerfication = 0.0;	 
     	for (PatternHelper pattern : patternList)
 		{
-			pl.Run(pattern.getPatternList());
-			resultVerfication += an.getLayer().computeSum(pattern.getPatternList());
-		}
-    	
-    	System.out.println("Selftest value summed: " + (resultVerfication / patternList.size()));     	
+			pl.Run(pattern.getPatternList());			
+		}    	  	
     	
     	for (PatternHelper pattern : patternList)
     	{
+    		resultVerfication += an.checkForRecognitionAsDouble(pattern.getPatternList());        	   
     		System.out.println("Recognized value of image " + pattern.getTagName() + " = " + an.checkForRecognitionAsString(pattern.getPatternList()) + " %");
     	}
+    	
+    	System.out.println("Selftest value summed: " + (resultVerfication / patternList.size()));
     	
 		an.Save(networkFile.toString(), im.getAverageMetric());
 	}

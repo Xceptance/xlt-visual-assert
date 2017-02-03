@@ -45,8 +45,8 @@ public class NetworkTester
           	{
           		imgList = an.scanFolderForChanges(args[1]);
           		im = new ImageTransformation(imgList, an.getAverageMetric(), false);
-          		patternList = im.computeAverageMetric();
-          		
+          		//patternList = im.computeAverageMetric();
+          		patternList = im.updateInternalPattern(im.getAverageMetric(), im.getCurator());
             	PerceptronLearning pl = new PerceptronLearning(an);
             	pl.setLearningRate(Constants.LEARNING_RATE);
             	
