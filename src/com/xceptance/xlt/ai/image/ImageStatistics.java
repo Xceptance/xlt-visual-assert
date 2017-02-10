@@ -21,6 +21,8 @@
 
 package com.xceptance.xlt.ai.image;
 
+import java.io.Serializable;
+
 import com.xceptance.xlt.ai.core.FeaturePoint;
 import com.xceptance.xlt.ai.image.FastBitmap;
 
@@ -28,9 +30,13 @@ import com.xceptance.xlt.ai.image.FastBitmap;
  * Gather statistics about image in Gray or RGB color space.
  * @author Diego Catalano edited by Thomas Vokmann
  */
-public class ImageStatistics 
+public class ImageStatistics implements Serializable
 {    
-    private ImageHistogram gray;
+    /**
+	 * Auto generated serial number.
+	 */
+	private static final long serialVersionUID = 1L;
+	private ImageHistogram gray;
     private ImageHistogram red;
     private ImageHistogram green;
     private ImageHistogram blue;

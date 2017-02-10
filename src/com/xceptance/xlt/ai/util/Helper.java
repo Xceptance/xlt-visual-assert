@@ -324,7 +324,7 @@ public class Helper
 	 * @param filename String full path name
 	 * @return BufferedImage
 	 */
-	public static FastBitmap loadImageScaled_FastBitmap(String filename) 
+	public static FastBitmap loadImageScaled_FastBitmap(String filename, String name) 
 	{
 		BufferedImage img = null;
 		try 
@@ -335,7 +335,7 @@ public class Helper
 		{ 
 			System.out.println("File Not Found"); 
 		}		
-		return imageToFastImage(img, filename);
+		return imageToFastImage(img, name);
 	}
 	
 	/***

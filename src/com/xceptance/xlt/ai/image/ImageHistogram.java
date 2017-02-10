@@ -24,13 +24,20 @@
 
 package com.xceptance.xlt.ai.image;
 
+import java.io.Serializable;
+
 /**
  * Image Histogram for random values.
  * @author Diego Catalano edited by Thomas Volkmann
  */
-public class ImageHistogram 
+public class ImageHistogram implements Serializable
 {     
     /**
+	 * Auto generated serial number.
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	/**
      * Compare two histograms values to each other.
      * @param histA Integer array of all values.
      * @param histB Integer array of all values.

@@ -35,6 +35,25 @@ public class MetricCurator implements Serializable
 	{
 		return tagName;
 	}
+	
+	@Override
+	public boolean equals(Object v) 
+	{
+		boolean retVal = false;
+
+	    if (v instanceof MetricCurator)
+	    {
+	    	MetricCurator pH = (MetricCurator) v;
+	    	retVal = pH.getTagName().hashCode() == this.getTagName().hashCode();
+	    }
+	    return retVal;
+	}
+
+	@Override
+	public int hashCode() 
+	{
+		return tagName.hashCode();
+	}
         
     /***
      * Name tag of the image.

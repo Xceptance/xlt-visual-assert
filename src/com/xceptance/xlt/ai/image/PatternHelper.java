@@ -91,6 +91,25 @@ public class PatternHelper implements Serializable
 		return tagName;
 	}	
 	
+	@Override
+	public boolean equals(Object v) 
+	{
+		boolean retVal = false;
+
+	    if (v instanceof PatternHelper)
+	    {
+	    	PatternHelper pH = (PatternHelper) v;
+	    	retVal = pH.getTagName().hashCode() == this.getTagName().hashCode();
+	    }
+	    return retVal;
+	}
+
+	@Override
+	public int hashCode() 
+	{
+		return tagName.hashCode();
+	}
+	
 	/***
 	 * Holds the value for the found pattern (0,1).
 	 */

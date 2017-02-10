@@ -266,18 +266,22 @@ public class AI implements WebDriverCustomModule
         	Constants.IMAGE_WIDTH = screenshot.getWidth();
         	Constants.IMAGE_HEIGHT = screenshot.getHeight();
         	
-          	imgList = an.scanFolderForChanges(
+          	imgList.addAll(an.scanFolderForChanges(
           			trainingScreenShotFile.getParent(), 
-           			exactScreenshotName);
+           			exactScreenshotName));
           	
           	// load all images from the directory
             im = new ImageTransformation(imgList);
             imgList = null;
         }
+
         
         patternList = im.computeAverageMetric();
+        
         // internal list in network for self testing and image confirmation   
-        an.setInternalList(patternList);            
+        an.setInternalParameter(im.getAverageMetric());
+        an.setInternalList(patternList);
+                
     	PerceptronLearning pl = new PerceptronLearning(an);
     	pl.setLearningRate(Constants.LEARNING_RATE);	
     	
@@ -288,11 +292,7 @@ public class AI implements WebDriverCustomModule
 				pl.Run(pattern.getPatternList());
 			}
     	}
-    	
-    	// test the corresponding network the new and all therefore seen pattern
-    	// if the self test is correct there is no further training necessary
-    	
-	   	
+
     	ArrayList<FastBitmap> validationList = an.scanFolderForChanges(trainingDirectory_val.toString());		   	
     	ArrayList<PatternHelper> validationPatternList = new ArrayList<>();
 		if (!validationList.isEmpty())
@@ -302,20 +302,17 @@ public class AI implements WebDriverCustomModule
 		}	
     	
 		boolean selfTest = an.onSelfTest(validationPatternList, Constants.NETWORK_MODE);
-			
 		double result = 2.0;
 
-		if (!Constants.NETWORK_MODE)
-		{	
-			// ensure to get the last element in the list, which is always the current screenshot
-			result = an.checkForRecognitionAsDouble(patternList.get(patternList.size() - 1).getPatternList());
-			System.out.println("Recognition result: " + result);
-		}
+		// ensure to get the last element in the list, which is always the current screenshot
+		result = an.checkForRecognitionAsDouble(patternList.get(patternList.size() - 1).getPatternList());
+		System.out.println("Recognition result: " + result);
+
 		
 		// console output
 		if (selfTest)
 		{
-			System.out.println("Network not ready and not learning cause of TRAINING Flag ");
+			System.out.println("Network not ready");
 		}
 			
 		// Save the screenshot
