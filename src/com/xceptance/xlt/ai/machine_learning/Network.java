@@ -35,6 +35,7 @@ import java.util.Map;
 import com.xceptance.xlt.ai.image.AverageMetric;
 import com.xceptance.xlt.ai.image.FastBitmap;
 import com.xceptance.xlt.ai.image.PatternHelper;
+import com.xceptance.xlt.ai.pre_processing.PreProcessing;
 import com.xceptance.xlt.ai.util.Constants;
 import com.xceptance.xlt.ai.util.Helper;
 
@@ -73,6 +74,15 @@ public abstract class Network implements Serializable
     }
     
     /**
+     * Get the internal list.
+     * @return internalList ArrayList PreProcessing.
+     */
+    public ArrayList<PatternHelper> getPatternList()
+    {
+    	return internalList;
+    }
+    
+    /**
      * Get Network layer, the perceptron has only one layer.
      * @return Network's layers count.
      */
@@ -100,11 +110,14 @@ public abstract class Network implements Serializable
         this.layer 				= Layer.getInstance(inputsCount);
         internalList 			= new ArrayList<>();
         overwatchList 			= new ArrayList<>();
+        internalUpdateList		= new ArrayList<>();
         selfTest 				= true;
         useColor				= Constants.USE_COLOR_FOR_COMPARISON;
         useOriginSize			= Constants.USE_ORIGINAL_SIZE;
         referenceImageHeight 	= Constants.IMAGE_HEIGHT;
-        referenceImageWidth 	= Constants.IMAGE_WIDTH;
+        referenceImageWidth 	= Constants.IMAGE_WIDTH;        
+    	percentageDifference	= Constants.PERCENTAGE_DIFFERENCE;
+    	learningRate			= Constants.LEARNING_RATE;
     }
     
     /**
@@ -164,7 +177,7 @@ public abstract class Network implements Serializable
      */
     public boolean onSelfTest(ArrayList<PatternHelper> validationList, Boolean flag)
     { 
-	    if (internalList.size() > 2 && flag)
+	    if (flag)
 	    {
 	    	// compute the summed value for already seen pattern
 	    	double resultVerfication = 0.0;	 
@@ -190,7 +203,8 @@ public abstract class Network implements Serializable
 		   		 resultValidation  / validationSize < Constants.INTENDED_PERCENTAGE_MATCH)
 	    	{
 		   		// disable self test for further use
-		   		internalList.clear();
+//		   		internalList.clear();
+//		   		internalUpdateList.clear();
 	    		selfTest = false;
 	    		return selfTest;
 	    	}  
@@ -217,7 +231,7 @@ public abstract class Network implements Serializable
 		{
 			if (!overwatchList.contains(element.getName().hashCode()))
 			{
-				result.add(Helper.loadImageScaled_FastBitmap(element.getAbsolutePath()));
+				result.add(Helper.loadImageScaled_FastBitmap(element.getAbsolutePath(), element.getName()));				
 			}
 			tempList.add(element.getName().hashCode());
 		}		
@@ -243,11 +257,34 @@ public abstract class Network implements Serializable
 		{
 			for (File element : list)
 			{
-				result.add(Helper.loadImageScaled_FastBitmap(element.getAbsolutePath()));
+				result.add(Helper.loadImageScaled_FastBitmap(element.getAbsolutePath(), element.getName()));
 			}	
     	}
     	return result;
     }
+    
+//    /**
+//     * Internal list for self test.
+//     * @param list with all processed images.
+//     */
+//    public void setInternalList(ArrayList<PatternHelper> list)
+//    { 
+//    	if (selfTest)
+//    	{
+//		   	for (PatternHelper element : list)
+//		   	{
+//		   		if (internalList.contains(element))
+//		   		{
+//		   			internalList.remove(element);
+//		   			internalList.add(element);
+//		   		}
+//		   		else
+//		   		{
+//		   			internalList.add(element);
+//		   		}
+//		    }
+//    	}
+//    }
     
     /**
      * Internal list for self test.
@@ -267,12 +304,30 @@ public abstract class Network implements Serializable
     	}
     }
     
+    public void setInternalUpdateList(ArrayList<PreProcessing> list)
+    {
+    	if (selfTest)
+    	{
+		   	for (PreProcessing element : list)
+		   	{
+		   		if (internalUpdateList.contains(element))
+		   		{
+		   			internalUpdateList.remove(element);
+		   			internalUpdateList.add(element);
+		   		}
+		   		else
+		   		{
+		   			internalUpdateList.add(element);
+		   		}
+		    }
+    	}    	
+    }
+    
     /**
-     * Save network to specified file.
-     * @param fileName File name to save network into.
-     * @param averMetric average metric to save
+     * Set the necessary parameter for further use of the network. 
+     * @param averMetric Average metric.
      */
-    public void Save(String fileName, Map<Integer, AverageMetric> averMetric)
+    public void setInternalParameter(Map<Integer, AverageMetric> averMetric)
     {
     	this.averMet 			= averMetric;
     	useColor 				= Constants.USE_COLOR_FOR_COMPARISON;
@@ -281,6 +336,16 @@ public abstract class Network implements Serializable
     	referenceImageWidth 	= Constants.IMAGE_WIDTH;
     	percentageDifference	= Constants.PERCENTAGE_DIFFERENCE;
     	learningRate			= Constants.LEARNING_RATE;
+    }
+    
+    /**
+     * Save network to specified file.
+     * @param fileName File name to save network into.
+     * @param averMetric average metric to save
+     */
+    public void Save(String fileName, Map<Integer, AverageMetric> averMetric)
+    {
+    	this.averMet 			= averMetric;
     	
         try 
         {        	
@@ -328,6 +393,8 @@ public abstract class Network implements Serializable
         return network;
     }
     	
+    public ArrayList<PreProcessing> internalUpdateList;;
+    
     /**
 	 * Auto generated serial number.
 	 */

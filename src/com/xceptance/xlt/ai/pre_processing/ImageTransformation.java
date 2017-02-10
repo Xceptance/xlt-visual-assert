@@ -117,6 +117,7 @@ public class ImageTransformation
 		FloatPoint centerOfGravity 					= new FloatPoint(0,0);		
 		boolean isEmptyFlag 						= true;
 		ArrayList<PatternHelper> foundPattern 		= new ArrayList<>();
+		ArrayList<Integer> keyList					= new ArrayList<>();
 		PatternHelper pattern;
 		
 		// if no network was loaded
@@ -135,6 +136,7 @@ public class ImageTransformation
 			for (int inde = 0; inde < averMet.keySet().size(); ++inde)
 			{
 				pattern.addElementToPattern(0);
+				keyList.add(inde);
 			}			
 			// loop to create the pattern
 			// also compare the pattern in respective to found or not found
@@ -176,12 +178,15 @@ public class ImageTransformation
 							&&
 							Helper.isInRange(averMet.get(key).getAverageHistogramRedMean(), histoRedMean) &&
 							Helper.isInRange(averMet.get(key).getAverageHistogramGreenMean(), histoGreenMean) &&
-							Helper.isInRange(averMet.get(key).getAverageHistogramBlueMean(), histoBlueMean)
-							)
-						{								
-							averMet.get(key).update(groupSize, boundingBoxSize, distanceMin, distanceMax, centerOfGravity, histoRedMean, histoGreenMean, histoBlueMean);
-							recognizeFlag = true;
-							break;
+							Helper.isInRange(averMet.get(key).getAverageHistogramBlueMean(), histoBlueMean))
+						{	
+							if (keyList.contains(key))
+							{
+								averMet.get(key).update(groupSize, boundingBoxSize, distanceMin, distanceMax, centerOfGravity, histoRedMean, histoGreenMean, histoBlueMean);
+								recognizeFlag = true;
+								keyList.remove(keyList.indexOf(key));
+								break;
+							}							
 						}
 					}												
 					// expand the pattern and update average metric for further comparing, set the pattern to 0 for not recognized 
@@ -189,6 +194,7 @@ public class ImageTransformation
 					{
 						averMet.put(key + 1, new AverageMetric(groupSize, boundingBoxSize, distanceMin, distanceMax, centerOfGravity, histoRedMean, histoGreenMean, histoBlueMean));
 						recognizeFlag = false;
+						keyList.add(key + 1);
 					}		
 				}
 				// alternative path if the network has already learned and now just compare the new metrics to the found average metric
@@ -202,11 +208,14 @@ public class ImageTransformation
 							&& 
 							Helper.isInRange(averMet.get(key).getAverageHistogramRedMean(), histoRedMean)&&
 							Helper.isInRange(averMet.get(key).getAverageHistogramGreenMean(), histoGreenMean) &&
-							Helper.isInRange(averMet.get(key).getAverageHistogramBlueMean(), histoBlueMean)
-							)
+							Helper.isInRange(averMet.get(key).getAverageHistogramBlueMean(), histoBlueMean))
 						{
-							recognizeFlag = true;
-							break;
+							if (keyList.contains(key))
+							{
+								recognizeFlag = true;
+								keyList.remove(keyList.indexOf(key));
+								break;
+							}
 						}						
 					}
 				}
@@ -215,9 +224,13 @@ public class ImageTransformation
 				{
 					pattern.addElementToPattern(recognizeFlag ? 1 : 0);
 				}
+				else if (pattern.getSize() < ind && !trainingFlag)
+				{
+					pattern.addElementToPattern(recognizeFlag ? 1 : 0);
+				}
 				else
 				{
-					pattern.setElement(key, recognizeFlag ? 1 : 0);
+					pattern.setElement(key, recognizeFlag ? 1 : 0);					
 				}
 				recognizeFlag = false;								
 			} 
@@ -248,6 +261,7 @@ public class ImageTransformation
 		double histoBlueMean						= 1.0; 
 		FloatPoint centerOfGravity 					= new FloatPoint(0,0);		
 		ArrayList<PatternHelper> foundPattern 		= new ArrayList<>();
+		ArrayList<Integer> keyList					= new ArrayList<>();
 		PatternHelper pattern;
 		
 		// main loop for all images which are stored in PreProcessing
@@ -260,6 +274,7 @@ public class ImageTransformation
 			for (int inde = 0; inde < averMetr.keySet().size(); ++inde)
 			{
 				pattern.addElementToPattern(0);
+				keyList.add(inde);
 			}			
 			// loop to create the pattern
 			// also compare the pattern in respective to found or not found
@@ -289,15 +304,18 @@ public class ImageTransformation
 						&& 
 						Helper.isInRange(averMetr.get(key).getAverageHistogramRedMean(), histoRedMean)&&
 						Helper.isInRange(averMetr.get(key).getAverageHistogramGreenMean(), histoGreenMean) &&
-						Helper.isInRange(averMetr.get(key).getAverageHistogramBlueMean(), histoBlueMean)
-						)
+						Helper.isInRange(averMetr.get(key).getAverageHistogramBlueMean(), histoBlueMean))
 					{
-						recognizeFlag = true;
-						break;
+						if (keyList.contains(key))
+						{
+							recognizeFlag = true;
+							keyList.remove(keyList.indexOf(key));
+							break;
+						}
 					}						
 				}
 				// set the pattern in respect to the recognizeFlag
-				if (pattern.getSize() < averMetr.keySet().size())
+				if (pattern.getSize() < ind)
 				{
 					pattern.addElementToPattern(recognizeFlag ? 1 : 0);
 				}

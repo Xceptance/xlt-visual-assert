@@ -1,5 +1,6 @@
 package com.xceptance.xlt.ai.pre_processing;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -20,8 +21,9 @@ import com.xceptance.xlt.ai.util.Helper;
  * Also the artifacts (in this case groups under a minimum value {@link Constants#MINGROUPSIZE}) are ignored and discarded.
  * @author Thomas Volkmann
  */
-public class PreProcessing 
+public class PreProcessing implements Serializable
 {
+
 	/***
 	 * Constructor which will automatically start the grouping of the edges {@link #findGroups(List, FastBitmap)}.
 	 * @param edges List of {@link FeaturePoint}
@@ -129,6 +131,11 @@ public class PreProcessing
 		}		 
 		allGroups = null;	
 	}
+	
+	/**
+	 * Auto generatef serial number.
+	 */
+	private static final long serialVersionUID = 1L;
 	
 	/***
 	 * Curator for the image metrics.

@@ -146,7 +146,7 @@ public class Layer implements Serializable
         // norming of the value
         result += activeNeuron.getThreshold();
         // / size original
-        result = result / (size - hits);
+        result = result / (input.size() - hits);
         result = activeNeuron.function.Function(result);
         
         return result;
