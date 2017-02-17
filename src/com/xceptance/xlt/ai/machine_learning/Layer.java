@@ -133,6 +133,7 @@ public class Layer implements Serializable
     	int hits = 0;
     	
     	int size = input.size() < activeNeuron.getNeurons().size() ? input.size() : activeNeuron.getNeurons().size();
+    	int maxSize = input.size() > activeNeuron.getNeurons().size() ? input.size() : activeNeuron.getNeurons().size();
     	
         // compute each neuron
         for (int i = 0; i < size; i++)
@@ -146,7 +147,7 @@ public class Layer implements Serializable
         // norming of the value
         result += activeNeuron.getThreshold();
         // / size original
-        result = result / (input.size() - hits);
+        result = result / (maxSize - hits);
         result = activeNeuron.function.Function(result);
         
         return result;
