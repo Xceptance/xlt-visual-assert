@@ -226,7 +226,7 @@ public class AI implements WebDriverCustomModule
             // webdriver cannot take the screenshot -> RETURN
             if (screenshot == null)
             {
-                return;
+            	System.exit(-1);
             }
            	
             // if the network is not done with training check the training folder for changes 
@@ -260,7 +260,7 @@ public class AI implements WebDriverCustomModule
     		// webdriver cannot take the screenshot -> RETURN
         	if (screenshot == null)
         	{
-        		return;
+        		System.exit(-1);
         	}         	
         	
         	Constants.IMAGE_WIDTH = screenshot.getWidth();

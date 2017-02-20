@@ -32,9 +32,9 @@ public class NetworkTester
         ArrayList<PatternHelper> patternList = new ArrayList<>();
         ArrayList<FastBitmap> imgList = new ArrayList<>(); 
 		
-        if (args.length == 0)
+        if (args.length < 2)
         {
-        	System.out.println("No parameter given.");
+        	System.err.println("NetworkTester <network-file> <images-to-test>");
         	return;
         }
         	
@@ -47,8 +47,6 @@ public class NetworkTester
           		imgList = an.scanFolderForChanges(args[1]);
           		im = new ImageTransformation(imgList, an.getAverageMetric(), false);
           		patternList = im.computeAverageMetric();
-//          	patternList = im.updateInternalPattern(im.getAverageMetric(), im.getCurator());
-//            	PerceptronLearning pl = new PerceptronLearning(an);
             	
           		for (PatternHelper pattern : patternList)
             	{
@@ -61,6 +59,5 @@ public class NetworkTester
             	}
           	}
         }
-	}
-
+  	}
 }

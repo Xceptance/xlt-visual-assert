@@ -3,10 +3,7 @@ package com.xceptance.xlt.ai.test;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Set;
 
-import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -22,12 +19,14 @@ public class Validator_ExactSameFolder
 		String[] argTR = 
 			{
 					"/home/tvolkmann/Master/30 Tage Bilder/Deckers",
-					"/home/tvolkmann/Master/xlt-visual-assert/config/ai.properties"
+					"/home/tvolkmann/Master",
+					"/home/tvolkmann/Master/xlt-visual-assert/config/ai.properties",
+					"unnamed"
 			};
 		
 		String[] argTE =
 			{
-					"/home/tvolkmann/Master/xlt-visual-assert/NetworkTrainer.result/unnamed",
+					"/home/tvolkmann/Master/unnamed.network",
 					"/home/tvolkmann/Master/30 Tage Bilder/Deckers"
 			};
 		
