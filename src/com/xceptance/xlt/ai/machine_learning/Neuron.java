@@ -122,7 +122,8 @@ public class Neuron implements Serializable
     public Neuron()
     {
         double d = range.length();
-        weight = r.nextDouble( ) * d + range.getMin();
+//        weight = r.nextDouble( ) * d + range.getMin();
+        weight = 0.5;
     }
     
     /**

@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import com.sun.org.apache.regexp.internal.recompile;
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 import com.xceptance.xlt.ai.image.PatternHelper;
 import com.xceptance.xlt.ai.machine_learning.ActivationNetwork;
 import com.xceptance.xlt.ai.machine_learning.BipolarSigmoidFunction;
@@ -27,6 +29,8 @@ import com.xceptance.xlt.ai.util.Helper;
  */
 public class NetworkTrainer 
 {
+	public static ActivationNetwork an;
+	public static ImageTransformation im;
     // args[0] = path to the learning folder
     // args[1] = path to properties file
 	// args[2] = optional network name 
@@ -66,22 +70,21 @@ public class NetworkTrainer
         final File networkFile = new File(networkDirectoryPath, networkName);
 
         // initialization        
-        ActivationNetwork an = new ActivationNetwork(new BipolarSigmoidFunction(), 1); 
-        ImageTransformation im;
+        an = new ActivationNetwork(new BipolarSigmoidFunction(), 1); 
         ArrayList<PatternHelper> patternList = new ArrayList<>();
         
-        im = new ImageTransformation(args[0]);
-        
+        im = new ImageTransformation(args[0]);        
         im.computeAverageMetric();
         // internal list in network for self testing and image confirmation 
         patternList = im.updateInternalPattern(im.getAverageMetric(), im.getCurator());
-        an.setInternalList(patternList);            
+          
     	PerceptronLearning pl = new PerceptronLearning(an);
     	pl.setLearningRate(Constants.LEARNING_RATE);
     	
     	double resultVerfication = 0.0;	 
     	for (PatternHelper pattern : patternList)
 		{
+    		System.out.println(pattern.getPatternList());
 			pl.Run(pattern.getPatternList());			
 		}    	  	
     	
@@ -93,6 +96,7 @@ public class NetworkTrainer
     	
     	System.out.println("Selftest value summed: " + (resultVerfication / patternList.size()));
     	
-		an.Save(networkFile.toString(), im.getAverageMetric());
+    	an.setInternalParameter(im.getAverageMetric());
+		an.Save(networkFile.toString());
 	}
 }

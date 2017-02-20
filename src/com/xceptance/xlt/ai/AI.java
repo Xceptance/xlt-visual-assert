@@ -339,7 +339,8 @@ public class AI implements WebDriverCustomModule
         	trainingDirectory.mkdirs();
         	trainingDirectory_uft.mkdir();
         	trainingDirectory_val.mkdir();
-			an.Save(networkFile.toString(), im.getAverageMetric());
+        	an.setInternalParameter(im.getAverageMetric());
+			an.Save(networkFile.toString());
 			Helper.saveImage(screenshot.toBufferedImage(), trainingScreenShotFile);				
 		}
     }

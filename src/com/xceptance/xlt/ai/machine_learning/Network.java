@@ -109,7 +109,7 @@ public abstract class Network implements Serializable
         this.inputsCount 		= Math.max( 1, inputsCount );        
         this.layer 				= Layer.getInstance(inputsCount);
         internalList 			= new ArrayList<>();
-        overwatchList 			= new ArrayList<>();
+        monitoringList 			= new ArrayList<>();
         internalUpdateList		= new ArrayList<>();
         selfTest 				= true;
         useColor				= Constants.USE_COLOR_FOR_COMPARISON;
@@ -229,16 +229,16 @@ public abstract class Network implements Serializable
 		
 		for (File element : list)
 		{
-			if (!overwatchList.contains(element.getName().hashCode()))
+			if (!monitoringList.contains(element.getName().hashCode()))
 			{
 				result.add(Helper.loadImageScaled_FastBitmap(element.getAbsolutePath(), element.getName()));				
 			}
 			tempList.add(element.getName().hashCode());
 		}		
 		
-		overwatchList.clear();		
-		overwatchList.add(screenshotName.hashCode());
-		overwatchList.addAll(tempList);
+		monitoringList.clear();		
+		monitoringList.add(screenshotName.hashCode());
+		monitoringList.addAll(tempList);
 		
     	return result;
     }
@@ -343,9 +343,9 @@ public abstract class Network implements Serializable
      * @param fileName File name to save network into.
      * @param averMetric average metric to save
      */
-    public void Save(String fileName, Map<Integer, AverageMetric> averMetric)
+    public void Save(String fileName)
     {
-    	this.averMet 			= averMetric;
+//    	this.averMet = averMetric;
     	
         try 
         {        	
@@ -432,7 +432,7 @@ public abstract class Network implements Serializable
 	/**
 	 * Folder list which contains Hashvalues from already seen images, in the folder corresponding to the network.
 	 */
-	private ArrayList<Integer> overwatchList;
+	private ArrayList<Integer> monitoringList;
 	
 	/**
 	 * Internal Pattern list for self test.

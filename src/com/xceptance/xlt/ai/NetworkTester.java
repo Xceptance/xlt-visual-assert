@@ -18,6 +18,8 @@ import com.xceptance.xlt.ai.util.Constants;
  */
 public class NetworkTester 
 {	
+	public static ActivationNetwork an;
+	public static ImageTransformation im;
 	/**
 	 * Entry point for running the network tester. 
 	 * @param args String array which contains the arguments, only two arguments will be used but are mandatory.
@@ -26,8 +28,7 @@ public class NetworkTester
 	{
 		Constants.NETWORK_MODE = true;
 		
-		ActivationNetwork an = new ActivationNetwork(new BipolarSigmoidFunction(), 1); 
-        ImageTransformation im;
+		an = new ActivationNetwork(new BipolarSigmoidFunction(), 1); 
         ArrayList<PatternHelper> patternList = new ArrayList<>();
         ArrayList<FastBitmap> imgList = new ArrayList<>(); 
 		
@@ -45,11 +46,15 @@ public class NetworkTester
           	{
           		imgList = an.scanFolderForChanges(args[1]);
           		im = new ImageTransformation(imgList, an.getAverageMetric(), false);
-          		// im.computeAverageMetric();
-          		patternList = im.updateInternalPattern(im.getAverageMetric(), im.getCurator());
-            	PerceptronLearning pl = new PerceptronLearning(an);
-            	pl.setLearningRate(Constants.LEARNING_RATE);
+          		patternList = im.computeAverageMetric();
+//          	patternList = im.updateInternalPattern(im.getAverageMetric(), im.getCurator());
+//            	PerceptronLearning pl = new PerceptronLearning(an);
             	
+          		for (PatternHelper pattern : patternList)
+            	{
+          			System.out.println(pattern.getPatternList());
+            	}
+          		
             	for (PatternHelper pattern : patternList)
             	{
             		System.out.println("Recognized value of image " + pattern.getTagName() + " = " + an.checkForRecognitionAsString(pattern.getPatternList()) + " %");
