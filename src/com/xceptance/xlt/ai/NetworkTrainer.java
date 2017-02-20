@@ -27,9 +27,10 @@ import com.xceptance.xlt.ai.util.Helper;
  */
 public class NetworkTrainer 
 {
-    // args[0] = path to the learning folder
-    // args[1] = path to properties file
-	// args[2] = optional network name 
+    // args[0] = what to learn
+    // args[1] = where to store the result
+	// args[2] = the properties
+	// args[3] = network name 
 	/**
 	 * Entry point for running the network trainer. 
 	 * @param args String array first two arguments are mandatory, third argument is optional.
@@ -39,19 +40,22 @@ public class NetworkTrainer
         //--------------------------------------------------------------------------------
         // Get Properties and convert them from String if necessary
         //--------------------------------------------------------------------------------
-  
+		if (args.length < 4)
+		{
+			System.err.println("Call with NetworkTrainer <data-dir> <result-dir> <property-file> <network-name>");
+			System.exit(-1);
+		}
+		
 		try 
 		{
-			Helper.readProperties(args[1]);
+			Helper.readProperties(args[2]);
 		} 
 		catch (IOException e) 
 		{
 			e.printStackTrace();
 		}
 
-        String networkName = "";
-        // Directory of the network file
-        final File networkDirectoryPath = new File("NetworkTrainer.result");
+        final File networkDirectoryPath = new File(args[1]);
         networkDirectoryPath.mkdirs();
         
         // Path to working folder
@@ -61,20 +65,17 @@ public class NetworkTrainer
         	return;
         }
         
-        networkName = (args.length == 3 ? args[2] : "unnamed");
+        String networkName = args[3] + ".network";
         
         final File networkFile = new File(networkDirectoryPath, networkName);
 
         // initialization        
         ActivationNetwork an = new ActivationNetwork(new BipolarSigmoidFunction(), 1); 
-        ImageTransformation im;
-        ArrayList<PatternHelper> patternList = new ArrayList<>();
-        
-        im = new ImageTransformation(args[0]);
-        
+        ImageTransformation im = new ImageTransformation(args[0]);
         im.computeAverageMetric();
+        
         // internal list in network for self testing and image confirmation 
-        patternList = im.updateInternalPattern(im.getAverageMetric(), im.getCurator());
+        ArrayList<PatternHelper> patternList = im.updateInternalPattern(im.getAverageMetric(), im.getCurator());
         an.setInternalList(patternList);            
     	PerceptronLearning pl = new PerceptronLearning(an);
     	pl.setLearningRate(Constants.LEARNING_RATE);

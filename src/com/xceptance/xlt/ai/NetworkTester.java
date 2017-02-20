@@ -31,31 +31,27 @@ public class NetworkTester
         ArrayList<PatternHelper> patternList = new ArrayList<>();
         ArrayList<FastBitmap> imgList = new ArrayList<>(); 
 		
-        if (args.length == 0)
+        if (args.length < 2)
         {
-        	System.out.println("No parameter given.");
+        	System.err.println("NetworkTester <network-file> <images-to-test>");
         	return;
         }
         	
-        if (args.length > 0)
-        {
-          	an = (ActivationNetwork) an.Load(args[0]); 
-          	an.setConstants();
-          	if (args.length >= 1)
-          	{
-          		imgList = an.scanFolderForChanges(args[1]);
-          		im = new ImageTransformation(imgList, an.getAverageMetric(), false);
-          		// im.computeAverageMetric();
-          		patternList = im.updateInternalPattern(im.getAverageMetric(), im.getCurator());
-            	PerceptronLearning pl = new PerceptronLearning(an);
-            	pl.setLearningRate(Constants.LEARNING_RATE);
-            	
-            	for (PatternHelper pattern : patternList)
-            	{
-            		System.out.println("Recognized value of image " + pattern.getTagName() + " = " + an.checkForRecognitionAsString(pattern.getPatternList()) + " %");
-            	}
-          	}
-        }
-	}
+      	an = (ActivationNetwork) an.Load(args[0]); 
+      	an.setConstants();
+
+      	
+  		imgList = an.scanFolderForChanges(args[1]);
+  		im = new ImageTransformation(imgList, an.getAverageMetric(), false);
+  		// im.computeAverageMetric();
+  		patternList = im.updateInternalPattern(im.getAverageMetric(), im.getCurator());
+    	PerceptronLearning pl = new PerceptronLearning(an);
+    	pl.setLearningRate(Constants.LEARNING_RATE);
+    	
+    	for (PatternHelper pattern : patternList)
+    	{
+    		System.out.println("Recognized value of image " + pattern.getTagName() + " = " + an.checkForRecognitionAsString(pattern.getPatternList()) + " %");
+    	}
+  	}
 
 }
