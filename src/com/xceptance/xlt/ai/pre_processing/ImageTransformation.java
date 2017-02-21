@@ -367,7 +367,8 @@ public class ImageTransformation
 			long estimatedTime = System.nanoTime() - startTime;
 			Helper.updatePercentageBar((double)index / (double)pictureList.size(), estimatedTime, pictureList.size(), index);
 			index++;
-		}	
+		}
+		pictureList.clear();
 		System.out.println("");
 	}
 	

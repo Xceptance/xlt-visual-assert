@@ -175,6 +175,7 @@ public class Helper
 		BufferedImage bi = new BufferedImage(img.getWidth(null), img.getHeight(null), imageType);
 		Graphics2D g2 = bi.createGraphics();
 		g2.drawImage(img, null, null);
+		g2.dispose();
 		return bi;
 	}
 

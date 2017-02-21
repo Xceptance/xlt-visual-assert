@@ -10,7 +10,6 @@ import org.junit.Test;
 import com.xceptance.xlt.ai.NetworkTester;
 import com.xceptance.xlt.ai.NetworkTrainer;
 import com.xceptance.xlt.ai.image.PatternHelper;
-import com.xceptance.xlt.ai.util.Constants;
 
 /**
  * Test if all values in both tools are equal. If the same Folder is selected all values must be the same.
@@ -25,7 +24,7 @@ public class Validator_ExactSameFolder
 	{
 		String[] argTR = 
 			{
-					"/home/tvolkmann/Master/30 Tage Bilder/Colehaan",
+					"/home/tvolkmann/Master/30 Tage Bilder/Colehaan_test",
 					"/home/tvolkmann/Master",
 					"/home/tvolkmann/Master/xlt-visual-assert/config/ai.properties",
 					"unnamed"
@@ -34,7 +33,7 @@ public class Validator_ExactSameFolder
 		String[] argTE =
 			{
 					"/home/tvolkmann/Master/unnamed.network",
-					"/home/tvolkmann/Master/30 Tage Bilder/Colehaan"
+					"/home/tvolkmann/Master/30 Tage Bilder/Colehaan_test_v"
 			};
 		
 		NetworkTrainer.main(argTR);
