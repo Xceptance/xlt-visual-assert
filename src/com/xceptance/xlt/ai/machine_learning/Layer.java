@@ -59,15 +59,6 @@ public class Layer implements Serializable
     	return Layer.instance;
     }
     
-    /**
-     * Get Neurons from layer.
-     * @return Neurons.
-     */
-    public ActivationNeuron getNeurons()
-    {
-        return activeNeuron;
-    }
-    
     /***
      * Get specified neuron from Layer.
      * @return Neuron.

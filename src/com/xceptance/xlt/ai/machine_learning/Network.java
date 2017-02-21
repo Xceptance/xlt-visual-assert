@@ -111,6 +111,7 @@ public abstract class Network implements Serializable
         internalList 			= new ArrayList<>();
         monitoringList 			= new ArrayList<>();
         internalUpdateList		= new ArrayList<>();
+        neurons					= new ArrayList<>();
         selfTest 				= true;
         useColor				= Constants.USE_COLOR_FOR_COMPARISON;
         useOriginSize			= Constants.USE_ORIGINAL_SIZE;
@@ -166,6 +167,9 @@ public abstract class Network implements Serializable
     	Constants.USE_ORIGINAL_SIZE 		= useOriginSize;
     	Constants.PERCENTAGE_DIFFERENCE		= percentageDifference;
     	Constants.LEARNING_RATE				= learningRate;
+    	Constants.THRESHOLD					= imageParameterThreshold;
+    	Constants.MINGROUPSIZE				= imageParameterGroupSize;
+    	layer.getActivationNeuron().setThreshold(threshold);
     }
     
     /**
@@ -263,29 +267,6 @@ public abstract class Network implements Serializable
     	return result;
     }
     
-//    /**
-//     * Internal list for self test.
-//     * @param list with all processed images.
-//     */
-//    public void setInternalList(ArrayList<PatternHelper> list)
-//    { 
-//    	if (selfTest)
-//    	{
-//		   	for (PatternHelper element : list)
-//		   	{
-//		   		if (internalList.contains(element))
-//		   		{
-//		   			internalList.remove(element);
-//		   			internalList.add(element);
-//		   		}
-//		   		else
-//		   		{
-//		   			internalList.add(element);
-//		   		}
-//		    }
-//    	}
-//    }
-    
     /**
      * Internal list for self test.
      * @param list with all processed images.
@@ -330,12 +311,16 @@ public abstract class Network implements Serializable
     public void setInternalParameter(Map<Integer, AverageMetric> averMetric)
     {
     	this.averMet 			= averMetric;
+    	threshold				= layer.getActivationNeuron().getThreshold();
+    	neurons.addAll(layer.getActivationNeuron().getNeurons());
     	useColor 				= Constants.USE_COLOR_FOR_COMPARISON;
     	useOriginSize 			= Constants.USE_ORIGINAL_SIZE;
     	referenceImageHeight 	= Constants.IMAGE_HEIGHT;
     	referenceImageWidth 	= Constants.IMAGE_WIDTH;
     	percentageDifference	= Constants.PERCENTAGE_DIFFERENCE;
     	learningRate			= Constants.LEARNING_RATE;
+    	imageParameterThreshold = Constants.THRESHOLD;
+    	imageParameterGroupSize	= Constants.MINGROUPSIZE;
     }
     
     /**
@@ -453,6 +438,14 @@ public abstract class Network implements Serializable
      * Network's inputs count.
      */	
     private int inputsCount;
+    
+    private int imageParameterThreshold;
+    
+    private int imageParameterGroupSize;
+    
+    public double threshold;
+    
+    public ArrayList<Neuron> neurons;
 
     /**
      * Network's output vector.

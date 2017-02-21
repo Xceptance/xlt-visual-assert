@@ -156,7 +156,7 @@ public class FastBitmap
         	this.bufferedImage 	= dimg;
     	}
     	else
-    	{  
+    	{      		
     		BufferedImage dimg 	= new BufferedImage(bufferedImage.getWidth(), bufferedImage.getHeight(), BufferedImage.TYPE_INT_RGB);
     		Image tmp 			= bufferedImage;
         	Graphics2D g2d 		= dimg.createGraphics();

@@ -10,7 +10,14 @@ import org.junit.Test;
 import com.xceptance.xlt.ai.NetworkTester;
 import com.xceptance.xlt.ai.NetworkTrainer;
 import com.xceptance.xlt.ai.image.PatternHelper;
+import com.xceptance.xlt.ai.util.Constants;
 
+/**
+ * Test if all values in both tools are equal. If the same Folder is selected all values must be the same.
+ * Validate that both tools work in an appropriate way.
+ * @author tvolkmann
+ *
+ */
 public class Validator_ExactSameFolder 
 {	
 	@BeforeClass
@@ -18,7 +25,7 @@ public class Validator_ExactSameFolder
 	{
 		String[] argTR = 
 			{
-					"/home/tvolkmann/Master/30 Tage Bilder/Deckers",
+					"/home/tvolkmann/Master/30 Tage Bilder/Colehaan",
 					"/home/tvolkmann/Master",
 					"/home/tvolkmann/Master/xlt-visual-assert/config/ai.properties",
 					"unnamed"
@@ -27,7 +34,7 @@ public class Validator_ExactSameFolder
 		String[] argTE =
 			{
 					"/home/tvolkmann/Master/unnamed.network",
-					"/home/tvolkmann/Master/30 Tage Bilder/Deckers"
+					"/home/tvolkmann/Master/30 Tage Bilder/Colehaan"
 			};
 		
 		NetworkTrainer.main(argTR);
@@ -62,6 +69,15 @@ public class Validator_ExactSameFolder
 	}
 	
 	@Test
+	public void ActivationNetworkParameter()
+	{
+		assertTrue(NetworkTrainer.an.getLayer().inputsCount == NetworkTester.an.getLayer().inputsCount);
+		assertTrue(NetworkTrainer.an.getLayer().getActivationNeuron().getInputCount() == NetworkTester.an.getLayer().getActivationNeuron().getInputCount());
+		assertTrue(NetworkTrainer.an.threshold == NetworkTester.an.getLayer().getActivationNeuron().getThreshold());
+		assertTrue(NetworkTrainer.an.getLayer().getActivationNeuron().getWeight() == NetworkTester.an.getLayer().getActivationNeuron().getWeight());		
+	}
+	
+	@Test
 	public void PatternCalculatedResult()
 	{
 		ArrayList<PatternHelper> patternListTrainer = NetworkTrainer.im.updateInternalPattern(NetworkTrainer.im.getAverageMetric(), NetworkTrainer.im.getCurator());
@@ -71,6 +87,18 @@ public class Validator_ExactSameFolder
 		{
 			assertTrue(NetworkTester.an.checkForRecognitionAsString(patternListTrainer.get(index).getPatternList()).equals(
 					   NetworkTester.an.checkForRecognitionAsString(patternListTester.get(index).getPatternList())));
+			System.out.println(NetworkTester.an.checkForRecognitionAsString(patternListTrainer.get(index).getPatternList()) +" "+ NetworkTester.an.checkForRecognitionAsString(patternListTester.get(index).getPatternList()));
+		}
+	}
+	
+	@Test
+	public void CompareNeuronWeights()
+	{
+		int size = NetworkTester.an.getLayer().getActivationNeuron().getNeurons().size();
+		
+		for (int index = 0; index < size; ++index)
+		{
+			assertTrue(NetworkTester.an.getLayer().getActivationNeuron().getNeurons().get(index).getWeight() == NetworkTrainer.an.neurons.get(index).getWeight());
 		}
 	}
 	
@@ -88,7 +116,6 @@ public class Validator_ExactSameFolder
 		PatternComparatorPatternSize(patternListTrainer, patternListTester, size);
 		PatternComparatorPatternName(patternListTrainer, patternListTester, size);
 		PatternComparatorPatternValue(patternListTrainer, patternListTester, size);
-		
 	}
 
 	private void PatternComparatorPatternSize(ArrayList<PatternHelper> patternListTrainer, ArrayList<PatternHelper> patternListTester, int size)

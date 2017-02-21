@@ -152,10 +152,11 @@ public class Helper
 		// values for the parameter THRESHOLD correspondent out of experience and testing
 		int tmpMinGrpSize = 300;
 		int tmpThreshold = 20;
-		tmpMinGrpSize = (Constants.IMAGE_WIDTH + Constants.IMAGE_HEIGHT) / 5;
+		tmpMinGrpSize = (Constants.IMAGE_WIDTH +Constants.IMAGE_HEIGHT) / 5;
 		
 		if (tmpMinGrpSize > 500)
 		{
+			tmpMinGrpSize = 400;
 			tmpThreshold = 30;
 		}
 		
@@ -385,7 +386,7 @@ public class Helper
 	 * @param width int value for scaling
 	 * @return ArrayList all found {@link FastBitmap} in the folder
 	 */
-	public static ArrayList<FastBitmap> loadAllImagesScaled_FastBitmap(String path ,int heigth, int width)
+	public static ArrayList<FastBitmap> loadAllImagesScaled_FastBitmap(String path)
 	{
 		ArrayList<FastBitmap> pictureList = new ArrayList<>();
 		File[] list = scanFolder(path);

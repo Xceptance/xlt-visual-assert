@@ -47,11 +47,6 @@ public class NetworkTester
           		imgList = an.scanFolderForChanges(args[1]);
           		im = new ImageTransformation(imgList, an.getAverageMetric(), false);
           		patternList = im.computeAverageMetric();
-            	
-          		for (PatternHelper pattern : patternList)
-            	{
-          			System.out.println(pattern.getPatternList());
-            	}
           		
             	for (PatternHelper pattern : patternList)
             	{

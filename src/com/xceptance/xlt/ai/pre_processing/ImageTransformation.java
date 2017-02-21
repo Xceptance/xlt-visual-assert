@@ -200,7 +200,7 @@ public class ImageTransformation
 				// alternative path if the network has already learned and now just compare the new metrics to the found average metric
 				else 
 				{
-					while (iter.hasNext())
+					while (iter.hasNext() && !keyList.isEmpty())
 					{
 						key = iter.next();
 						if (Helper.isInRange(averMet.get(key).getAverageGroupSize(), groupSize) && 
@@ -296,7 +296,7 @@ public class ImageTransformation
 	
 				Iterator<Integer> iter = averMetr.keySet().iterator();
 				// alternative path if the network has already learned and now just compare the new metrics to the found average metric
-				while (iter.hasNext())
+				while (iter.hasNext() && !keyList.isEmpty())
 				{
 					key = iter.next();
 					if (Helper.isInRange(averMetr.get(key).getAverageGroupSize(), groupSize) && 
@@ -377,11 +377,13 @@ public class ImageTransformation
 	 */
 	private void load(String path)
 	{
-		pictureList = Helper.loadAllImagesScaled_FastBitmap(path, Constants.IMAGE_HEIGHT, Constants.IMAGE_WIDTH);
+		pictureList = Helper.loadAllImagesScaled_FastBitmap(path);
 		Constants.NETWORK_MODE 	= true;
 		
 		if (!pictureList.isEmpty())
-		{			
+		{	
+			Constants.IMAGE_WIDTH = pictureList.get(0).getWidth();
+			Constants.IMAGE_HEIGHT = pictureList.get(0).getHeight();
 			Helper.setImageParameter();							
 		}
 		else

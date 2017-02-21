@@ -91,7 +91,6 @@ public class NetworkTrainer
     	double resultVerfication = 0.0;	 
     	for (PatternHelper pattern : patternList)
 		{
-    		System.out.println(pattern.getPatternList());
 			pl.Run(pattern.getPatternList());			
 		}    	  	
     	

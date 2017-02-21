@@ -133,7 +133,8 @@ public class Neuron implements Serializable
     public void Randomize()
     {
         double d = range.length();        
-        weight = r.nextDouble( ) * d + range.getMin();                
+//        weight = r.nextDouble( ) * d + range.getMin();
+        weight = 0.5;
     }  
     
     /**
