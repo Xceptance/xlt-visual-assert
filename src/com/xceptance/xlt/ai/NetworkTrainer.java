@@ -97,7 +97,7 @@ public class NetworkTrainer
         im = new ImageTransformation(args[0]);  
         im.computeAverageMetric();
         
-        // internal list in network for self testing and image confirmation 
+        // updated list for self testing and image confirmation 
         patternList = im.updateInternalPattern(im.getAverageMetric(), im.getCurator());
 
     	PerceptronLearning pl = new PerceptronLearning(an);

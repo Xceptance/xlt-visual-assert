@@ -45,12 +45,12 @@ public class Validator_ExactSameFolder
         File file = new File(location.getPath()).getParentFile();
         
         // /xlt-visual-assert/config
-        String propertieFile = file.toString() + file.separator + "config" + file.separator + "ai.properties";
+        String propertieFile = file.toString() + File.separator + "config" + File.separator + "ai.properties";
         
         // /xlt-visual-assert/src/test/com/xceptance/xlt/ai
-        String testFolderPath = file.toString() + file.separator + "src" + file.separator + 
-        						"test" + file.separator + "com" + file.separator + "xceptance" + 
-        						file.separator + "xlt" + file.separator + "ai" + file.separator;
+        String testFolderPath = file.toString() + File.separator + "src" + File.separator + 
+        						"test" + File.separator + "com" + File.separator + "xceptance" + 
+        						File.separator + "xlt" + File.separator + "ai" + File.separator;
                
      // images for the Exact-Same-Folder (ESF) test
      		String testFolderName 	= "Test_Images_ESF";		
@@ -120,7 +120,6 @@ public class Validator_ExactSameFolder
 		{
 			assertTrue(NetworkTester.an.checkForRecognitionAsString(patternListTrainer.get(index).getPatternList()).equals(
 					   NetworkTester.an.checkForRecognitionAsString(patternListTester.get(index).getPatternList())));
-			System.out.println(NetworkTester.an.checkForRecognitionAsString(patternListTrainer.get(index).getPatternList()) +" "+ NetworkTester.an.checkForRecognitionAsString(patternListTester.get(index).getPatternList()));
 		}
 	}
 	
