@@ -261,6 +261,7 @@ public class ImageTransformation
 			histoBlueMean		= 1.0; 
 			recognizeFlag 		= false;
 			isEmptyFlag 		= false;
+			keyList.clear();
 			foundPattern.add(pattern);			
 		}
 		return foundPattern;
@@ -351,7 +352,8 @@ public class ImageTransformation
 			histoGreenMean		= 1.0;
 			histoBlueMean		= 1.0; 
 			recognizeFlag 		= false;
-			foundPattern.add(pattern);			
+			keyList.clear();
+			foundPattern.add(pattern);	
 		}
 		return foundPattern;
 	}
