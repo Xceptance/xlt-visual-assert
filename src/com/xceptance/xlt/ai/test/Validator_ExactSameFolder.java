@@ -52,8 +52,8 @@ public class Validator_ExactSameFolder
         						"test" + File.separator + "com" + File.separator + "xceptance" + 
         						File.separator + "xlt" + File.separator + "ai" + File.separator;
                
-     // images for the Exact-Same-Folder (ESF) test
-     		String testFolderName 	= "Test_Images_ESF";		
+        // images for the Exact-Same-Folder (ESF) test
+     	String testFolderName 	= "Test_Images_ESF";		
 		String completteFolderName 	= testFolderPath + testFolderName; 
         
 		String[] argTR = 

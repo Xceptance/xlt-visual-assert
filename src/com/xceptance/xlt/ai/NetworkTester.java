@@ -16,13 +16,16 @@
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 package com.xceptance.xlt.ai;
 
+import java.io.File;
 import java.util.ArrayList;
 import com.xceptance.xlt.ai.image.FastBitmap;
+import com.xceptance.xlt.ai.image.Highlighter;
 import com.xceptance.xlt.ai.image.PatternHelper;
 import com.xceptance.xlt.ai.machine_learning.ActivationNetwork;
 import com.xceptance.xlt.ai.machine_learning.BipolarSigmoidFunction;
 import com.xceptance.xlt.ai.pre_processing.ImageTransformation;
 import com.xceptance.xlt.ai.util.Constants;
+import com.xceptance.xlt.ai.util.Helper;
 
 /**
  * The NetworkTester tool take two arguments. The first argument is for the network location. 
@@ -63,9 +66,13 @@ public class NetworkTester
           		im = new ImageTransformation(imgList, an.getAverageMetric(), false);
          		patternList = im.computeAverageMetric();
          		
+         		int index = 0;
             	for (PatternHelper pattern : patternList)
-            	{
+            	{            		
             		System.out.println("Recognized value of image " + pattern.getTagName() + " = " + an.checkForRecognitionAsString(pattern.getPatternList()) + " %");
+//            		Highlighter hLight = new Highlighter(imgList.get(index), an.getAverageMetric(), pattern);
+//            		Helper.saveImage(hLight.getMarkedImage(), new File(args[0] + index));
+            		++index;
             	}
           	}
         }

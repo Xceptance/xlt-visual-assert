@@ -31,6 +31,7 @@ import com.xceptance.xlt.ai.corner.FastCornersDetector.Algorithm;
 import com.xceptance.xlt.ai.image.AverageMetric;
 import com.xceptance.xlt.ai.image.Convolution;
 import com.xceptance.xlt.ai.image.FastBitmap;
+import com.xceptance.xlt.ai.image.Metric;
 import com.xceptance.xlt.ai.image.MetricCurator;
 import com.xceptance.xlt.ai.image.PatternHelper;
 import com.xceptance.xlt.ai.util.Constants;
@@ -159,17 +160,18 @@ public class ImageTransformation
 			for (int ind = 0; ind < maxSize; ++ind)
 			{
 				int key 			= 0;
-				groupSize 		 	= pp.get(index).getMetricCurator().metricList.get(ind).getGroupSize();
-				boundingBoxSize 	= pp.get(index).getMetricCurator().metricList.get(ind).getBoundingBoxDistance();
-				distanceMin 		= pp.get(index).getMetricCurator().metricList.get(ind).getMinDistanceToZero();
-				distanceMax 		= pp.get(index).getMetricCurator().metricList.get(ind).getMaxDistanceToZero();		
-				centerOfGravity.Add(pp.get(index).getMetricCurator().metricList.get(ind).getCenterOfGravity());
+				Metric met 			= mc.metricList.get(ind);
+				groupSize 		 	= met.getGroupSize();
+				boundingBoxSize 	= met.getBoundingBoxDistance();
+				distanceMin 		= met.getMinDistanceToZero();
+				distanceMax 		= met.getMaxDistanceToZero();		
+				centerOfGravity.Add(met.getCenterOfGravity());
 				
 				if (Constants.USE_COLOR_FOR_COMPARISON)
 				{
-					histoRedMean		= pp.get(index).getMetricCurator().metricList.get(ind).getImageStatistic().getHistogramRed().getMean();
-					histoGreenMean		= pp.get(index).getMetricCurator().metricList.get(ind).getImageStatistic().getHistogramGreen().getMean();
-					histoBlueMean		= pp.get(index).getMetricCurator().metricList.get(ind).getImageStatistic().getHistogramBlue().getMean();
+					histoRedMean		= met.getImageStatistic().getHistogramRed().getMean();
+					histoGreenMean		= met.getImageStatistic().getHistogramGreen().getMean();
+					histoBlueMean		= met.getImageStatistic().getHistogramBlue().getMean();
 				}
 	
 				Iterator<Integer> iter = averMet.keySet().iterator();
@@ -178,6 +180,7 @@ public class ImageTransformation
 				if (isEmptyFlag)
 				{
 					averMet.put(ind, new AverageMetric(groupSize, boundingBoxSize, distanceMin, distanceMax, centerOfGravity, histoRedMean, histoGreenMean, histoBlueMean));
+					averMet.get(ind).newBoundingBox(met.getBoundingBoxMin(), met.getBoundingBoxMax());
 					recognizeFlag = true;
 				}
 				// if training is activated and the average metric is not empty analyze the new metric in relevance to the average metric					
@@ -199,6 +202,7 @@ public class ImageTransformation
 							if (keyList.contains(key))
 							{
 								averMet.get(key).update(groupSize, boundingBoxSize, distanceMin, distanceMax, centerOfGravity, histoRedMean, histoGreenMean, histoBlueMean);
+								averMet.get(key).updateBoundingBox(met.getBoundingBoxMin(), met.getBoundingBoxMax());
 								recognizeFlag = true;
 								keyList.remove(keyList.indexOf(key));
 								break;
@@ -209,6 +213,7 @@ public class ImageTransformation
 					if (!recognizeFlag)
 					{
 						averMet.put(key + 1, new AverageMetric(groupSize, boundingBoxSize, distanceMin, distanceMax, centerOfGravity, histoRedMean, histoGreenMean, histoBlueMean));
+						averMet.get(key +1).newBoundingBox(met.getBoundingBoxMin(), met.getBoundingBoxMax());
 						recognizeFlag = false;
 						keyList.add(key + 1);
 					}		
@@ -298,17 +303,18 @@ public class ImageTransformation
 			for (int ind = 0; ind < maxSize; ++ind)
 			{
 				int key 			= 0;
-				groupSize 		 	= ppList.get(index).getMetricCurator().metricList.get(ind).getGroupSize();
-				boundingBoxSize 	= ppList.get(index).getMetricCurator().metricList.get(ind).getBoundingBoxDistance();
-				distanceMin 		= ppList.get(index).getMetricCurator().metricList.get(ind).getMinDistanceToZero();
-				distanceMax 		= ppList.get(index).getMetricCurator().metricList.get(ind).getMaxDistanceToZero();		
-				centerOfGravity.Add(ppList.get(index).getMetricCurator().metricList.get(ind).getCenterOfGravity());
+				Metric met 			= mc.metricList.get(ind);
+				groupSize 		 	= met.getGroupSize();
+				boundingBoxSize 	= met.getBoundingBoxDistance();
+				distanceMin 		= met.getMinDistanceToZero();
+				distanceMax 		= met.getMaxDistanceToZero();		
+				centerOfGravity.Add(met.getCenterOfGravity());
 				
 				if (Constants.USE_COLOR_FOR_COMPARISON)
 				{
-					histoRedMean		= ppList.get(index).getMetricCurator().metricList.get(ind).getImageStatistic().getHistogramRed().getMean();
-					histoGreenMean		= ppList.get(index).getMetricCurator().metricList.get(ind).getImageStatistic().getHistogramGreen().getMean();
-					histoBlueMean		= ppList.get(index).getMetricCurator().metricList.get(ind).getImageStatistic().getHistogramBlue().getMean();
+					histoRedMean		= met.getImageStatistic().getHistogramRed().getMean();
+					histoGreenMean		= met.getImageStatistic().getHistogramGreen().getMean();
+					histoBlueMean		= met.getImageStatistic().getHistogramBlue().getMean();
 				}
 	
 				Iterator<Integer> iter = averMetr.keySet().iterator();
@@ -386,7 +392,7 @@ public class ImageTransformation
 			Helper.updatePercentageBar((double)index / (double)pictureList.size(), estimatedTime, pictureList.size(), index);
 			index++;
 		}
-		pictureList.clear();
+//		pictureList.clear();
 		System.out.println("");
 	}
 	

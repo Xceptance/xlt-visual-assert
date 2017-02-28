@@ -18,7 +18,9 @@
 package com.xceptance.xlt.ai.image;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
+import com.xceptance.xlt.ai.core.FeaturePoint;
 import com.xceptance.xlt.ai.core.FloatPoint;
 
 /***
@@ -56,6 +58,9 @@ public class AverageMetric implements Serializable
 		averageHistoRedMean			= histoRedMean;
 		averageHistoGreenMean		= histoGreenMean;
 		averageHistoBlueMean		= histoBlueMean;
+		boundingBox					= new ArrayList<>();
+		boundingBox.add(new FeaturePoint(0,0));
+		boundingBox.add(new FeaturePoint(0,0));
 		itemCounter 				= 2;
 	}
 	
@@ -89,6 +94,23 @@ public class AverageMetric implements Serializable
 		averageHistoGreenMean		= (histoGreenMean == 0 ? averageHistoGreenMean : averageHistoGreenMean/itemCounter);
 		averageHistoBlueMean		= (histoBlueMean  == 0 ? averageHistoBlueMean : averageHistoBlueMean/itemCounter);
 		averageCenterOfGravity.Divide(itemCounter);		
+	}
+	
+	public void newBoundingBox(FeaturePoint min, FeaturePoint max)
+	{
+		boundingBox.set(0, new FeaturePoint(min.x,min.y));
+		boundingBox.set(1, new FeaturePoint(max.x,max.y));
+	}
+	
+	public void updateBoundingBox(FeaturePoint min, FeaturePoint max)
+	{
+		boundingBox.set(0, new FeaturePoint( ((boundingBox.get(0).x + min.x) / itemCounter) , (boundingBox.get(0).y + min.y) / itemCounter)); 
+		boundingBox.set(1, new FeaturePoint( ((boundingBox.get(1).x + max.x) / itemCounter)  , (boundingBox.get(1).y + max.y)/ itemCounter));	
+	}
+	
+	public ArrayList<FeaturePoint> getBoundingBox()
+	{
+		return boundingBox;
 	}
 	
 	/***
@@ -207,4 +229,6 @@ public class AverageMetric implements Serializable
 	 * Value for dividing and create the average value.
 	 */
 	private int itemCounter;	
+	
+	private ArrayList<FeaturePoint> boundingBox;
 }
