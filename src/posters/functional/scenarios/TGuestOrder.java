@@ -10,7 +10,7 @@ import com.xceptance.xlt.api.engine.scripting.ScriptName;
  * <p>Simulates browsing the catalog, adding product(s) to the cart, checkout as guest and place the order.</p>
  */
 @ScriptName
-("posters.functional.scenarios.TGuestOrder")
+("posters.functional.scenarios.TGuestOrderAI")
 public class TGuestOrder extends AbstractScriptTestCase
 {
 }

@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<javamodule xmlns="http://xlt.xceptance.com/xlt-script/2" version="6" class="com.xceptance.xlt.ai.AI">
+ <description>Call the java code for AI and take the destination folder as parameter.</description> 
+ <parameter name="name"/>
+</javamodule>
