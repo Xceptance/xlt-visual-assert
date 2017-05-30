@@ -130,8 +130,7 @@ Algorithms in Detail
 Any difference will be reported.
 
 ### Fuzzy
-The fuzziness is reached by tolerating a small amount of pixels being different for every small block in the picture. The property ```com.xceptance.xlt.visualassertion.fuzzy.blocksize.xy
-``` determines the size of each of these blocks. The entire screenshot will be divided into these blocks.
+The fuzziness is reached by tolerating a small amount of pixels being different for every small block in the picture. The property ```com.xceptance.xlt.visualassertion.fuzzy.blocksize.xy``` determines the size of each of these blocks. The entire screenshot will be divided into these blocks.
 
 So when you have 10x10 blocks, a fuzzy factor (```com.xceptance.xlt.visualassertion.tolerance.pixels```) of 0.1 indicates, that 10% of the pixels can be different. So we will tolerate a difference of 10 pixels in total for this area.
 
