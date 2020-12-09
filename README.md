@@ -1,10 +1,14 @@
 Visual Regression Testing with XLT
 ==================================
 
+Deprecation Note
+------------
+This test suite is deprecated but you can still try to use its base concept and borrow the library for other similar topics.
+
 Introduction
 ------------
 
-XLT is a tool for functional test automation as well as load and performance testing. This test suite is meant to be the base for functional test automation with visual verification and can be easily combined with any existing XLT test suite you might already have (see: https://github.com/Xceptance/SiteGenesis-Community-TestSuite).
+XLT is a tool for functional test automation as well as load and performance testing. This test suite is meant to be the base for functional test automation with visual verification and can be easily combined with any existing XLT test suite.
 
 ### Validation
 
